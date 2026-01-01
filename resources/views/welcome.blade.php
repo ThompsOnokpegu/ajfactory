@@ -25,7 +25,7 @@
             
             <nav class="flex items-center justify-between py-8">
                 <div class="text-2xl font-black tracking-tighter italic">
-                    <span class="text-purple-500">AJ</span>.FACTORY
+                    AJ.<span class="text-purple-500">THOMPSON</span>
                 </div>
                 <a href="#contact" class="hidden md:block text-sm font-mono text-zinc-400 hover:text-white transition uppercase tracking-widest">
                     // Book Workflow Audit
@@ -34,52 +34,52 @@
 
             <main class="grid lg:grid-cols-2 gap-16 items-start py-16 lg:py-24">
     
-    <div class="space-y-6">
-        {{-- <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-orange-500 text-[10px] font-black uppercase tracking-[0.2em]">
-            Status: Eliminating Lead Decay
-        </div> --}}
+                <div class="space-y-6">
+                    {{-- <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-orange-500/10 border border-orange-500/20 text-orange-500 text-[10px] font-black uppercase tracking-[0.2em]">
+                        Status: Eliminating Lead Decay
+                    </div> --}}
 
-        <h1 class="text-6xl lg:text-8xl font-black leading-[0.85] tracking-tighter font-['Space_Grotesk'] uppercase italic">
-            STOP MISSING <br>
-            <span class="text-orange-500">THE LEADS</span> <br>
-            YOU PAID FOR.
-        </h1>
+                    <h1 class="text-6xl lg:text-8xl font-black leading-[0.85] tracking-tighter font-['Space_Grotesk'] uppercase italic">
+                        STOP MISSING <br>
+                        <span class="text-orange-500">THE LEADS</span> <br>
+                        YOU PAID FOR.
+                    </h1>
 
-        <div class="max-w-md space-y-4">
-            <p class="text-lg text-zinc-300 leading-snug">
-                You’re on the job site. Your ads are running. But every lead you don't answer within 5 minutes is a lead you've lost to the competition.
-            </p>
-            <p class="text-zinc-500 font-mono text-sm leading-relaxed">
-                I build automation infrastructure that intercepts, qualifies, and books your leads 24/7. Focus on the work. Let the "Factory" handle the phone.
-            </p>
-        </div>
+                    <div class="max-w-md space-y-4">
+                        <p class="text-lg text-zinc-300 leading-snug">
+                            You’re on the job site. Your ads are running. But every lead you don't answer within 5 minutes is a lead you've lost to the competition.
+                        </p>
+                        <p class="text-zinc-500 font-mono text-sm leading-relaxed">
+                            I build automation pipelines that intercepts, qualifies, and books your leads 24/7. Focus on the work. Let the "Factory" handle the phone.
+                        </p>
+                    </div>
 
-        <div class="flex items-center gap-6 pt-4">
-            <div class="text-center">
-                <div class="text-2xl font-bold text-white leading-none">10s</div>
-                <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Response</div>
-            </div>
-            <div class="h-8 w-px bg-zinc-800"></div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-white leading-none">24/7</div>
-                <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Availability</div>
-            </div>
-            <div class="h-8 w-px bg-zinc-800"></div>
-            <div class="text-center">
-                <div class="text-2xl font-bold text-white leading-none">0</div>
-                <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Missed Ops</div>
-            </div>
-        </div>
-    </div>
+                    <div class="flex items-center gap-6 pt-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white leading-none">10s</div>
+                            <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Response</div>
+                        </div>
+                        <div class="h-8 w-px bg-zinc-800"></div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white leading-none">24/7</div>
+                            <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Availability</div>
+                        </div>
+                        <div class="h-8 w-px bg-zinc-800"></div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-white leading-none">0</div>
+                            <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Missed Ops</div>
+                        </div>
+                    </div>
+                </div>
 
-    <div class="relative sticky top-8">
-        <div class="absolute -top-6 -left-6 bg-orange-500 text-black px-4 py-1 text-xs font-black uppercase tracking-widest rotate-[-2deg] z-20">
-            Workflow Audit
-        </div>
-        <livewire:lead-demo-form />
-    </div>
+                <div class="relative sticky top-8">
+                    <div class="absolute -top-6 -left-6 bg-orange-500 text-black px-4 py-1 text-xs font-black uppercase tracking-widest rotate-[-2deg] z-20">
+                        Workflow Audit
+                    </div>
+                    <livewire:lead-demo-form />
+                </div>
 
-</main>
+            </main>
 
             <div class="border-t border-zinc-900 py-12 mt-12">
                 <p class="text-center text-zinc-600 text-xs font-mono uppercase tracking-widest mb-8">Built on Enterprise Standards</p>

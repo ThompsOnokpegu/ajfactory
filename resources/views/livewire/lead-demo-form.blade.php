@@ -43,7 +43,7 @@ new class extends Component {
                 'phone' => $this->phone,
                 'preference' => $this->preference,
                 'volume' => $this->volume,
-                'source' => 'website_demo'
+                'source' => 'website_form'
             ]);
 
             // 4. Handle Success
@@ -62,6 +62,7 @@ new class extends Component {
         } catch (\Exception $e) {
             // Handle connection failure
             $this->statusMessage = "Connection Interrupted. Re-attempting...";
+            Log::error($e);
             // In production, you might log this error: \Log::error($e);
         }
 
@@ -132,7 +133,7 @@ new class extends Component {
 
             <!-- CONTACT PREFERENCE TOGGLE -->
             <div class="space-y-2">
-                <label class="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 ml-1">Select Contact Option</label>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 ml-1">Contact Preference</label>
                 <div class="bg-zinc-900 p-1 rounded-xl flex gap-1 border border-zinc-800">
                     <button type="button" 
                         wire:click="$set('preference', 'voice')"
@@ -141,7 +142,7 @@ new class extends Component {
                     </button>
                     <button type="button" 
                         wire:click="$set('preference', 'whatsapp')"
-                        class="flex-1 py-2.5 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {{ $preference === 'whatsapp' ? 'bg-green-600 text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300' }}">
+                        class="flex-1 py-2.5 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {{ $preference === 'whatsapp' ? 'bg-[#2FA422] text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300' }}">
                         WhatsApp
                     </button>
                 </div>
@@ -152,7 +153,7 @@ new class extends Component {
                     wire:loading.attr="disabled" 
                     class="w-full relative group/btn bg-white text-black font-black py-4 rounded-lg overflow-hidden transition-all hover:bg-orange-500 hover:text-white">
                 <div class="relative z-10 flex items-center justify-center gap-2">
-                    <span wire:loading.remove class="uppercase tracking-tighter text-lg">Deploy Automation</span>
+                    <span wire:loading.remove class="uppercase tracking-tighter text-lg">Request Audit</span>
                     <span wire:loading class="uppercase tracking-tighter text-lg animate-pulse italic">Connecting Factory...</span>
                 </div>
             </button>
