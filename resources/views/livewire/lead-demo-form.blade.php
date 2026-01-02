@@ -8,6 +8,8 @@ use Illuminate\Validation\Rule;
 new class extends Component {
     public string $name = '';
     public string $phone = '';
+    public string $business_name = '';
+    public string $email = '';
     public string $preference = 'voice'; 
     public string $volume = '';
     public string $statusMessage = '';
@@ -18,6 +20,8 @@ new class extends Component {
         // 1. Validate Inputs
         $this->validate([
             'name' => ['required', 'min:2'],
+            'business_name' => ['required', 'min:2'],
+            'email' => ['required', 'email'],
             'phone' => ['required', 'min:10'],
             'volume' => ['required'],
         ]);
@@ -29,6 +33,8 @@ new class extends Component {
             // 2. Save Lead to Database
             $lead = Lead::create([
                 'name' => $this->name,
+                'business_name' => $this->business_name,
+                'email' => $this->email,
                 'phone' => $this->phone,
                 'contact_preference' => $this->preference,
                 'estimated_leads_per_month' => $this->volume,
@@ -40,6 +46,8 @@ new class extends Component {
             $response = Http::timeout(5)->post(config('services.n8n.webhook_url'), [
                 'lead_id' => $lead->id,
                 'name' => $this->name,
+                'business_name' => $this->business_name,
+                'email' => $this->email,
                 'phone' => $this->phone,
                 'preference' => $this->preference,
                 'volume' => $this->volume,
@@ -53,7 +61,7 @@ new class extends Component {
                     : "PROTOCOL OPENED. Check your WhatsApp now.";
                 
                 // Optional: Reset form fields
-                $this->reset(['name', 'phone', 'volume']);
+                $this->reset(['name', 'business_name', 'email', 'phone', 'volume']);
             } else {
                 // Handle n8n error (e.g. 500 or 404)
                 $this->statusMessage = "System Busy. Your lead has been queued manually.";
@@ -84,77 +92,65 @@ new class extends Component {
             </div>
         @endif
 
-        <form wire:submit="submit" class="space-y-5">
-            
-            <!-- IDENTITY INPUTS -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="space-y-1">
-                    <input type="text" 
-                           wire:model.blur="name" 
-                           placeholder="Full Name" 
-                           class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-all">
-                    @error('name') 
-                        <span class="text-[8px] text-red-500 font-black uppercase tracking-widest">{{ $message }}</span> 
-                    @enderror
-                </div>
-                <div class="space-y-1">
-                    <input type="text" 
-                           wire:model.blur="phone" 
-                           placeholder="Mobile Number" 
-                           class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-all">
-                    @error('phone') 
-                        <span class="text-[8px] text-red-500 font-black uppercase tracking-widest">{{ $message }}</span> 
-                    @enderror
-                </div>
-            </div>
-
-            <!-- VOLUME SELECTOR -->
+        <form wire:submit.prevent="submit" class="space-y-4">
+            <!-- Full Name -->
             <div class="space-y-1">
-                <label class="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 ml-1">Current Monthly Volume</label>
-                <div class="relative">
-                    <select wire:model="volume" 
-                            class="w-full bg-zinc-900 border-zinc-800 text-zinc-500 rounded-lg p-3 text-sm focus:border-purple-500 focus:ring-0 transition-all cursor-pointer appearance-none">
-                        <option value="">Select Capacity...</option>
-                        <option value="1-20">1 - 20 Leads / Month</option>
-                        <option value="21-100">21 - 100 Leads / Month</option>
-                        <option value="100+">100+ Leads / Month</option>
-                    </select>
-                    <!-- Custom Arrow Icon -->
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-zinc-500">
-                        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </div>
-                </div>
-                @error('volume') 
-                    <span class="text-[8px] text-red-500 font-black uppercase tracking-widest">{{ $message }}</span> 
-                @enderror
+                <input type="text" wire:model="name" placeholder="Contact Name" 
+                    class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
+                @error('name') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
             </div>
 
-            <!-- CONTACT PREFERENCE TOGGLE -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-2 ml-1">Contact Preference</label>
-                <div class="bg-zinc-900 p-1 rounded-xl flex gap-1 border border-zinc-800">
-                    <button type="button" 
-                        wire:click="$set('preference', 'voice')"
-                        class="flex-1 py-2.5 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {{ $preference === 'voice' ? 'bg-orange-500 text-black shadow-lg' : 'text-zinc-500 hover:text-zinc-300' }}">
-                        Voice Call
-                    </button>
-                    <button type="button" 
-                        wire:click="$set('preference', 'whatsapp')"
-                        class="flex-1 py-2.5 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {{ $preference === 'whatsapp' ? 'bg-[#2FA422] text-white shadow-lg' : 'text-zinc-500 hover:text-zinc-300' }}">
-                        WhatsApp
-                    </button>
+            <!-- Business/Clinic Name -->
+            <div class="space-y-1">
+                <input type="text" wire:model="business_name" placeholder="Clinic / Business Name" 
+                    class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
+                @error('business_name') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <!-- Email Address -->
+                <div class="space-y-1">
+                    <input type="email" wire:model="email" placeholder="Email Address" 
+                        class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
+                    @error('email') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
+                </div>
+                <!-- Phone -->
+                <div class="space-y-1">
+                    <input type="text" wire:model="phone" placeholder="Mobile Number" 
+                        class="w-full bg-zinc-900 border-zinc-900 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
+                    @error('phone') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
                 </div>
             </div>
 
-            <!-- SUBMIT ACTION -->
-            <button type="submit" 
-                    wire:loading.attr="disabled" 
-                    class="w-full relative group/btn bg-white text-black font-black py-4 rounded-lg overflow-hidden transition-all hover:bg-orange-500 hover:text-white">
+            <div class="space-y-1">
+                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600 mb-2 ml-1">Current Monthly Lead Volume</label>
+                <select wire:model="volume" class="w-full bg-zinc-900 border-zinc-800 text-white rounded-lg p-3 text-sm focus:border-purple-500 focus:ring-0 transition-colors cursor-pointer appearance-none">
+                    <option value="">Select Scale...</option>
+                    <option value="1-20">1-20 (Getting Started)</option>
+                    <option value="21-100">21-100 (Scaling Clinic)</option>
+                    <option value="100+">100+ (High Velocity)</option>
+                </select>
+                @error('volume') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
+            </div>
+
+            <div class="bg-zinc-900/50 p-1 rounded-xl flex gap-1 border border-zinc-800/50 mt-2">
+                <button type="button" 
+                    wire:click="$set('preference', 'voice')"
+                    class="flex-1 py-2.5 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {{ $preference === 'voice' ? 'bg-orange-500 text-black shadow-lg shadow-orange-500/20' : 'text-zinc-500 hover:text-zinc-300' }}">
+                    Voice Call
+                </button>
+                <button type="button" 
+                    wire:click="$set('preference', 'whatsapp')"
+                    class="flex-1 py-2.5 px-4 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all {{ $preference === 'whatsapp' ? 'bg-green-600 text-white shadow-lg shadow-green-600/20' : 'text-zinc-500 hover:text-zinc-300' }}">
+                    WhatsApp
+                </button>
+            </div>
+
+            <button type="submit" wire:loading.attr="disabled" 
+                class="group relative w-full bg-white text-black font-black py-4 rounded-lg overflow-hidden transition-all hover:bg-orange-500 hover:text-white mt-4">
                 <div class="relative z-10 flex items-center justify-center gap-2">
-                    <span wire:loading.remove class="uppercase tracking-tighter text-lg">Request Audit</span>
-                    <span wire:loading class="uppercase tracking-tighter text-lg animate-pulse italic">Connecting Factory...</span>
+                    <span wire:loading.remove class="uppercase tracking-tighter text-lg">Initiate Factory Audit</span>
+                    <span wire:loading class="uppercase tracking-tighter text-lg animate-pulse italic">Connecting Core...</span>
                 </div>
             </button>
         </form>

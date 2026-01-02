@@ -37,6 +37,7 @@ return [
     
     'n8n' => [
         'webhook_url' => env('N8N_WEBHOOK_URL'),
+        'student_webhook_url' => env('N8N_STUDENT_WEBHOOK_URL'),
     ],
 
 ];

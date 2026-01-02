@@ -4,6 +4,11 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
 
+
+
+Route::get('/builders', function () {
+    return view('builders');
+});
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
