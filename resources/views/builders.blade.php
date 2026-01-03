@@ -25,7 +25,7 @@
                 </a>
             </nav>
 
-            <main class="flex-1 flex items-center justify-center -mt-20">
+            <main class="flex-1 flex items-center justify-center sm:-mt-20">
                 <livewire:student-waitlist />
             </main>
 

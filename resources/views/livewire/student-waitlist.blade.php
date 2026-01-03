@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 new class extends Component {
+    public string $name = '';
     public string $email = '';
     public string $whatsapp = '';
     public string $interest = 'course';
@@ -13,6 +14,7 @@ new class extends Component {
     public function join()
     {
         $this->validate([
+            'name' => 'required|min:2',
             'email' => 'required|email',
             'whatsapp' => 'required|min:10',
         ]);
@@ -21,6 +23,7 @@ new class extends Component {
         if (DB::table('students')->where('email', $this->email)->doesntExist()) {
             // 1. Save to Database
             DB::table('students')->insert([
+                'name' => $this->name,
                 'email' => $this->email,
                 'whatsapp' => $this->whatsapp, // Ensure you run a migration for this column
                 'interest' => $this->interest,
@@ -33,6 +36,7 @@ new class extends Component {
                 // Using a specific student webhook URL or the main one with a 'type'
                 Http::post(config('services.n8n.student_webhook_url', env('N8N_STUDENT_WEBHOOK_URL')), [
                     'type' => 'student_signup',
+                    'name' => $this->name,
                     'email' => $this->email,
                     'whatsapp' => $this->whatsapp,
                     'interest' => $this->interest,
@@ -84,6 +88,9 @@ new class extends Component {
                 <input type="text" wire:model="whatsapp" placeholder="WhatsApp Number" 
                     class="w-full bg-zinc-950 border-zinc-800 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-3 placeholder-zinc-600 font-mono">
                 @error('whatsapp') <span class="text-[10px] text-red-500 ml-1">{{ $message }}</span> @enderror
+                <input type="text" wire:model="name" placeholder="Full Name" 
+                    class="w-full bg-zinc-950 border-zinc-800 text-white text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-3 placeholder-zinc-600 font-mono">
+                @error('name') <span class="text-[10px] text-red-500 ml-1">{{ $message }}</span> @enderror
                 
                 <button wire:click="join" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black uppercase tracking-wider text-xs py-4 rounded-lg transition-all shadow-lg shadow-cyan-600/20 mt-2">
                     Join Waitlist
