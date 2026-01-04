@@ -9,6 +9,7 @@ new class extends Component {
     public string $name = '';
     public string $phone = '';
     public string $business_name = '';
+    public string $website = '';
     public string $email = '';
     public string $preference = 'voice'; 
     public string $volume = '';
@@ -21,6 +22,7 @@ new class extends Component {
         $this->validate([
             'name' => ['required', 'min:2'],
             'business_name' => ['required', 'min:2'],
+            'website' => ['url'],
             'email' => ['required', 'email'],
             'phone' => ['required', 'min:10'],
             'volume' => ['required'],
@@ -34,6 +36,7 @@ new class extends Component {
             $lead = Lead::create([
                 'name' => $this->name,
                 'business_name' => $this->business_name,
+                'website' => $this->website,
                 'email' => $this->email,
                 'phone' => $this->phone,
                 'contact_preference' => $this->preference,
@@ -47,6 +50,7 @@ new class extends Component {
                 'lead_id' => $lead->id,
                 'name' => $this->name,
                 'business_name' => $this->business_name,
+                'website' => $this->website,
                 'email' => $this->email,
                 'phone' => $this->phone,
                 'preference' => $this->preference,
@@ -101,10 +105,18 @@ new class extends Component {
             </div>
 
             <!-- Business/Clinic Name -->
-            <div class="space-y-1">
-                <input type="text" wire:model="business_name" placeholder="Clinic / Business Name" 
-                    class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
-                @error('business_name') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <input type="text" wire:model="business_name" placeholder="Business Name" 
+                        class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
+                    @error('business_name') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
+                </div>
+                <!-- Website URL -->
+                <div class="space-y-1">
+                    <input type="text" wire:model="website" placeholder="Website URL (optional)" 
+                        class="w-full bg-zinc-900 border-zinc-800 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
+                    @error('website') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -116,7 +128,7 @@ new class extends Component {
                 </div>
                 <!-- Phone -->
                 <div class="space-y-1">
-                    <input type="text" wire:model="phone" placeholder="Mobile Number" 
+                    <input type="text" wire:model="phone" placeholder="WhatsApp Number" 
                         class="w-full bg-zinc-900 border-zinc-900 text-white placeholder-zinc-700 rounded-lg p-3 text-sm focus:border-orange-500 focus:ring-0 transition-colors">
                     @error('phone') <span class="text-[10px] text-red-500 font-bold uppercase tracking-tighter">{{ $message }}</span> @enderror
                 </div>
@@ -149,7 +161,7 @@ new class extends Component {
             <button type="submit" wire:loading.attr="disabled" 
                 class="group relative w-full bg-white text-black font-black py-4 rounded-lg overflow-hidden transition-all hover:bg-orange-500 hover:text-white mt-4">
                 <div class="relative z-10 flex items-center justify-center gap-2">
-                    <span wire:loading.remove class="uppercase tracking-tighter text-lg">Initiate Factory Audit</span>
+                    <span wire:loading.remove class="uppercase tracking-tighter text-lg">Initiate Workflow Audit</span>
                     <span wire:loading class="uppercase tracking-tighter text-lg animate-pulse italic">Connecting Core...</span>
                 </div>
             </button>
