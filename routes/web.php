@@ -1,47 +1,58 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 use Livewire\Volt\Volt;
+use App\Http\Middleware\CheckEnrollment;
+use App\Http\Controllers\VaultController;
 
+/*
+|--------------------------------------------------------------------------
+| Public Marketing & Sales Routes
+|--------------------------------------------------------------------------
+*/
 
+// Agency Landing Page (Business Clients)
+Route::get('/', function () {
+    return view('welcome');
+});
 
+// Builders Landing Page (TikTok Waitlist)
 Route::get('/builders', function () {
     return view('builders');
 });
+
+// Accelerator Sales Page
 Route::get('/accelerator', function () {
     return view('accelerator');
 });
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
 
+// Dedicated Checkout Page
 Route::get('/checkout', function () {
     return view('checkout');
-})->name('checkout');
+});
 
-// This treats the file as a full Livewire component
-Volt::route('/thank-you', 'thank-you')->name('thank-you');
+// Thank You / Verification Page
+Volt::route('/thank-you', 'thank-you');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| Authenticated Member Routes
+|--------------------------------------------------------------------------
+*/
 
-Route::middleware(['auth'])->group(function () {
-    Route::redirect('settings', 'settings/profile');
+// 1. The "Home" Fix: Redirects any default Laravel 'home' calls to dashboard
+Route::get('/home', function () {
+    return redirect()->route('dashboard');
+})->middleware(['auth'])->name('home');
 
-    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
-    Volt::route('settings/password', 'settings.password')->name('user-password.edit');
-    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+// 2. Protected Member Terminal
+Route::middleware(['auth', CheckEnrollment::class])->group(function () {
+    
+    // The Main Member Dashboard
+    Volt::route('/dashboard', 'dashboard.terminal')->name('dashboard');
 
-    Volt::route('settings/two-factor', 'settings.two-factor')
-        ->middleware(
-            when(
-                Features::canManageTwoFactorAuthentication()
-                    && Features::optionEnabled(Features::twoFactorAuthentication(), 'confirmPassword'),
-                ['password.confirm'],
-                [],
-            ),
-        )
-        ->name('two-factor.show');
+    // Secure Snapshot Vault Downloads
+    Route::get('/vault/download/{lessonId}', [VaultController::class, 'download'])
+        ->name('vault.download');
+
 });
