@@ -15,6 +15,7 @@ class EnrollmentController extends Controller
      */
     public function handleWebhook(Request $request)
     {
+        Log::info('Paystack Webhook Received', $request->all());
         $paystackSignature = $request->header('x-paystack-signature');
         $secretKey = config('services.paystack.secret_key');
 
