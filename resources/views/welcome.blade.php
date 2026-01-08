@@ -29,7 +29,7 @@
                 </div>
                 <div class="flex items-center gap-6">
                     <!-- Added Builders Link -->
-                    <a href="/builders" class="md:block text-xs font-mono text-cyan-500 hover:text-cyan-400 uppercase tracking-widest transition">
+                    <a href="/accelerator" class="md:block text-xs font-mono text-cyan-500 hover:text-cyan-400 uppercase tracking-widest transition">
                         For Builders
                     </a>
                 </div>

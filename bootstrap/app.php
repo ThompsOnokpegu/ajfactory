@@ -13,6 +13,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/paystack',        // Exclude paystack webhook route URI'
+            'webhooks/vapi', // Exclude Vapi webhook route URI
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

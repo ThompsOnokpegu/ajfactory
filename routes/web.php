@@ -9,9 +9,19 @@ use Livewire\Volt\Volt;
 Route::get('/builders', function () {
     return view('builders');
 });
+Route::get('/accelerator', function () {
+    return view('accelerator');
+});
 Route::get('/', function () {
     return view('welcome');
 })->name('home');
+
+Route::get('/checkout', function () {
+    return view('checkout');
+})->name('checkout');
+
+// This treats the file as a full Livewire component
+Volt::route('/thank-you', 'thank-you')->name('thank-you');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
