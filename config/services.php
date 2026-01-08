@@ -38,6 +38,7 @@ return [
     'n8n' => [
         'webhook_url' => env('N8N_WEBHOOK_URL'),
         'student_webhook_url' => env('N8N_STUDENT_WEBHOOK_URL'),
+        'enrollment_webhook' => env('N8N_ENROLLMENT_WEBHOOK'),
     ],
     'paystack' => [
         'public_key' => env('PAYSTACK_PUBLIC_KEY'),
