@@ -13,7 +13,7 @@ state([
 ]);
 
 mount(function () {
-    // 1. Enrollment Check (Uncomment for Production)
+    // 1. Enrollment Check (Production Safety)
     /*
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
     if (!$enrollment || $enrollment->status !== 'paid') {
@@ -21,13 +21,13 @@ mount(function () {
     }
     */
 
-    // 2. Define Curriculum Data
+    // 2. Curriculum Data
     $this->curriculum = [
         [
             'title' => 'Module 01: The Foundation',
             'lessons' => [
                 ['id' => '01-01', 'title' => 'Local n8n Setup vs Cloud', 'video_id' => 'w0H1-b044KY', 'duration' => '12:45', 'has_blueprint' => false],
-                ['id' => '01-02', 'title' => 'API Handshakes Explained', 'video_id' => 'S8r0-fC_6iE', 'duration' => '15:20', 'has_blueprint' => true],
+                ['id' => '01-02', 'title' => 'API Handshakes Explained', 'video_id' => 'w0H1-b044KY', 'duration' => '15:20', 'has_blueprint' => true],
             ]
         ],
         [
@@ -46,11 +46,9 @@ mount(function () {
         ]
     ];
 
-    // Initialize first video
     $this->currentVideoId = $this->curriculum[0]['lessons'][0]['video_id'];
 });
 
-// Action to switch lessons
 $selectLesson = function ($modIndex, $lessIndex) {
     $this->activeModule = $modIndex;
     $this->activeLesson = $lessIndex;
@@ -59,109 +57,118 @@ $selectLesson = function ($modIndex, $lessIndex) {
 
 ?>
 
-<div class="flex h-full w-full bg-zinc-950">
+<div class="flex h-screen w-full bg-zinc-950 overflow-hidden" x-data="{ mobileMenuOpen: false }">
     
-    <!-- =======================
-         LEFT SIDEBAR (Navigation)
-         ======================= -->
-    <aside class="w-80 h-full bg-zinc-900/50 border-r border-zinc-800 flex flex-col shrink-0">
-        <!-- Logo -->
-        <div class="h-16 flex items-center px-6 border-b border-zinc-800">
+    <!-- MOBILE SIDEBAR OVERLAY -->
+    <div x-show="mobileMenuOpen" 
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-40 bg-zinc-950/90 backdrop-blur-sm lg:hidden" 
+         @click="mobileMenuOpen = false"></div>
+
+    <!-- SIDEBAR (Desktop & Mobile Drawer) -->
+    <aside 
+        class="fixed inset-y-0 left-0 z-50 w-80 bg-zinc-900 border-r border-zinc-800 flex flex-col transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0"
+        :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
+    >
+        <div class="h-16 flex items-center justify-between px-6 border-b border-zinc-800 bg-zinc-950/50">
             <div class="text-sm font-black tracking-tighter italic text-white uppercase">
-                AUTO<span class="text-cyan-500">MATION</span>.ACC
+                AUTO<span class="text-cyan-500">MATION</span>.FACTORY
             </div>
+            <button @click="mobileMenuOpen = false" class="lg:hidden text-zinc-500 hover:text-white">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
         </div>
 
-        <!-- Curriculum List -->
-        <div class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-8">
+        <nav class="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-8">
             @foreach($curriculum as $mIndex => $module)
                 <div class="space-y-3">
-                    <h3 class="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">
+                    <h3 class="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 italic">
                         {{ $module['title'] }}
                     </h3>
                     <div class="space-y-1">
                         @foreach($module['lessons'] as $lIndex => $lesson)
                             <button 
                                 wire:click="selectLesson({{ $mIndex }}, {{ $lIndex }})"
-                                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left group {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500/10 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'border border-transparent hover:bg-zinc-800/50' }}"
+                                @click="mobileMenuOpen = false"
+                                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left group {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500/10 border border-cyan-500/20' : 'hover:bg-zinc-800/50' }}"
                             >
-                                <!-- Status Indicator -->
-                                <div class="h-6 w-6 flex-shrink-0 rounded border flex items-center justify-center text-[10px] font-mono {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800' }}">
+                                <div class="h-6 w-6 shrink-0 rounded border flex items-center justify-center text-[10px] font-mono {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800' }}">
                                     {{ $lIndex + 1 }}
                                 </div>
-                                
-                                <!-- Text -->
                                 <div class="flex-1 min-w-0">
                                     <p class="text-[11px] font-bold uppercase tracking-tight truncate {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-200' }}">
                                         {{ $lesson['title'] }}
                                     </p>
                                     <p class="text-[9px] font-mono text-zinc-600 tracking-tighter">{{ $lesson['duration'] }}</p>
                                 </div>
-
-                                <!-- Play Icon (Active) -->
-                                @if($activeModule === $mIndex && $activeLesson === $lIndex)
-                                    <div class="w-2 h-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_#06b6d4]"></div>
-                                @endif
                             </button>
                         @endforeach
                     </div>
                 </div>
             @endforeach
-        </div>
+        </nav>
 
-        <!-- User Profile Footer -->
-        <div class="p-4 border-t border-zinc-800 bg-zinc-900">
+        <div class="p-4 border-t border-zinc-800 bg-zinc-950/50 mt-auto">
             <div class="flex items-center gap-3">
                 <div class="h-8 w-8 rounded bg-cyan-600 flex items-center justify-center text-xs font-black text-white uppercase">
-                    {{ substr(auth()->user()->name ?? 'A', 0, 1) }}
+                    {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-[10px] font-bold text-white truncate uppercase tracking-wider">{{ auth()->user()->name ?? 'Builder' }}</p>
-                    <div class="flex items-center gap-1.5 mt-0.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-                        <p class="text-[8px] text-zinc-500 font-mono uppercase tracking-widest">Online</p>
-                    </div>
+                    <p class="text-[8px] text-zinc-500 font-mono uppercase tracking-widest leading-none mt-1">Status: Online</p>
                 </div>
             </div>
         </div>
     </aside>
 
-    <!-- =======================
-         MAIN CONTENT (Player)
-         ======================= -->
-    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
-        
-        <!-- Header -->
-        <header class="h-16 flex items-center justify-between px-8 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
+    <!-- MAIN VIEWPORT -->
+    <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
+        <!-- HEADER -->
+        <header class="h-16 flex items-center justify-between px-6 lg:px-8 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
             <div class="flex items-center gap-4">
-                <div class="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] border border-zinc-800 px-2 py-1 rounded">
-                    Terminal // Mod_{{ str_pad($activeModule + 1, 2, '0', STR_PAD_LEFT) }}
+                <button @click="mobileMenuOpen = true" class="lg:hidden p-2 -ml-2 text-zinc-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                </button>
+                <div class="hidden sm:block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] border border-zinc-800 px-2 py-1 rounded">
+                    Terminal // Mod_{{ $activeModule + 1 }} // Lesson_{{ $activeLesson + 1 }}
+                </div>
+                <div class="sm:hidden text-[10px] font-mono font-bold text-cyan-500 uppercase tracking-widest">
+                    M{{ $activeModule + 1 }}.L{{ $activeLesson + 1 }}
                 </div>
             </div>
-            <div class="flex items-center gap-6">
-                <a href="https://discord.gg" target="_blank" class="text-[10px] font-black text-zinc-500 hover:text-cyan-500 transition uppercase tracking-widest flex items-center gap-2">
-                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
-                    Discord Uplink
+            
+            <div class="flex items-center gap-4 lg:gap-6">
+                <a href="#" target="_blank" class="hidden md:flex text-[10px] font-black text-zinc-500 hover:text-cyan-500 transition uppercase tracking-widest items-center gap-2">
+                    Private Community
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" class="text-[10px] font-black text-zinc-700 hover:text-red-500 transition uppercase tracking-widest">
-                        Exit Terminal
+                        Exit
                     </button>
                 </form>
             </div>
         </header>
 
-        <!-- Video & Content Stage -->
+        <!-- CONTENT STAGE -->
         <div class="flex-1 overflow-y-auto p-8 lg:p-12 custom-scrollbar">
             <div class="max-w-5xl mx-auto">
                 
-                <!-- 1. VIDEO PLAYER -->
-                <!-- wire:key ensures iframe refreshes when ID changes -->
+                <!-- 1. VIDEO PLAYER (Refined Parameters) -->
+                <!-- 
+                    rel=0: Related videos only from the same channel.
+                    modestbranding=1: Hide the YouTube logo from the control bar.
+                    iv_load_policy=3: Disables video annotations.
+                -->
                 <div class="aspect-video bg-black border border-zinc-800 rounded-xl overflow-hidden shadow-2xl relative group" wire:key="video-{{ $activeModule }}-{{ $activeLesson }}">
                     <iframe 
                         class="w-full h-full"
-                        src="https://www.youtube.com/embed/{{ $currentVideoId }}?rel=0&modestbranding=1&autoplay=1&iv_load_policy=3" 
+                        src="https://www.youtube.com/embed/{{ $currentVideoId }}?rel=0&modestbranding=1&autoplay=1&iv_load_policy=3&controls=1" 
                         title="YouTube video player" 
                         frameborder="0" 
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 

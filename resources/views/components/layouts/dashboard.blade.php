@@ -14,15 +14,15 @@
     
     <style>
         [x-cloak] { display: none !important; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #09090b; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #27272a; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #3f3f46; }
     </style>
 </head>
 <body class="h-full text-zinc-300 font-sans antialiased overflow-hidden">
     
-    <!-- The Livewire Component will fill this entire slot -->
+    <!-- The component fills the entire body -->
     {{ $slot }}
 
     @livewireScripts
