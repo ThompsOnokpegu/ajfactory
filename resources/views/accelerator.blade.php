@@ -189,8 +189,8 @@
                     
                     <div class="relative z-10">
                         <div class="flex flex-col items-center mb-12">
-                            <div class="text-zinc-500 line-through text-lg mb-2">Total Value: N450,000+</div>
-                            <div class="text-6xl md:text-8xl font-black text-white tracking-tighter italic">N150,000</div>
+                            <div class="text-zinc-500 line-through text-lg mb-2">Total Value: ₦150,000+</div>
+                            <div class="text-6xl md:text-8xl font-black text-white tracking-tighter italic">₦79,000</div>
                             <div class="text-zinc-500 text-sm font-mono mt-2 tracking-widest uppercase">/ Founding Member Price</div>
                         </div>
 
