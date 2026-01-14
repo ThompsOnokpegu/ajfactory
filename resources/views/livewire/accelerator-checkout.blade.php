@@ -8,14 +8,15 @@ new class extends Component {
     public string $email = '';
     public string $full_name = '';
     public string $whatsapp = '';
-    public int $amount = 150000; // Default Price
+    public int $amount = 79000; // Default Price
+    public int $waitlistDiscount = 20000; // Waitlist Discount
     public bool $isWaitlisted = false;
     public string $statusMessage = '';
 
     protected $rules = [
         'full_name' => 'required|string|max:255',
         'email' => 'required|email',
-        'whatsapp' => 'nullable|string|min:10',
+        'whatsapp' => 'required|nullable|string|min:10',
     ];
 
     /**
@@ -29,13 +30,13 @@ new class extends Component {
 
         if ($student) {
             $this->isWaitlisted = true;
-            $this->amount = 120000; // Apply N30,000 Discount
+            $this->amount = $this->amount - $this->waitlistDiscount; // Apply N20,000 Discount
             $this->whatsapp = $student->whatsapp ?? '';
             // Note: If you captured names on the waitlist, prefill here too
             $this->full_name = $student->name ?? '';
         } else {
             $this->isWaitlisted = false;
-            $this->amount = 150000;
+            //$this->amount = 79000;
         }
     }
 
@@ -83,10 +84,11 @@ new class extends Component {
             
             @if($isWaitlisted)
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-black uppercase tracking-widest mb-6 animate-bounce">
-                    ✨ Waitlist Discount Applied: -N30,000
+                    ✨ Waitlist Discount Applied: - ₦{{ number_format($waitlistDiscount,2) }}
                 </div>
             @else
                 <p class="text-zinc-500 mb-10 text-sm font-medium uppercase tracking-wider">Waitlist Member Discount: <span class="text-cyan-500">Active</span></p>
+                
             @endif
             
             <form wire:submit.prevent="initiatePayment" class="space-y-6">
@@ -123,8 +125,8 @@ new class extends Component {
                 <div class="pt-6">
                     <button type="submit" wire:loading.attr="disabled" 
                             class="w-full py-5 bg-cyan-500 text-black font-black uppercase text-xl rounded-2xl hover:bg-white transition-all shadow-xl shadow-cyan-500/10 disabled:opacity-50">
-                        <span wire:loading.remove>Initiate Deployment</span>
-                        <span wire:loading>Syncing with Core...</span>
+                        <span wire:loading.remove>Initiate Payment</span>
+                        <span wire:loading>Syncing with Paystack...</span>
                     </button>
                 </div>
             </form>
@@ -143,10 +145,10 @@ new class extends Component {
                     </div>
                     <div class="text-right">
                         @if($isWaitlisted)
-                            <div class="text-xs text-zinc-500 line-through">N150,000</div>
-                            <div class="text-xl font-black text-cyan-400">N120,000</div>
+                            <div class="text-xs text-zinc-500 line-through">₦{{ number_format($this->amount + $waitlistDiscount, 2) }}</div>
+                            <div class="text-xl font-black text-cyan-400">₦{{ number_format($this->amount, 2) }}</div>
                         @else
-                            <div class="text-xl font-black text-white">N150,000</div>
+                            <div class="text-xl font-black text-white">₦{{ number_format($this->amount, 2) }}</div>
                         @endif
                     </div>
                 </div>
@@ -154,7 +156,7 @@ new class extends Component {
                 <div class="space-y-4 pt-8 border-t border-zinc-900">
                     <div class="flex items-center gap-3 text-xs text-zinc-400">
                         <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                        n8n Snapshot Vault
+                        n8n Snapshot Vault (deployment ready)
                     </div>
                     <div class="flex items-center gap-3 text-xs text-zinc-400 font-bold">
                         <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
@@ -167,6 +169,10 @@ new class extends Component {
                     <div class="flex items-center gap-3 text-xs text-zinc-400">
                         <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
                         Lifetime Strategy Updates
+                    </div>
+                    <div class="flex items-center gap-3 text-xs text-zinc-400">
+                        <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+                        Weekly Live Q&A Sessions
                     </div>
                 </div>
             </div>

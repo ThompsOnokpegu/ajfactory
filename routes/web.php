@@ -16,6 +16,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+//Legal: terms and conditions
+Route::get('/terms', function () {
+    return view('legal');
+})->name('legal');
+
 // Builders Landing Page (TikTok Waitlist)
 Route::get('/builders', function () {
     return view('builders');
@@ -34,6 +39,7 @@ Route::get('/checkout', function () {
 // Thank You / Verification Page
 Volt::route('/thank-you', 'thank-you');
 
+Volt::route('/booking', 'booking-form');
 /*
 |--------------------------------------------------------------------------
 | Authenticated Member Routes

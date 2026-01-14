@@ -23,6 +23,7 @@ class Enrollment extends Model
         'status',
         'paystack_payload',
         'paid_at',
+        'completed_lessons',
     ];
 
     /**
@@ -30,9 +31,11 @@ class Enrollment extends Model
      *
      * @var array<string, string>
      */
+    
     protected $casts = [
         'paystack_payload' => 'array',
         'paid_at' => 'datetime',
         'amount' => 'decimal:2',
+        'completed_lessons' => 'array', 
     ];
 }

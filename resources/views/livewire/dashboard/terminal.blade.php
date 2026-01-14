@@ -10,74 +10,87 @@ state([
     'activeLesson' => 0,
     'currentVideoId' => '', 
     'curriculum' => [],
+    'completedLessons' => [],
 ]);
 
 mount(function () {
-    // 1. Enrollment Check (Production Safety)
-    /*
+    // 1. Enrollment Check
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
-    if (!$enrollment || $enrollment->status !== 'paid') {
-        return redirect()->route('checkout');
-    }
-    */
+    $this->completedLessons = is_array($enrollment?->completed_lessons) 
+        ? $enrollment->completed_lessons 
+        : [];
 
-    // 2. Curriculum Data
+    // 2. Load and Structure Curriculum
+    // We wrap the flat config list into a single "Main Track" to fit the UI structure
+    $rawConfig = config('curriculum') ?? [];
+    
     $this->curriculum = [
         [
-            'title' => 'Module 01: The Foundation',
-            'lessons' => [
-                ['id' => '01-01', 'title' => 'Local n8n Setup vs Cloud', 'video_id' => 'w0H1-b044KY', 'duration' => '12:45', 'has_blueprint' => false],
-                ['id' => '01-02', 'title' => 'API Handshakes Explained', 'video_id' => 'w0H1-b044KY', 'duration' => '15:20', 'has_blueprint' => true],
-            ]
-        ],
-        [
-            'title' => 'Module 02: WhatsApp Revenue',
-            'lessons' => [
-                ['id' => '02-01', 'title' => 'Meta Cloud API Auth', 'video_id' => 'S8r0-fC_6iE', 'duration' => '22:10', 'has_blueprint' => true],
-                ['id' => '02-02', 'title' => 'Inbound Webhook Logic', 'video_id' => 'S8r0-fC_6iE', 'duration' => '18:05', 'has_blueprint' => true],
-            ]
-        ],
-        [
-            'title' => 'Module 03: High-Ticket Voice',
-            'lessons' => [
-                ['id' => '03-01', 'title' => 'Vapi Core Architecture', 'video_id' => 'S8r0-fC_6iE', 'duration' => '25:30', 'has_blueprint' => true],
-                ['id' => '03-02', 'title' => 'Deploying the Dental Agent', 'video_id' => 'S8r0-fC_6iE', 'duration' => '30:15', 'has_blueprint' => true],
-            ]
+            'title' => 'AI Automation Accelerator',
+            'lessons' => $rawConfig
         ]
     ];
 
-    $this->currentVideoId = $this->curriculum[0]['lessons'][0]['video_id'];
+    // 3. Initialize First Video
+    if (!empty($this->curriculum) && !empty($this->curriculum[0]['lessons'])) {
+        $this->updateVideoSource($this->curriculum[0]['lessons'][0]);
+    }
 });
 
 $selectLesson = function ($modIndex, $lessIndex) {
     $this->activeModule = $modIndex;
     $this->activeLesson = $lessIndex;
-    $this->currentVideoId = $this->curriculum[$modIndex]['lessons'][$lessIndex]['video_id'];
+    $lesson = $this->curriculum[$modIndex]['lessons'][$lessIndex];
+    $this->updateVideoSource($lesson);
+};
+
+// EXCLUSIVE BUNNY.NET LOGIC
+$updateVideoSource = function ($lesson) {
+    $videoId = trim($lesson['video_id']); 
+    $libraryId = config('services.bunny.library_id'); 
+    
+    if (!$libraryId || !$videoId) {
+        $this->currentVideoId = ""; 
+        return;
+    }
+
+    $this->currentVideoId = "https://iframe.mediadelivery.net/embed/{$libraryId}/{$videoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true&context=true";
+};
+
+$toggleComplete = function ($lessonId) {
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    if (!$enrollment) return;
+
+    $completed = collect($this->completedLessons);
+
+    if ($completed->contains($lessonId)) {
+        $completed = $completed->reject(fn($id) => $id === $lessonId);
+    } else {
+        $completed->push($lessonId);
+    }
+
+    $this->completedLessons = $completed->values()->all();
+    
+    $enrollment->update([
+        'completed_lessons' => $this->completedLessons
+    ]);
 };
 
 ?>
 
 <div class="flex h-screen w-full bg-zinc-950 overflow-hidden" x-data="{ mobileMenuOpen: false }">
     
-    <!-- MOBILE SIDEBAR OVERLAY -->
-    <div x-show="mobileMenuOpen" 
-         x-transition:enter="transition-opacity ease-linear duration-300"
-         x-transition:enter-start="opacity-0"
-         x-transition:enter-end="opacity-100"
-         x-transition:leave="transition-opacity ease-linear duration-300"
-         x-transition:leave-start="opacity-100"
-         x-transition:leave-end="opacity-0"
-         class="fixed inset-0 z-40 bg-zinc-950/90 backdrop-blur-sm lg:hidden" 
-         @click="mobileMenuOpen = false"></div>
+    <!-- MOBILE OVERLAY -->
+    <div x-show="mobileMenuOpen" class="fixed inset-0 z-40 bg-zinc-950/90 backdrop-blur-sm lg:hidden" @click="mobileMenuOpen = false" x-cloak></div>
 
-    <!-- SIDEBAR (Desktop & Mobile Drawer) -->
+    <!-- SIDEBAR -->
     <aside 
         class="fixed inset-y-0 left-0 z-50 w-80 bg-zinc-900 border-r border-zinc-800 flex flex-col transition-transform duration-300 transform lg:translate-x-0 lg:static lg:inset-0"
         :class="mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'"
     >
         <div class="h-16 flex items-center justify-between px-6 border-b border-zinc-800 bg-zinc-950/50">
             <div class="text-sm font-black tracking-tighter italic text-white uppercase">
-                AUTO<span class="text-cyan-500">MATION</span>.FACTORY
+                AUTO<span class="text-cyan-500">MATION</span>.ACC
             </div>
             <button @click="mobileMenuOpen = false" class="lg:hidden text-zinc-500 hover:text-white">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -95,10 +108,16 @@ $selectLesson = function ($modIndex, $lessIndex) {
                             <button 
                                 wire:click="selectLesson({{ $mIndex }}, {{ $lIndex }})"
                                 @click="mobileMenuOpen = false"
-                                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left group {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500/10 border border-cyan-500/20' : 'hover:bg-zinc-800/50' }}"
+                                class="w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-all text-left group {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500/10 border border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.1)]' : 'border border-transparent hover:bg-zinc-800/50' }}"
                             >
-                                <div class="h-6 w-6 shrink-0 rounded border flex items-center justify-center text-[10px] font-mono {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800' }}">
-                                    {{ $lIndex + 1 }}
+                                <div class="h-6 w-6 shrink-0 rounded border flex items-center justify-center text-[10px] font-mono 
+                                    {{ in_array($lesson['id'], $completedLessons) ? 'bg-green-500/20 border-green-500/50 text-green-500' : 
+                                       (($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800') }}">
+                                    @if(in_array($lesson['id'], $completedLessons))
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    @else
+                                        {{ $lIndex + 1 }}
+                                    @endif
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <p class="text-[11px] font-bold uppercase tracking-tight truncate {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-200' }}">
@@ -128,14 +147,13 @@ $selectLesson = function ($modIndex, $lessIndex) {
 
     <!-- MAIN VIEWPORT -->
     <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
-        <!-- HEADER -->
         <header class="h-16 flex items-center justify-between px-6 lg:px-8 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
             <div class="flex items-center gap-4">
                 <button @click="mobileMenuOpen = true" class="lg:hidden p-2 -ml-2 text-zinc-400 hover:text-white transition">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
                 <div class="hidden sm:block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] border border-zinc-800 px-2 py-1 rounded">
-                    Terminal // Mod_{{ $activeModule + 1 }} // Lesson_{{ $activeLesson + 1 }}
+                    Terminal // Mod_{{ $activeModule + 1 }}
                 </div>
                 <div class="sm:hidden text-[10px] font-mono font-bold text-cyan-500 uppercase tracking-widest">
                     M{{ $activeModule + 1 }}.L{{ $activeLesson + 1 }}
@@ -155,98 +173,87 @@ $selectLesson = function ($modIndex, $lessIndex) {
             </div>
         </header>
 
-        <!-- CONTENT STAGE -->
-        <div class="flex-1 overflow-y-auto p-8 lg:p-12 custom-scrollbar">
-            <div class="max-w-5xl mx-auto">
+        <div class="flex-1 overflow-y-auto p-4 lg:p-12 custom-scrollbar">
+            <div class="max-w-5xl mx-auto space-y-8">
                 
-                <!-- 1. VIDEO PLAYER (Refined Parameters) -->
-                <!-- 
-                    rel=0: Related videos only from the same channel.
-                    modestbranding=1: Hide the YouTube logo from the control bar.
-                    iv_load_policy=3: Disables video annotations.
-                -->
-                <div class="aspect-video bg-black border border-zinc-800 rounded-xl overflow-hidden shadow-2xl relative group" wire:key="video-{{ $activeModule }}-{{ $activeLesson }}">
-                    <iframe 
-                        class="w-full h-full"
-                        src="https://www.youtube.com/embed/{{ $currentVideoId }}?rel=0&modestbranding=1&autoplay=1&iv_load_policy=3&controls=1" 
-                        title="YouTube video player" 
-                        frameborder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        allowfullscreen>
-                    </iframe>
+                <!-- BUNNY.NET PLAYER -->
+                <div class="relative w-full bg-black border border-cyan-500 rounded-xl overflow-hidden shadow-2xl"
+                     style="padding-top: 56.25%;" 
+                     wire:key="bunny-player-{{ $activeModule }}-{{ $activeLesson }}">
+                    
+                    @if($currentVideoId)
+                        <iframe 
+                            src="{{ $currentVideoId }}" 
+                            loading="lazy" 
+                            class="absolute top-0 left-0 w-full h-full border-none"
+                            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; clipboard-write;" 
+                            allowfullscreen="true">
+                        </iframe>
+                    @else
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-zinc-600">
+                            <span class="text-[10px] font-mono uppercase tracking-widest">Stream Offline</span>
+                            <span class="text-[9px] font-mono text-zinc-700 mt-1">Check Library ID Config</span>
+                        </div>
+                    @endif
                 </div>
 
-                <!-- 2. LESSON INFO -->
-                <div class="mt-8 grid lg:grid-cols-3 gap-10">
-                    
-                    <!-- Description -->
+                <!-- INFO GRID -->
+                <div class="grid lg:grid-cols-3 gap-10">
                     <div class="lg:col-span-2 space-y-6">
-                        <div>
-                            <div class="flex items-center gap-3 mb-3">
-                                <span class="px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-500 border border-cyan-500/20 text-[9px] font-black uppercase tracking-widest">
-                                    Deployment Phase
-                                </span>
-                                <span class="text-[10px] font-mono text-zinc-600 uppercase">
-                                    ID: {{ $curriculum[$activeModule]['lessons'][$activeLesson]['id'] }}
-                                </span>
-                            </div>
-                            <h1 class="text-3xl lg:text-4xl font-black text-white uppercase italic tracking-tighter leading-none">
-                                {{ $curriculum[$activeModule]['lessons'][$activeLesson]['title'] }}
-                            </h1>
+                        <h1 class="text-3xl lg:text-5xl font-black text-white uppercase italic tracking-tighter leading-[0.9]">
+                            {{ $curriculum[$activeModule]['lessons'][$activeLesson]['title'] }}
+                        </h1>
+                        <!-- Dynamic Lesson Description -->
+                        <div class="prose prose-invert prose-sm text-zinc-400 font-medium leading-relaxed max-w-2xl">
+                            {{ $curriculum[$activeModule]['lessons'][$activeLesson]['description'] ?? 'No description available.' }}
                         </div>
-
-                        <div class="prose prose-invert prose-sm text-zinc-400 font-medium leading-relaxed">
-                            <p>In this module, we execute the core logic for the automation. Ensure your API keys are set in your `.env` file before proceeding.</p>
-                            <ul class="text-xs font-mono bg-zinc-900 p-4 rounded-lg border border-zinc-800 space-y-2 list-none pl-0">
-                                <li>> Verify Node Version: v1.0.2</li>
-                                <li>> Check Webhook Listener Status</li>
-                                <li>> Confirm Paystack/Vapi Credentials</li>
-                            </ul>
+                        <div class="pt-4">
+                            <button 
+                                wire:click="toggleComplete('{{ $curriculum[$activeModule]['lessons'][$activeLesson]['id'] }}')"
+                                class="inline-flex items-center gap-3 px-6 py-3 rounded-xl border transition-all text-[11px] font-black uppercase tracking-widest 
+                                {{ in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons) 
+                                    ? 'bg-zinc-900 border-green-500/50 text-green-500 hover:bg-green-500/10' 
+                                    : 'bg-white text-black hover:bg-cyan-500' }}"
+                            >
+                                @if(in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons))
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    Mark as Incomplete
+                                @else
+                                    Complete Lesson
+                                @endif
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 3. THE VAULT (Downloads) -->
+                    <!-- THE VAULT & PROGRESS -->
                     <div class="space-y-6">
                         @if($curriculum[$activeModule]['lessons'][$activeLesson]['has_blueprint'])
-                            <div class="p-6 bg-zinc-900 border border-cyan-900/50 rounded-xl relative overflow-hidden group hover:border-cyan-500/30 transition-all">
-                                <!-- Glow Effect -->
-                                <div class="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 blur-[40px] pointer-events-none"></div>
-                                
-                                <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-4 flex items-center gap-2 relative z-10">
+                            <div class="p-6 bg-zinc-900 border border-cyan-900/50 rounded-2xl relative overflow-hidden group shadow-lg">
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-3 flex items-center gap-2">
                                     <span class="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
                                     Snapshot Vault
                                 </h4>
-                                <p class="text-[10px] text-zinc-400 mb-6 leading-relaxed relative z-10">
-                                    This lesson includes a production-ready n8n JSON file. Import it to skip the manual build process.
+                                <p class="text-[10px] text-zinc-400 mb-6 leading-relaxed">
+                                    Download the production-ready n8n JSON file for this module.
                                 </p>
-                                
                                 <a href="{{ route('vault.download', $curriculum[$activeModule]['lessons'][$activeLesson]['id']) }}" 
-                                   class="block w-full py-3 bg-white text-black text-center font-black uppercase text-[10px] tracking-widest rounded hover:bg-cyan-400 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] transition-all relative z-10">
-                                    Download Blueprint .JSON
+                                   class="block w-full py-4 bg-white text-black text-center font-black uppercase text-[10px] tracking-widest rounded-lg hover:bg-cyan-500 transition-all">
+                                    <span wire:loading.remove wire:target="vault.download">Download JSON</span>
+                                    <span wire:loading wire:target="vault.download">Syncing...</span>
                                 </a>
                             </div>
-                        @else
-                            <div class="p-6 bg-zinc-900/30 border border-zinc-800 rounded-xl flex items-center justify-center min-h-[140px]">
-                                <div class="text-center opacity-50">
-                                    <svg class="w-8 h-8 text-zinc-600 mx-auto mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                    <p class="text-[9px] font-mono text-zinc-500 uppercase">No Assets Required</p>
-                                </div>
-                            </div>
                         @endif
-
-                        <!-- System Status Box -->
-                        <div class="p-4 border border-zinc-800 rounded-xl bg-zinc-950/50">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-[9px] font-black uppercase text-zinc-500 tracking-widest">System Status</span>
-                                <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
+                        
+                        <div class="p-6 border border-zinc-900 rounded-2xl bg-zinc-950/50">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[9px] font-black uppercase text-zinc-500 tracking-widest">Foundry Progress</span>
+                                <span class="text-[10px] font-mono text-cyan-500">{{ count($completedLessons) }} / 8</span>
                             </div>
-                            <div class="space-y-1 font-mono text-[9px] text-zinc-600">
-                                <div class="flex justify-between"><span>API Gateway</span> <span>Online</span></div>
-                                <div class="flex justify-between"><span>Vault Core</span> <span>Secure</span></div>
+                            <div class="h-1.5 w-full bg-zinc-900 rounded-full overflow-hidden">
+                                <div class="h-full bg-cyan-500 transition-all duration-700 shadow-[0_0_10px_#06b6d4]" style="width: {{ (count($completedLessons) / 6) * 100 }}%"></div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

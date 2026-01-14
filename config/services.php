@@ -44,6 +44,10 @@ return [
         'public_key' => env('PAYSTACK_PUBLIC_KEY'),
         'secret_key' => env('PAYSTACK_SECRET_KEY'),
     ],
+    'bunny' => [
+        'api_key' => env('BUNNY_API_KEY'),
+        'library_id' => env('BUNNY_LIBRARY_ID'),
+    ],
     
 
 ];
