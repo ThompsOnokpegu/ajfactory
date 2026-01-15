@@ -74,11 +74,12 @@
                     </a>
                 </div>
                 
-                <div class="mt-16 flex justify-center items-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">LARAVEL</span>
+                <div class="mt-16 flex justify-center items-center gap-5 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">N8N</span>
+                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">WHATSAPP</span>
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">VAPI</span>
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">PINECONE</span>
+                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">TWILIO</span>
                 </div>
             </section>
 
