@@ -87,8 +87,8 @@
             <section id="curriculum" class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-900">
                 <div class="grid lg:grid-cols-3 gap-16">
                     <div class="lg:col-span-1 space-y-6">
-                        <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Phase 01: Deployment</div>
-                        <h2 class="text-4xl font-black text-white uppercase italic tracking-tighter">The End of <br>No-Code Toys.</h2>
+                        <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Deployment Program</div>
+                        <h2 class="text-4xl font-black text-white uppercase italic tracking-tighter">Real-World <br>AI Agents.</h2>
                         <p class="text-zinc-500 leading-relaxed">Most people build simple bots that break. We build <strong>resilient commercial-grade automation</strong> that handles errors, keeps logs, and scales with the business.</p>
                         
                         <div class="pt-8 space-y-4">
@@ -109,6 +109,12 @@
                                     <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                 </div>
                                 <span class="text-sm font-bold text-zinc-300">Vapi Voice AI Architecture</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="h-5 w-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center">
+                                    <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                </div>
+                                <span class="text-sm font-bold text-zinc-300">Knowlegeable AI Agents</span>
                             </div>
                         </div>
                     </div>
@@ -182,7 +188,7 @@
             <section id="pricing" class="max-w-4xl mx-auto px-6 py-32 text-center">
                 <div class="space-y-4 mb-12">
                     <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter">The Founding Batch.</h2>
-                    <p class="text-zinc-500">Only 20 spots available. Once they're gone, the price doubles.</p>
+                    <p class="text-zinc-500">I can only handle 20 students because I am personally reviewing your workflows. Once these spots are gone, the price doubles, and the bonuses disappear.</p>
                 </div>
 
                 <div class="bg-zinc-900 border border-zinc-800 p-8 md:p-16 rounded-[4rem] relative overflow-hidden">
