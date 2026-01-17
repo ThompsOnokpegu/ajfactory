@@ -2,6 +2,7 @@
 
 use function Livewire\Volt\{state, layout, mount};
 use App\Models\Enrollment;
+use Carbon\Carbon;
 
 layout('components.layouts.dashboard');
 
@@ -11,45 +12,59 @@ state([
     'currentVideoId' => '', 
     'curriculum' => [],
     'completedLessons' => [],
+    'isLocked' => false,
+    'unlockDate' => '',
 ]);
 
 mount(function () {
-    // 1. Enrollment Check
+    // 1. Fetch Enrollment & Progress
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
     $this->completedLessons = is_array($enrollment?->completed_lessons) 
         ? $enrollment->completed_lessons 
         : [];
 
     // 2. Load and Structure Curriculum
-    // We wrap the flat config list into a single "Main Track" to fit the UI structure
+    // We wrap your flat config into a "Main Track" to keep the loop-based UI consistent
     $rawConfig = config('curriculum') ?? [];
     
     $this->curriculum = [
         [
-            'title' => 'AI Automation Accelerator',
+            'title' => 'Course Roadmap',
             'lessons' => $rawConfig
         ]
     ];
 
-    // 3. Initialize First Video
+    // 3. Initialize First Video / Module
     if (!empty($this->curriculum) && !empty($this->curriculum[0]['lessons'])) {
-        $this->updateVideoSource($this->curriculum[0]['lessons'][0]);
+        $this->selectLesson(0, 0);
     }
 });
 
 $selectLesson = function ($modIndex, $lessIndex) {
     $this->activeModule = $modIndex;
     $this->activeLesson = $lessIndex;
-    $lesson = $this->curriculum[$modIndex]['lessons'][$lessIndex];
-    $this->updateVideoSource($lesson);
+    
+    $module = $this->curriculum[$modIndex];
+    $lesson = $module['lessons'][$lessIndex];
+    
+    // CHECK LOCK STATUS AT LESSON LEVEL
+    // Your new structure has release_at on the lesson items themselves
+    if (isset($lesson['release_at']) && Carbon::parse($lesson['release_at'])->isFuture()) {
+        $this->isLocked = true;
+        $this->unlockDate = Carbon::parse($lesson['release_at'])->format('M d, Y @ h:00 A');
+        $this->currentVideoId = ''; 
+    } else {
+        $this->isLocked = false;
+        $this->updateVideoSource($lesson);
+    }
 };
 
-// EXCLUSIVE BUNNY.NET LOGIC
 $updateVideoSource = function ($lesson) {
-    $videoId = trim($lesson['video_id']); 
+    $videoId = trim($lesson['video_id'] ?? '');
     $libraryId = config('services.bunny.library_id'); 
     
-    if (!$libraryId || !$videoId) {
+    if (!$libraryId || !$videoId || $videoId === 'welcome_video_id' || str_contains($videoId, 'bunny_video_id')) {
+        // Handle placeholder or empty IDs
         $this->currentVideoId = ""; 
         return;
     }
@@ -58,6 +73,8 @@ $updateVideoSource = function ($lesson) {
 };
 
 $toggleComplete = function ($lessonId) {
+    if ($this->isLocked) return;
+
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
     if (!$enrollment) return;
 
@@ -70,10 +87,7 @@ $toggleComplete = function ($lessonId) {
     }
 
     $this->completedLessons = $completed->values()->all();
-    
-    $enrollment->update([
-        'completed_lessons' => $this->completedLessons
-    ]);
+    $enrollment->update(['completed_lessons' => $this->completedLessons]);
 };
 
 ?>
@@ -105,6 +119,9 @@ $toggleComplete = function ($lessonId) {
                     </h3>
                     <div class="space-y-1">
                         @foreach($module['lessons'] as $lIndex => $lesson)
+                            @php
+                                $lessonLocked = isset($lesson['release_at']) && \Carbon\Carbon::parse($lesson['release_at'])->isFuture();
+                            @endphp
                             <button 
                                 wire:click="selectLesson({{ $mIndex }}, {{ $lIndex }})"
                                 @click="mobileMenuOpen = false"
@@ -112,15 +129,18 @@ $toggleComplete = function ($lessonId) {
                             >
                                 <div class="h-6 w-6 shrink-0 rounded border flex items-center justify-center text-[10px] font-mono 
                                     {{ in_array($lesson['id'], $completedLessons) ? 'bg-green-500/20 border-green-500/50 text-green-500' : 
-                                       (($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800') }}">
+                                       ($lessonLocked ? 'border-zinc-800 text-zinc-700 bg-zinc-900/50' : 
+                                       (($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800')) }}">
                                     @if(in_array($lesson['id'], $completedLessons))
                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    @elseif($lessonLocked)
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                     @else
                                         {{ $lIndex + 1 }}
                                     @endif
                                 </div>
                                 <div class="flex-1 min-w-0">
-                                    <p class="text-[11px] font-bold uppercase tracking-tight truncate {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'text-white' : 'text-zinc-400 group-hover:text-zinc-200' }}">
+                                    <p class="text-[11px] font-bold uppercase tracking-tight truncate {{ ($activeModule === $mIndex && $activeLesson === $lIndex) ? 'text-white' : ($lessonLocked ? 'text-zinc-600' : 'text-zinc-400 group-hover:text-zinc-200') }}">
                                         {{ $lesson['title'] }}
                                     </p>
                                     <p class="text-[9px] font-mono text-zinc-600 tracking-tighter">{{ $lesson['duration'] }}</p>
@@ -145,7 +165,7 @@ $toggleComplete = function ($lessonId) {
         </div>
     </aside>
 
-    <!-- MAIN VIEWPORT -->
+    <!-- MAIN STAGE -->
     <main class="flex-1 flex flex-col min-w-0 h-full overflow-hidden">
         <header class="h-16 flex items-center justify-between px-6 lg:px-8 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur sticky top-0 z-20">
             <div class="flex items-center gap-4">
@@ -153,16 +173,16 @@ $toggleComplete = function ($lessonId) {
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
                 <div class="hidden sm:block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] border border-zinc-800 px-2 py-1 rounded">
-                    Terminal // Mod_{{ $activeModule + 1 }}
+                    Terminal // Batch_001
                 </div>
                 <div class="sm:hidden text-[10px] font-mono font-bold text-cyan-500 uppercase tracking-widest">
-                    M{{ $activeModule + 1 }}.L{{ $activeLesson + 1 }}
+                    M{{ $activeLesson + 1 }}
                 </div>
             </div>
             
             <div class="flex items-center gap-4 lg:gap-6">
-                <a href="#" target="_blank" class="hidden md:flex text-[10px] font-black text-zinc-500 hover:text-cyan-500 transition uppercase tracking-widest items-center gap-2">
-                    Private Community
+                <a href="https://t.me/yourlink" target="_blank" class="hidden md:flex text-[10px] font-black text-zinc-500 hover:text-cyan-500 transition uppercase tracking-widest items-center gap-2">
+                    Telegram Community
                 </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
@@ -176,12 +196,25 @@ $toggleComplete = function ($lessonId) {
         <div class="flex-1 overflow-y-auto p-4 lg:p-12 custom-scrollbar">
             <div class="max-w-5xl mx-auto space-y-8">
                 
-                <!-- BUNNY.NET PLAYER -->
-                <div class="relative w-full bg-black border border-cyan-500 rounded-xl overflow-hidden shadow-2xl"
-                     style="padding-top: 56.25%;" 
-                     wire:key="bunny-player-{{ $activeModule }}-{{ $activeLesson }}">
+                <!-- DYNAMIC PLAYER AREA -->
+                <div class="relative w-full bg-black border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl"
+                     style="padding-bottom: 56.25%;" 
+                     wire:key="player-area-{{ $activeModule }}-{{ $activeLesson }}">
                     
-                    @if($currentVideoId)
+                    @if($isLocked)
+                        <!-- LOCKED STATE -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-center bg-zinc-900/80 backdrop-blur-sm p-6">
+                            <div class="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-4 border border-zinc-700">
+                                <svg class="w-8 h-8 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            </div>
+                            <h3 class="text-xl font-black text-white uppercase italic tracking-tighter">Classified Module</h3>
+                            <p class="text-xs text-zinc-400 font-mono mt-2 uppercase tracking-widest">
+                                Unlocks: {{ $unlockDate }}
+                            </p>
+                        </div>
+
+                    @elseif($currentVideoId)
+                        <!-- ACTIVE BUNNY PLAYER -->
                         <iframe 
                             src="{{ $currentVideoId }}" 
                             loading="lazy" 
@@ -189,10 +222,12 @@ $toggleComplete = function ($lessonId) {
                             allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture; clipboard-write;" 
                             allowfullscreen="true">
                         </iframe>
+
                     @else
-                        <div class="absolute inset-0 flex flex-col items-center justify-center text-zinc-600">
-                            <span class="text-[10px] font-mono uppercase tracking-widest">Stream Offline</span>
-                            <span class="text-[9px] font-mono text-zinc-700 mt-1">Check Library ID Config</span>
+                        <!-- UPLOAD PENDING STATE (No 404) -->
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-zinc-600 bg-zinc-950">
+                            <span class="text-[10px] font-mono uppercase tracking-widest animate-pulse">Stream Offline</span>
+                            <span class="text-[9px] font-mono text-zinc-700 mt-1 uppercase tracking-widest">Awaiting Command from AJ Factory</span>
                         </div>
                     @endif
                 </div>
@@ -200,57 +235,88 @@ $toggleComplete = function ($lessonId) {
                 <!-- INFO GRID -->
                 <div class="grid lg:grid-cols-3 gap-10">
                     <div class="lg:col-span-2 space-y-6">
+                        <div class="flex items-center gap-3">
+                            @if(in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons))
+                                <span class="px-2 py-0.5 rounded bg-green-500/10 text-green-500 border border-green-500/20 text-[9px] font-black uppercase tracking-widest flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    Module Verified
+                                </span>
+                            @else
+                                <span class="px-2 py-0.5 rounded {{ $isLocked ? 'bg-zinc-800 text-zinc-500' : 'bg-cyan-500/10 text-cyan-500 border border-cyan-500/20' }} text-[9px] font-black uppercase tracking-widest">
+                                    Status: {{ $isLocked ? 'Encrypted' : 'Sync_In_Progress' }}
+                                </span>
+                            @endif
+                            <span class="text-[10px] font-mono text-zinc-600 uppercase">
+                                ID: {{ $curriculum[$activeModule]['lessons'][$activeLesson]['id'] }}
+                            </span>
+                        </div>
+
                         <h1 class="text-3xl lg:text-5xl font-black text-white uppercase italic tracking-tighter leading-[0.9]">
                             {{ $curriculum[$activeModule]['lessons'][$activeLesson]['title'] }}
                         </h1>
-                        <!-- Dynamic Lesson Description -->
                         <div class="prose prose-invert prose-sm text-zinc-400 font-medium leading-relaxed max-w-2xl">
-                            {{ $curriculum[$activeModule]['lessons'][$activeLesson]['description'] ?? 'No description available.' }}
+                            {{ $curriculum[$activeModule]['lessons'][$activeLesson]['description'] }}
                         </div>
+                        
+                        <!-- Progress Button -->
                         <div class="pt-4">
-                            <button 
-                                wire:click="toggleComplete('{{ $curriculum[$activeModule]['lessons'][$activeLesson]['id'] }}')"
-                                class="inline-flex items-center gap-3 px-6 py-3 rounded-xl border transition-all text-[11px] font-black uppercase tracking-widest 
-                                {{ in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons) 
-                                    ? 'bg-zinc-900 border-green-500/50 text-green-500 hover:bg-green-500/10' 
-                                    : 'bg-white text-black hover:bg-cyan-500' }}"
-                            >
-                                @if(in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons))
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                                    Mark as Incomplete
-                                @else
-                                    Complete Lesson
-                                @endif
-                            </button>
+                            @if(!$isLocked)
+                                <button 
+                                    wire:click="toggleComplete('{{ $curriculum[$activeModule]['lessons'][$activeLesson]['id'] }}')"
+                                    class="inline-flex items-center gap-3 px-6 py-3 rounded-xl border transition-all text-[11px] font-black uppercase tracking-widest 
+                                    {{ in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons) 
+                                        ? 'bg-zinc-900 border-green-500/50 text-green-500' 
+                                        : 'bg-white text-black hover:bg-cyan-500' }}"
+                                >
+                                    @if(in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons))
+                                        Mark as Incomplete
+                                    @else
+                                        Complete Module
+                                    @endif
+                                </button>
+                            @else
+                                <button disabled class="inline-flex items-center gap-3 px-6 py-3 rounded-xl border border-zinc-800 text-zinc-600 text-[11px] font-black uppercase tracking-widest cursor-not-allowed">
+                                    <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                    Protocol Locked
+                                </button>
+                            @endif
                         </div>
                     </div>
 
-                    <!-- THE VAULT & PROGRESS -->
+                    <!-- THE VAULT -->
                     <div class="space-y-6">
-                        @if($curriculum[$activeModule]['lessons'][$activeLesson]['has_blueprint'])
+                        @if(!$isLocked && $curriculum[$activeModule]['lessons'][$activeLesson]['has_blueprint'])
                             <div class="p-6 bg-zinc-900 border border-cyan-900/50 rounded-2xl relative overflow-hidden group shadow-lg">
-                                <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-3 flex items-center gap-2">
+                                <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-3 flex items-center gap-2 relative z-10">
                                     <span class="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
                                     Snapshot Vault
                                 </h4>
                                 <p class="text-[10px] text-zinc-400 mb-6 leading-relaxed">
-                                    Download the production-ready n8n JSON file for this module.
+                                    Access the technical blueprints for this module.
                                 </p>
                                 <a href="{{ route('vault.download', $curriculum[$activeModule]['lessons'][$activeLesson]['id']) }}" 
-                                   class="block w-full py-4 bg-white text-black text-center font-black uppercase text-[10px] tracking-widest rounded-lg hover:bg-cyan-500 transition-all">
-                                    <span wire:loading.remove wire:target="vault.download">Download JSON</span>
-                                    <span wire:loading wire:target="vault.download">Syncing...</span>
+                                   class="block w-full py-4 bg-white text-black text-center font-black uppercase text-[10px] tracking-widest rounded-lg hover:bg-cyan-500 transition-all relative z-10">
+                                    Download JSON
                                 </a>
+                            </div>
+                        @elseif($isLocked)
+                            <div class="p-6 bg-zinc-900/30 border border-zinc-800 rounded-2xl flex items-center justify-center min-h-[120px]">
+                                <p class="text-[9px] font-mono text-zinc-600 uppercase">Assets Encrypted</p>
                             </div>
                         @endif
                         
                         <div class="p-6 border border-zinc-900 rounded-2xl bg-zinc-950/50">
+                            @php
+                                $totalItems = count($curriculum[0]['lessons']);
+                                $completedCount = count($completedLessons);
+                                $percent = ($totalItems > 0) ? ($completedCount / $totalItems) * 100 : 0;
+                            @endphp
                             <div class="flex items-center justify-between mb-3">
                                 <span class="text-[9px] font-black uppercase text-zinc-500 tracking-widest">Foundry Progress</span>
-                                <span class="text-[10px] font-mono text-cyan-500">{{ count($completedLessons) }} / 8</span>
+                                <span class="text-[10px] font-mono text-cyan-500">{{ $completedCount }} / {{ $totalItems }}</span>
                             </div>
                             <div class="h-1.5 w-full bg-zinc-900 rounded-full overflow-hidden">
-                                <div class="h-full bg-cyan-500 transition-all duration-700 shadow-[0_0_10px_#06b6d4]" style="width: {{ (count($completedLessons) / 6) * 100 }}%"></div>
+                                <div class="h-full bg-cyan-500 transition-all duration-700 shadow-[0_0_10px_#06b6d4]" style="width: {{ $percent }}%"></div>
                             </div>
                         </div>
                     </div>

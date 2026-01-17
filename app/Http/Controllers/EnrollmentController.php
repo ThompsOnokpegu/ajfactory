@@ -80,6 +80,7 @@ class EnrollmentController extends Controller
                 'event' => 'enrollment_finalized',
                 'full_name' => $enrollment->full_name,
                 'email' => $enrollment->email,
+                'phone' => $enrollment->whatsapp,
                 'temp_password' => $temporaryPassword, 
                 'login_url' => url('/login'),
                 'amount' => $enrollment->amount,

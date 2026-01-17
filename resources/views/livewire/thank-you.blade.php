@@ -71,7 +71,7 @@ mount(function () {
                         </div>
                         <div class="flex items-start gap-4">
                             <div class="mt-1 h-5 w-5 rounded bg-cyan-500/20 flex items-center justify-center text-cyan-500 text-[10px] font-black">02</div>
-                            <p class="text-xs text-zinc-500 leading-snug">Join the <strong class="text-zinc-300 uppercase">Private Community</strong> via the link in your welcome email to start the 30-day roadmap.</p>
+                            <p class="text-xs text-zinc-500 leading-snug">Join the <strong class="text-zinc-300 uppercase">Private Telegram Community</strong> via the link in your welcome email to start the 30-day roadmap.</p>
                         </div>
                     </div>
                 </div>
