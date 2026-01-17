@@ -227,7 +227,8 @@ $toggleComplete = function ($lessonId) {
                         <!-- UPLOAD PENDING STATE (No 404) -->
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-zinc-600 bg-zinc-950">
                             <span class="text-[10px] font-mono uppercase tracking-widest animate-pulse">Stream Offline</span>
-                            <span class="text-[9px] font-mono text-zinc-700 mt-1 uppercase tracking-widest">Awaiting Command from AJ Factory</span>
+                            <span class="text-[9px] font-mono text-zinc-100 mt-1 uppercase tracking-widest text-center">The core mission begins on Monday, January 26th. <br>Our protocol is simple: Every Monday, a new deployment module unlocks. <br>
+                                Every Thursday, we meet live for technical build sessions and real-time Q&A.</span>
                         </div>
                     @endif
                 </div>
