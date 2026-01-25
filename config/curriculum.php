@@ -23,7 +23,7 @@ return [
     [
         'id' => 'module-03',
         'title' => 'Module 03: API Calls With n8n',
-        'release_at' => '2026-01-02 00:00:00',
+        'release_at' => '2026-02-02 00:00:00',
         'video_id' => 'e895c6bf-ff14-46f4-87b1-d62817bfb401',
         'duration' => '28:38 Mins',
         'has_blueprint' => true,
