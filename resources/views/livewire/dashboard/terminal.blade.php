@@ -24,7 +24,7 @@ mount(function () {
         : [];
 
     // 2. Load and Structure Curriculum
-    // We wrap your flat config into a "Main Track" to keep the loop-based UI consistent
+    // We maintain the nested structure so the existing Blade markup loops continue to function.
     $rawConfig = config('curriculum') ?? [];
     
     $this->curriculum = [
@@ -44,14 +44,19 @@ $selectLesson = function ($modIndex, $lessIndex) {
     $this->activeModule = $modIndex;
     $this->activeLesson = $lessIndex;
     
+    // In your structure, the 'lesson' is actually the module item from the flat config.
     $module = $this->curriculum[$modIndex];
     $lesson = $module['lessons'][$lessIndex];
     
-    // CHECK LOCK STATUS AT LESSON LEVEL
-    // Your new structure has release_at on the lesson items themselves
-    if (isset($lesson['release_at']) && Carbon::parse($lesson['release_at'])->isFuture()) {
+    // NEW LOGIC: Use Africa/Lagos timezone to ensure 12:00 AM WAT release works accurately
+    $now = Carbon::now('Africa/Lagos');
+    $releaseAt = isset($lesson['release_at']) 
+        ? Carbon::parse($lesson['release_at'], 'Africa/Lagos') 
+        : $now->subDay(); // If no date, assume released
+
+    if ($releaseAt->gt($now)) {
         $this->isLocked = true;
-        $this->unlockDate = Carbon::parse($lesson['release_at'])->format('M d, Y @ h:00 A');
+        $this->unlockDate = $releaseAt->format('M d, Y @ h:i A');
         $this->currentVideoId = ''; 
     } else {
         $this->isLocked = false;
@@ -64,7 +69,6 @@ $updateVideoSource = function ($lesson) {
     $libraryId = config('services.bunny.library_id'); 
     
     if (!$libraryId || !$videoId || $videoId === 'welcome_video_id' || str_contains($videoId, 'bunny_video_id')) {
-        // Handle placeholder or empty IDs
         $this->currentVideoId = ""; 
         return;
     }
@@ -73,6 +77,7 @@ $updateVideoSource = function ($lesson) {
 };
 
 $toggleComplete = function ($lessonId) {
+    // Logic check: only allow completion of unlocked content
     if ($this->isLocked) return;
 
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
@@ -120,7 +125,8 @@ $toggleComplete = function ($lessonId) {
                     <div class="space-y-1">
                         @foreach($module['lessons'] as $lIndex => $lesson)
                             @php
-                                $lessonLocked = isset($lesson['release_at']) && \Carbon\Carbon::parse($lesson['release_at'])->isFuture();
+                                // Logic: Check individual item release time against current time in Nigeria
+                                $lessonLocked = isset($lesson['release_at']) && \Carbon\Carbon::parse($lesson['release_at'], 'Africa/Lagos')->isFuture();
                             @endphp
                             <button 
                                 wire:click="selectLesson({{ $mIndex }}, {{ $lIndex }})"
@@ -132,9 +138,9 @@ $toggleComplete = function ($lessonId) {
                                        ($lessonLocked ? 'border-zinc-800 text-zinc-700 bg-zinc-900/50' : 
                                        (($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800')) }}">
                                     @if(in_array($lesson['id'], $completedLessons))
-                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                     @elseif($lessonLocked)
-                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                         <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                     @else
                                         {{ $lIndex + 1 }}
                                     @endif
@@ -295,7 +301,7 @@ $toggleComplete = function ($lessonId) {
                                 <p class="text-[10px] text-zinc-400 mb-6 leading-relaxed">
                                     Access the technical blueprints for this module.
                                 </p>
-                                <a href="{{ route('vault.download', $curriculum[$activeModule]['lessons'][$activeLesson]['id']) }}" 
+                                <a href="https://drive.google.com/drive/folders/1-LCglWb4khbJEoN3Kqwdi-XVSWfYtR6v?usp=drive_link" target="_blank"
                                    class="block w-full py-4 bg-white text-black text-center font-black uppercase text-[10px] tracking-widest rounded-lg hover:bg-cyan-500 transition-all relative z-10">
                                     Download JSON
                                 </a>

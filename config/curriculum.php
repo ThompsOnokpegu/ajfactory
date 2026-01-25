@@ -59,7 +59,7 @@ return [
     [
         'id' => 'module-07',
         'title' => 'Module 07: AI Chat Support Agent',
-        'release_at' => '2026-02-16 00:00:00',
+        'release_at' => '2026-02-23 00:00:00',
         'video_id' => '78096f8a-8945-4052-8d4d-67ede32e4e81',
         'duration' => '40:00',
         'has_blueprint' => true,
