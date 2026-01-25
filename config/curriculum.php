@@ -42,7 +42,7 @@ return [
         'id' => 'module-05',
         'title' => 'Module 05: WhatsApp Automation',
         'release_at' => '2026-02-02 00:00:00',
-        'video_id' => 'bunny_video_id_module_05',
+        'video_id' => 'e3c1e139-b0d1-4c84-aa17-97c61710b526',
         'duration' => '45:00',
         'has_blueprint' => true,
         'description' => "Building a production-ready WhatsApp bot using Twilio. Topics include:\n\n• Buying a Real Number & Setting up a Sender Profile.\n• Understanding the Meta 24-Hour Session Window & Templates.\n• Configuring Production Webhooks to handle live traffic."
@@ -50,7 +50,7 @@ return [
     [
         'id' => 'module-06',
         'title' => 'Module 06: AI Voice Support Agent',
-        'video_id' => 'bunny_video_id_module_06',
+        'video_id' => 'ad4ae58d-9faf-453d-8fa9-45df3d78d1a0',
         'release_at' => '2026-02-16 00:00:00',
         'duration' => '40:00',
         'has_blueprint' => true,
@@ -60,7 +60,7 @@ return [
         'id' => 'module-07',
         'title' => 'Module 07: AI Chat Support Agent',
         'release_at' => '2026-02-16 00:00:00',
-        'video_id' => 'bunny_video_id_module_07',
+        'video_id' => '78096f8a-8945-4052-8d4d-67ede32e4e81',
         'duration' => '40:00',
         'has_blueprint' => true,
         'description' => "Bringing it all together into a smart Chat Agent. We cover:\n\n• Using the AI Agent Node with Window Buffer Memory.\n• Connecting your Pinecone Knowledge Base as a 'Tool'.\n• Logic for handling Fallbacks and Human Handoffs via Email."
