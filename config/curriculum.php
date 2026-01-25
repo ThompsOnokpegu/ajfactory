@@ -23,7 +23,7 @@ return [
     [
         'id' => 'module-03',
         'title' => 'Module 03: API Calls With n8n',
-        'release_at' => '2026-01-26 00:00:00',
+        'release_at' => '2026-01-02 00:00:00',
         'video_id' => 'e895c6bf-ff14-46f4-87b1-d62817bfb401',
         'duration' => '28:38 Mins',
         'has_blueprint' => true,
@@ -32,7 +32,7 @@ return [
     [
         'id' => 'module-04',
         'title' => 'Module 04: Knowledge Base (RAG)',
-        'release_at' => '2026-02-02 00:00:00',
+        'release_at' => '2026-02-09 00:00:00',
         'video_id' => '01246ff7-d654-46c3-8c30-93ab2d894ff3',
         'duration' => '19:33 Mins',
         'has_blueprint' => true,
@@ -41,7 +41,7 @@ return [
     [
         'id' => 'module-05',
         'title' => 'Module 05: WhatsApp Automation',
-        'release_at' => '2026-02-02 00:00:00',
+        'release_at' => '2026-02-09 00:00:00',
         'video_id' => 'e3c1e139-b0d1-4c84-aa17-97c61710b526',
         'duration' => '45:00',
         'has_blueprint' => true,
