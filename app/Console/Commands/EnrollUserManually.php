@@ -12,9 +12,9 @@ use Illuminate\Support\Str;
 class EnrollUserManually extends Command
 {
     /**
-     * Usage: php artisan enroll:user {email} {name} {amount=150000} {currency=NGN}
+     * Usage: php artisan enroll:user {email} {name} {amount=59000} {currency=NGN}
      */
-    protected $signature = 'enroll:user {email} {name} {amount=150000} {currency=NGN}';
+    protected $signature = 'enroll:user {email} {name} {amount=59000} {currency=NGN}';
     protected $description = 'Manually enroll a student who paid offline and trigger welcome automation';
 
     public function handle()

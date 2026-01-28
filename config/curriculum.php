@@ -69,9 +69,9 @@ return [
         'id' => 'module-08',
         'title' => 'Module 08: Deploy Your Automation',
         'release_at' => '2026-02-23 00:00:00',
-        'video_id' => 'bunny_video_id_module_08',
+        'video_id' => '67369c39-c2d7-481f-abbf-6aa879641949',
         'duration' => '35:00',
         'has_blueprint' => true,
-        'description' => "Taking your bots from 'Student Project' to 'Business Asset'. Topics:\n\n• Building a Global Error Handling workflow (The Safety Net).\n• The critical difference between Test URLs and Production Webhook URLs.\n• Managing Execution Data logs and exporting workflows for backup."
+        'description' => "Taking your bots from 'Student Project' to 'Business Asset'. Topics:\n\n• Building a Global Error Handling workflow (The Safety Net).\n• The critical difference between Test URLs and Production Webhook URLs.\n• Managing Execution Data logs and exporting workflows for backup.\n• Free Google Cloud Hosting setup guide."
     ]
 ];
