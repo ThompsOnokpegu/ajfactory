@@ -56,7 +56,7 @@
                     <h2>02. Privacy Policy</h2>
                     <p>We respect your data. Our identity protocols are designed to be transparent.</p>
                     <p><strong>Data Collection:</strong> We collect your name, email, and WhatsApp number specifically to provision your Member Terminal access and send system updates.</p>
-                    <p><strong>Third Parties:</strong> Payment data is handled exclusively by Paystack. We do not store your credit card or bank details on our local servers.</p>
+                    <p><strong>Third Parties:</strong> Payment data is handled exclusively by Paystack and Flutterwave. We do not store your credit card or bank details on our local servers.</p>
                 </section>
 
                 <section id="refunds">

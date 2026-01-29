@@ -241,9 +241,49 @@
                 <div class="mt-6 font-mono text-[10px] uppercase text-zinc-600">— AJ Thompson // Founder</div>
             </section>
 
-            <!-- FOOTER -->
-            <footer class="py-12 border-t border-zinc-900 text-center">
-                <p class="text-[10px] font-mono text-zinc-700 uppercase tracking-[0.5em]">AJ.THOMPSON // AUTOMATION FACTORY // 2026</p>
+            <!-- [STITCHING FOOTER AT THE BOTTOM] -->
+            <footer class="py-20 border-t border-zinc-900 bg-zinc-950 relative overflow-hidden">
+                <div class="max-w-6xl mx-auto px-6 relative z-10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 mb-16">
+                        <!-- Brand & Address -->
+                        <div class="space-y-6">
+                            <div class="text-xl font-black text-white uppercase italic tracking-tighter">
+                                DEEPR<span class="text-cyan-500 text-sm">WEB SERVICES</span>
+                            </div>
+                            <div class="text-xs font-mono text-zinc-500 leading-relaxed uppercase tracking-[0.1em]">
+                                Jidu Airport Road Lugbe, Abuja.<br>
+                                Federal Capital Territory, Nigeria.
+                            </div>
+                            <div class="flex flex-col gap-2">
+                                <a href="mailto:tommyriode@gmail.com" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">tommyriode@gmail.com</a>
+                                <a href="tel:08068125034" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">08068125034</a>
+                            </div>
+                        </div>
+
+                        <!-- Legal Navigation -->
+                        <div class="flex flex-col md:items-end gap-8">
+                            <div class="flex flex-wrap gap-8 md:justify-end">
+                                <a href="{{ route("legal") }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Terms</a>
+                                <a href="{{ route("legal") }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Privacy</a>
+                                <a href="{{ route("legal") }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Refunds</a>
+                            </div>
+                            
+                            <div class="text-right">
+                                <p class="text-[9px] font-mono text-zinc-700 uppercase tracking-widest leading-relaxed">
+                                    A High-Performance Training Division by <br>
+                                    <span class="text-zinc-500 font-bold">Deepr Web Services</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-10 border-t border-zinc-900 flex justify-between items-center">
+                        <p class="text-[10px] font-mono text-zinc-800 uppercase tracking-widest">
+                            &copy; {{ date('Y') }} Deepr Web Services.
+                        </p>
+                        <div class="h-2 w-2 rounded-full bg-zinc-900 animate-pulse"></div>
+                    </div>
+                </div>
             </footer>
         </div>
     </body>
