@@ -16,10 +16,13 @@ state([
     'unlockDate' => '',
 ]);
 
-// Helper: Calculate Video URL (Returns string, does not use $this)
-$getVideoUrl = function ($lesson) {
+// Helper: Handle Video Source Logic (Updated for Multi-Library Support)
+$updateVideoSource = function ($lesson) {
     $videoId = trim($lesson['video_id'] ?? '');
-    $libraryId = config('services.bunny.library_id'); 
+    
+    // 1. Check if the lesson has a specific library override (e.g. for Live Replays)
+    // 2. If not, fall back to the default library ID from services config
+    $libraryId = $lesson['library_id'] ?? config('services.bunny.library_id'); 
     
     // Check for empty, placeholders, or welcome IDs
     if (!$libraryId || !$videoId || $videoId === 'welcome_video_id' || str_contains($videoId, 'bunny_video_id')) {
@@ -29,14 +32,14 @@ $getVideoUrl = function ($lesson) {
     return "https://iframe.mediadelivery.net/embed/{$libraryId}/{$videoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true&context=true";
 };
 
-mount(function () use ($getVideoUrl) {
+mount(function () use ($updateVideoSource) {
     // 1. Fetch Enrollment & Progress
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
     $this->completedLessons = is_array($enrollment?->completed_lessons) 
         ? $enrollment->completed_lessons 
         : [];
 
-    // 2. Load and Structure Curriculum
+    // 2. Load Curriculum
     $rawConfig = config('curriculum') ?? [];
     
     $this->curriculum = [];
@@ -57,7 +60,7 @@ mount(function () use ($getVideoUrl) {
             ];
         }
     } else {
-        // Handle Flat Structure (Wrap in single track)
+        // Handle Flat Structure
         $this->curriculum[] = [
             'title' => 'Course Roadmap',
             'lessons' => array_values($rawConfig)
@@ -68,7 +71,6 @@ mount(function () use ($getVideoUrl) {
     if (!empty($this->curriculum) && !empty($this->curriculum[0]['lessons'])) {
         $firstLesson = $this->curriculum[0]['lessons'][0];
         
-        // Initial Lock Logic
         $now = Carbon::now('Africa/Lagos');
         $releaseAt = isset($firstLesson['release_at']) 
             ? Carbon::parse($firstLesson['release_at'], 'Africa/Lagos') 
@@ -80,16 +82,15 @@ mount(function () use ($getVideoUrl) {
             $this->currentVideoId = ''; 
         } else {
             $this->isLocked = false;
-            $this->currentVideoId = $getVideoUrl($firstLesson);
+            $this->currentVideoId = $updateVideoSource($firstLesson);
         }
     }
 });
 
-$selectLesson = function ($modIndex, $lessIndex) use ($getVideoUrl) {
+$selectLesson = function ($modIndex, $lessIndex) use ($updateVideoSource) {
     $this->activeModule = $modIndex;
     $this->activeLesson = $lessIndex;
     
-    // Safety Check
     if (!isset($this->curriculum[$modIndex]) || !isset($this->curriculum[$modIndex]['lessons'][$lessIndex])) {
         return; 
     }
@@ -97,7 +98,6 @@ $selectLesson = function ($modIndex, $lessIndex) use ($getVideoUrl) {
     $section = $this->curriculum[$modIndex];
     $lesson = $section['lessons'][$lessIndex];
     
-    // LOCK LOGIC (Timezone Aware)
     $now = Carbon::now('Africa/Lagos');
     $releaseAt = isset($lesson['release_at']) 
         ? Carbon::parse($lesson['release_at'], 'Africa/Lagos') 
@@ -109,7 +109,7 @@ $selectLesson = function ($modIndex, $lessIndex) use ($getVideoUrl) {
         $this->currentVideoId = ''; 
     } else {
         $this->isLocked = false;
-        $this->currentVideoId = $getVideoUrl($lesson);
+        $this->currentVideoId = $updateVideoSource($lesson);
     }
 };
 
@@ -337,7 +337,8 @@ $toggleComplete = function ($lessonId) {
                                 <p class="text-[10px] text-zinc-400 mb-6 leading-relaxed">
                                     Access the technical blueprints for this module.
                                 </p>
-                                <a href="https://drive.google.com/drive/folders/1-LCglWb4khbJEoN3Kqwdi-XVSWfYtR6v?usp=drive_link" target="_blank"
+                                <a href="https://drive.google.com/drive/folders/1-LCglWb4khbJEoN3Kqwdi-XVSWfYtR6v?usp=drive_link" 
+                                   target="_blank"
                                    class="block w-full py-4 bg-white text-black text-center font-black uppercase text-[10px] tracking-widest rounded-lg hover:bg-cyan-500 transition-all relative z-10">
                                     Download JSON
                                 </a>

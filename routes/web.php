@@ -10,7 +10,9 @@ use App\Http\Controllers\VaultController;
 | Public Marketing & Sales Routes
 |--------------------------------------------------------------------------
 */
-
+Route::get('/links', function () {
+    return view('links');
+});
 // Agency Landing Page (Business Clients)
 Route::get('/', function () {
     return view('welcome');

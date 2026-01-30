@@ -89,10 +89,11 @@ return [
         [
             'id' => 'live-01',
             'title' => 'Live Session #1: n8n Build & Q&A',
-            'release_at' => '2026-01-29 20:00:00',
+            'release_at' => '2026-01-29 00:00:00',
+            'library_id' => '589383', // Bunny Library ID
             'video_id' => '8fc97608-f186-4961-a7b2-31cc8653b174', // Upload your Google Meet recording here
             'duration' => '71:00 Mins',
-            'has_blueprint' => false,
+            'has_blueprint' => true,
             'description' => "Our first group build. We covered:\n\n• order status routing (delivered, pending, cancelled) using an \n n8n Switch node and sending Gmail alerts for order #AJB0012.\n• Live Q&A regarding Module 02."
         ],
     ]
