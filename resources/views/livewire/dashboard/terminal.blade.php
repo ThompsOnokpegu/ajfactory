@@ -16,7 +16,20 @@ state([
     'unlockDate' => '',
 ]);
 
-mount(function () {
+// Helper: Calculate Video URL (Returns string, does not use $this)
+$getVideoUrl = function ($lesson) {
+    $videoId = trim($lesson['video_id'] ?? '');
+    $libraryId = config('services.bunny.library_id'); 
+    
+    // Check for empty, placeholders, or welcome IDs
+    if (!$libraryId || !$videoId || $videoId === 'welcome_video_id' || str_contains($videoId, 'bunny_video_id')) {
+        return ""; 
+    }
+
+    return "https://iframe.mediadelivery.net/embed/{$libraryId}/{$videoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true&context=true";
+};
+
+mount(function () use ($getVideoUrl) {
     // 1. Fetch Enrollment & Progress
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
     $this->completedLessons = is_array($enrollment?->completed_lessons) 
@@ -24,35 +37,71 @@ mount(function () {
         : [];
 
     // 2. Load and Structure Curriculum
-    // We maintain the nested structure so the existing Blade markup loops continue to function.
     $rawConfig = config('curriculum') ?? [];
     
-    $this->curriculum = [
-        [
-            'title' => 'Course Roadmap',
-            'lessons' => $rawConfig
-        ]
-    ];
+    $this->curriculum = [];
 
-    // 3. Initialize First Video / Module
+    // Logic to handle both 'Split' (Core/Live) and 'Flat' structures
+    if (isset($rawConfig['core']) || isset($rawConfig['live'])) {
+        // Handle Split Structure
+        if (!empty($rawConfig['core'])) {
+            $this->curriculum[] = [
+                'title' => 'Core Training',
+                'lessons' => array_values($rawConfig['core'])
+            ];
+        }
+        if (!empty($rawConfig['live'])) {
+            $this->curriculum[] = [
+                'title' => 'Live Archive',
+                'lessons' => array_values($rawConfig['live'])
+            ];
+        }
+    } else {
+        // Handle Flat Structure (Wrap in single track)
+        $this->curriculum[] = [
+            'title' => 'Course Roadmap',
+            'lessons' => array_values($rawConfig)
+        ];
+    }
+
+    // 3. Initialize First Video / Module manually
     if (!empty($this->curriculum) && !empty($this->curriculum[0]['lessons'])) {
-        $this->selectLesson(0, 0);
+        $firstLesson = $this->curriculum[0]['lessons'][0];
+        
+        // Initial Lock Logic
+        $now = Carbon::now('Africa/Lagos');
+        $releaseAt = isset($firstLesson['release_at']) 
+            ? Carbon::parse($firstLesson['release_at'], 'Africa/Lagos') 
+            : $now->subDay(); 
+
+        if ($releaseAt->gt($now)) {
+            $this->isLocked = true;
+            $this->unlockDate = $releaseAt->format('M d, Y @ h:i A');
+            $this->currentVideoId = ''; 
+        } else {
+            $this->isLocked = false;
+            $this->currentVideoId = $getVideoUrl($firstLesson);
+        }
     }
 });
 
-$selectLesson = function ($modIndex, $lessIndex) {
+$selectLesson = function ($modIndex, $lessIndex) use ($getVideoUrl) {
     $this->activeModule = $modIndex;
     $this->activeLesson = $lessIndex;
     
-    // In your structure, the 'lesson' is actually the module item from the flat config.
-    $module = $this->curriculum[$modIndex];
-    $lesson = $module['lessons'][$lessIndex];
+    // Safety Check
+    if (!isset($this->curriculum[$modIndex]) || !isset($this->curriculum[$modIndex]['lessons'][$lessIndex])) {
+        return; 
+    }
     
-    // NEW LOGIC: Use Africa/Lagos timezone to ensure 12:00 AM WAT release works accurately
+    $section = $this->curriculum[$modIndex];
+    $lesson = $section['lessons'][$lessIndex];
+    
+    // LOCK LOGIC (Timezone Aware)
     $now = Carbon::now('Africa/Lagos');
     $releaseAt = isset($lesson['release_at']) 
         ? Carbon::parse($lesson['release_at'], 'Africa/Lagos') 
-        : $now->subDay(); // If no date, assume released
+        : $now->subDay(); 
 
     if ($releaseAt->gt($now)) {
         $this->isLocked = true;
@@ -60,24 +109,11 @@ $selectLesson = function ($modIndex, $lessIndex) {
         $this->currentVideoId = ''; 
     } else {
         $this->isLocked = false;
-        $this->updateVideoSource($lesson);
+        $this->currentVideoId = $getVideoUrl($lesson);
     }
-};
-
-$updateVideoSource = function ($lesson) {
-    $videoId = trim($lesson['video_id'] ?? '');
-    $libraryId = config('services.bunny.library_id'); 
-    
-    if (!$libraryId || !$videoId || $videoId === 'welcome_video_id' || str_contains($videoId, 'bunny_video_id')) {
-        $this->currentVideoId = ""; 
-        return;
-    }
-
-    $this->currentVideoId = "https://iframe.mediadelivery.net/embed/{$libraryId}/{$videoId}?autoplay=true&loop=false&muted=false&preload=true&responsive=true&context=true";
 };
 
 $toggleComplete = function ($lessonId) {
-    // Logic check: only allow completion of unlocked content
     if ($this->isLocked) return;
 
     $enrollment = Enrollment::where('email', auth()->user()->email)->first();
@@ -125,8 +161,8 @@ $toggleComplete = function ($lessonId) {
                     <div class="space-y-1">
                         @foreach($module['lessons'] as $lIndex => $lesson)
                             @php
-                                // Logic: Check individual item release time against current time in Nigeria
-                                $lessonLocked = isset($lesson['release_at']) && \Carbon\Carbon::parse($lesson['release_at'], 'Africa/Lagos')->isFuture();
+                                $releaseTime = isset($lesson['release_at']) ? \Carbon\Carbon::parse($lesson['release_at'], 'Africa/Lagos') : \Carbon\Carbon::now()->subDay();
+                                $lessonLocked = $releaseTime->isFuture();
                             @endphp
                             <button 
                                 wire:click="selectLesson({{ $mIndex }}, {{ $lIndex }})"
@@ -138,9 +174,9 @@ $toggleComplete = function ($lessonId) {
                                        ($lessonLocked ? 'border-zinc-800 text-zinc-700 bg-zinc-900/50' : 
                                        (($activeModule === $mIndex && $activeLesson === $lIndex) ? 'bg-cyan-500 border-cyan-400 text-black font-bold' : 'border-zinc-700 text-zinc-600 bg-zinc-800')) }}">
                                     @if(in_array($lesson['id'], $completedLessons))
-                                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
                                     @elseif($lessonLocked)
-                                         <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                        <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                     @else
                                         {{ $lIndex + 1 }}
                                     @endif
@@ -179,7 +215,7 @@ $toggleComplete = function ($lessonId) {
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                 </button>
                 <div class="hidden sm:block text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-[0.2em] border border-zinc-800 px-2 py-1 rounded">
-                    Terminal // Batch_001
+                    Terminal // Mod_{{ $activeLesson + 1 }}
                 </div>
                 <div class="sm:hidden text-[10px] font-mono font-bold text-cyan-500 uppercase tracking-widest">
                     M{{ $activeLesson + 1 }}
@@ -272,7 +308,7 @@ $toggleComplete = function ($lessonId) {
                                     wire:click="toggleComplete('{{ $curriculum[$activeModule]['lessons'][$activeLesson]['id'] }}')"
                                     class="inline-flex items-center gap-3 px-6 py-3 rounded-xl border transition-all text-[11px] font-black uppercase tracking-widest 
                                     {{ in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons) 
-                                        ? 'bg-zinc-900 border-green-500/50 text-green-500' 
+                                        ? 'bg-zinc-900 border-green-500/50 text-green-500 hover:bg-green-500/10' 
                                         : 'bg-white text-black hover:bg-cyan-500' }}"
                                 >
                                     @if(in_array($curriculum[$activeModule]['lessons'][$activeLesson]['id'], $completedLessons))
@@ -292,7 +328,7 @@ $toggleComplete = function ($lessonId) {
 
                     <!-- THE VAULT -->
                     <div class="space-y-6">
-                        @if(!$isLocked && $curriculum[$activeModule]['lessons'][$activeLesson]['has_blueprint'])
+                        @if(!$isLocked && ($curriculum[$activeModule]['lessons'][$activeLesson]['has_blueprint'] ?? false))
                             <div class="p-6 bg-zinc-900 border border-cyan-900/50 rounded-2xl relative overflow-hidden group shadow-lg">
                                 <h4 class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-3 flex items-center gap-2 relative z-10">
                                     <span class="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
