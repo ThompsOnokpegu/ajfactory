@@ -96,5 +96,15 @@ return [
             'has_blueprint' => true,
             'description' => "Our first group build. We covered:\n\n• order status routing (delivered, pending, cancelled) using an \n n8n Switch node and sending Gmail alerts for order #AJB0012.\n• Live Q&A regarding Module 02."
         ],
+        [
+            'id' => 'live-02',
+            'title' => 'Live Session #2: n8n Build & Q&A',
+            'release_at' => '2026-02-07 00:00:00',
+            'library_id' => '589383', // Bunny Library ID
+            'video_id' => '1d3b04b5-0270-47cd-851e-054ae2693187', // Upload your Google Meet recording here
+            'duration' => '71:00 Mins',
+            'has_blueprint' => true,
+            'description' => "Our second group build. We covered:\n\n• Webhook Concepts - a simple notification that an event happened. \n Webhooks have payload (the accompanying data).\n• Live Q&A regarding individual expectations from the course."
+        ],
     ]
 ];
