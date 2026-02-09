@@ -46,7 +46,7 @@
             </a>
 
             <!-- 2. Accelerator Waitlist -->
-            <a href="/builders" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
+            <a href="/accelerator" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
                 <div class="flex items-center justify-center gap-3">
                     <span class="text-lg">⚡️</span>
                     <span class="font-bold text-white tracking-wide">Join AI Accelerator (Cohort 2)</span>

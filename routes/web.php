@@ -12,7 +12,7 @@ use App\Http\Controllers\VaultController;
 */
 Route::get('/links', function () {
     return view('links');
-});
+})->name('links');
 // Agency Landing Page (Business Clients)
 Route::get('/', function () {
     return view('welcome');
@@ -26,20 +26,20 @@ Route::get('/terms', function () {
 // Builders Landing Page (TikTok Waitlist)
 Route::get('/builders', function () {
     return view('builders');
-});
+})->name('builders');
 
 // Accelerator Sales Page
 Route::get('/accelerator', function () {
     return view('accelerator');
-});
+})->name('accelerator');
 
 // Dedicated Checkout Page
 Route::get('/checkout', function () {
     return view('checkout');
-});
+})->name('checkout');
 
 // Thank You / Verification Page
-Volt::route('/thank-you', 'thank-you');
+Volt::route('/thank-you', 'thank-you')->name('thank-you');
 
 Volt::route('/booking', 'booking-form');
 /*
