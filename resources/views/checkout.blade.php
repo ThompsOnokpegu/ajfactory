@@ -17,10 +17,10 @@
         <!-- HEADER -->
         <header class="p-6 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md sticky top-0 z-50">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
-                <a href="/accelerator" class="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">← Back to Accelerator</a>
+                <a href="/accelerator" class="text-xs font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">← Accelerator</a>
                 <div class="text-[10px] font-mono text-cyan-500 uppercase tracking-widest flex items-center gap-2">
                     <span class="h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
-                    Terminal_Secure_Handshake
+                    Secure Checkout
                 </div>
             </div>
         </header>
@@ -40,12 +40,12 @@
                             DEEPR<span class="text-cyan-500 text-xs">WEB SERVICES</span>
                         </div>
                         <div class="text-[11px] font-mono text-zinc-500 leading-relaxed uppercase tracking-wider">
-                            <p>Jidu Airport Road Lugbe, Abuja.</p>
+                            <p>Jidu Airport Road, Abuja.</p>
                             <p>Nigeria</p>
                         </div>
                         <div class="text-[11px] font-mono text-zinc-400 space-y-1">
-                            <p>Support: <a href="mailto:tommyriode@gmail.com" class="text-cyan-500 hover:underline">tommyriode@gmail.com</a></p>
-                            <p>Line: <a href="tel:08068125034" class="text-cyan-500 hover:underline">08068125034</a></p>
+                            <p>Support: <a href="mailto:tommyriode@gmail.com" class="text-cyan-500 hover:underline">hello@ajbuildai.com</a></p>
+                            <p>Line: <a href="tel:08068125034" class="text-cyan-500 hover:underline">+2348068125034</a></p>
                         </div>
                     </div>
 

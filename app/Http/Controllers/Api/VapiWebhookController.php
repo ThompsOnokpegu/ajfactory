@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class VapiWebhookController extends Controller
 {
-    public function handle(Request $request)
+    public function handleWebhook(Request $request)
     {
         // 1. Log incoming data (Useful for debugging)
         Log::info('Vapi Webhook Received', $request->all());

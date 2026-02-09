@@ -187,7 +187,7 @@
             <!-- THE FOUNDING OFFER -->
             <section id="pricing" class="max-w-4xl mx-auto px-6 py-32 text-center">
                 <div class="space-y-4 mb-12">
-                    <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter">The Founding Batch.</h2>
+                    <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter">Cohort 02.</h2>
                     <p class="text-zinc-500">I can only handle 20 students because I am personally reviewing your workflows. Once these spots are gone, the price doubles, and the bonuses disappear.</p>
                 </div>
 
@@ -198,7 +198,7 @@
                         <div class="flex flex-col items-center mb-12">
                             <div class="text-zinc-500 line-through text-lg mb-2">Total Value: ₦150,000+</div>
                             <div class="text-6xl md:text-8xl font-black text-white tracking-tighter italic">₦79,000</div>
-                            <div class="text-zinc-500 text-sm font-mono mt-2 tracking-widest uppercase">/ Founding Member Price</div>
+                            <div class="text-zinc-500 text-sm font-mono mt-2 tracking-widest uppercase">/ Early Signup Price</div>
                         </div>
 
                         <div class="grid sm:grid-cols-2 gap-4 max-w-lg mx-auto mb-12 text-left">
@@ -251,12 +251,12 @@
                                 DEEPR<span class="text-cyan-500 text-sm">WEB SERVICES</span>
                             </div>
                             <div class="text-xs font-mono text-zinc-500 leading-relaxed uppercase tracking-[0.1em]">
-                                Jidu Airport Road Lugbe, Abuja.<br>
+                                Jidu Airport Road, Abuja.<br>
                                 Federal Capital Territory, Nigeria.
                             </div>
                             <div class="flex flex-col gap-2">
-                                <a href="mailto:tommyriode@gmail.com" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">tommyriode@gmail.com</a>
-                                <a href="tel:08068125034" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">08068125034</a>
+                                <a href="mailto:tommyriode@gmail.com" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">hello@ajbuildai.com</a>
+                                <a href="tel:08068125034" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">+2348068125034</a>
                             </div>
                         </div>
 

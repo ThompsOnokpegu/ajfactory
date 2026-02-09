@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'api/webhooks/paystack',        // Exclude paystack webhook route URI'
             'api/webhooks/vapi', // Exclude Vapi webhook route URI
+            'api/webhooks/flutterwave', // Exclude Flutterwave webhook route URI
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

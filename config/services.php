@@ -49,5 +49,10 @@ return [
         'library_id' => env('BUNNY_LIBRARY_ID'),
     ],
     
+    'flutterwave' => [
+        'public_key' => env('FLW_PUBLIC_KEY'),
+        'secret_key' => env('FLW_SECRET_KEY'),
+        'secret_hash' => env('FLUTTERWAVE_SECRET_HASH'),
+    ],
 
 ];
