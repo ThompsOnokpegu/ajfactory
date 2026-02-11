@@ -78,6 +78,15 @@ return [
             'duration' => '35:00',
             'has_blueprint' => true,
             'description' => "Taking your bots from 'Student Project' to 'Business Asset'. Topics:\n\n• Building a Global Error Handling workflow (The Safety Net).\n• The critical difference between Test URLs and Production Webhook URLs.\n• Managing Execution Data logs and exporting workflows for backup.\n• Free Google Cloud Hosting setup guide."
+        ],
+        [
+            'id' => 'module-09',
+            'title' => 'Module 09: FREE Google Cloud Hosting Guide',
+            'release_at' => '2026-02-11 00:00:00',
+            'video_id' => '27d0d009-27fc-432e-b246-63bfd77fb2a9',
+            'duration' => '33:00',
+            'has_blueprint' => true,
+            'description' => "A step-by-step walkthrough to get your n8n instance live on the web for free using Google Cloud's Always Free tier. We cover:\n\n• Setting up a Google Cloud Account and Navigating the Console.\n• Configuring a Compute Engine VM with Docker to host n8n.\n• Setting up a Reverse Proxy with Nginx and securing it with SSL (Let's Encrypt).\n• Connecting your custom domain and configuring DNS settings."
         ]
     ],
      /*

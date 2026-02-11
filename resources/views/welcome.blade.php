@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{{ config('app.name') }} | Speed-to-Lead Automation</title>
+        <title>Speed-to-Lead Automation | AJ Thompson</title>
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,81 +12,106 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
         
+        <style>
+            .glitch-text:hover { animation: glitch 0.3s cubic-bezier(.25,.46,.45,.94) both infinite; text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
+            @keyframes glitch { 0% { transform: translate(0); } 20% { transform: translate(-2px, 2px); } 40% { transform: translate(-2px, -2px); } 60% { transform: translate(2px, 2px); } 80% { transform: translate(2px, -2px); } 100% { transform: translate(0); } }
+            @keyframes flicker { 0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; } 20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; } }
+            .flicker-slow { animation: flicker 3s linear infinite; }
+        </style>
     </head>
     <body class="bg-zinc-950 text-white font-sans antialiased selection:bg-orange-500 selection:text-white overflow-x-hidden">
 
+        <!-- Background Grid -->
         <div class="fixed inset-0 z-0 pointer-events-none opacity-10" 
              style="background-image: linear-gradient(to right, #3f3f46 1px, transparent 1px), linear-gradient(to bottom, #3f3f46 1px, transparent 1px); background-size: 40px 40px;">
         </div>
 
-        <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-purple-900/20 blur-[120px] rounded-full z-0 pointer-events-none"></div>
+        <!-- Ambient Glow -->
+        <div class="fixed top-0 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-orange-900/10 blur-[120px] rounded-full z-0 pointer-events-none"></div>
 
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8">
             
+            <!-- NAVBAR -->
             <nav class="flex items-center justify-between py-8">
-                <div class="text-2xl font-black tracking-tighter italic">
-                    AJ.<span class="text-purple-500">THOMPSON</span>
+                <div class="text-2xl font-black tracking-tighter italic uppercase">
+                    AJ.<span class="text-orange-500">AUTOMATION</span>
                 </div>
                 <div class="flex items-center gap-6">
-                    <!-- Added Builders Link -->
-                    <a href="/accelerator" class="md:block text-xs font-mono text-cyan-500 hover:text-cyan-400 uppercase tracking-widest transition">
+                    <a href="/accelerator" class="text-xs font-mono text-zinc-500 hover:text-white uppercase tracking-widest transition border border-zinc-800 px-4 py-2 rounded">
                         For Builders
                     </a>
                 </div>
             </nav>
 
+            <!-- HERO SECTION -->
             <main class="grid lg:grid-cols-2 gap-16 items-start py-16 lg:py-24">
     
-                <div class="space-y-6">
-                    <h1 class="text-6xl lg:text-8xl font-black leading-[0.85] tracking-tighter font-['Space_Grotesk'] uppercase italic">
-                        STOP MISSING <br>
-                        <span class="text-orange-500">THE LEADS</span> <br>
-                        YOU PAID FOR.
+                <!-- LEFT: The Pitch -->
+                <div class="space-y-8">
+                    <!-- Status Indicator -->
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-zinc-900 border border-zinc-700 text-zinc-400 text-[9px] font-black uppercase tracking-[0.2em] flicker-slow">
+                        <span class="h-2 w-2 rounded-full bg-red-600 shadow-[0_0_8px_#dc2626]"></span>
+                        Leaking Revenue Detected
+                    </div>
+
+                    <!-- Headline -->
+                    <h1 class="text-5xl lg:text-7xl font-black leading-[0.9] tracking-tighter font-['Space_Grotesk'] uppercase italic">
+                        YOUR ADS ARE <br> WORKING. <br><br>
+                        YOUR <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-500 glitch-text">SPEED-TO-LEAD</span> <br>
+                        IS BROKEN.
                     </h1>
 
-                    <div class="max-w-md space-y-4">
-                        <p class="text-lg text-zinc-300 leading-snug">
-                            You’re running a service business. Your ads are bringing in leads. But if you aren't capturing them instantly across every channel, you're burning cash.
+                    <!-- Sub-headline -->
+                    <div class="max-w-xl space-y-6">
+                        <p class="text-lg text-zinc-300 leading-snug font-medium border-l-2 border-orange-500/50 pl-6">
+                            You are paying for leads that your team calls back 2 hours later. By then, they have already hired your competitor. Stop burning your marketing budget on slow follow-up.
                         </p>
+                        
                         <p class="text-zinc-500 font-mono text-sm leading-relaxed">
-                            I build complete automation ecosystems—AI Voice, SMS, WhatsApp, and Custom Workflows—that intercept, qualify, and book your leads 24/7. It's more than just a phone bot; it's your entire front-of-house, automated.
+                            I deploy commercial-grade <strong>AI Revenue Agents</strong> that intercept every lead instantly—via Voice, WhatsApp, or SMS. They qualify the prospect, handle objections, and book the appointment directly into your calendar in under 60 seconds.
                         </p>
                     </div>
 
-                    <div class="flex items-center gap-6 pt-4">
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white leading-none">10s</div>
-                            <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Response</div>
+                    <!-- The Stats (Proof) -->
+                    <div class="flex flex-wrap items-center gap-8 pt-6 border-t border-zinc-900">
+                        <div>
+                            <div class="text-3xl font-black text-white italic tracking-tighter">&lt; 2s</div>
+                            <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mt-1">Response Time</div>
                         </div>
-                        <div class="h-8 w-px bg-zinc-800"></div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white leading-none">24/7</div>
-                            <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Coverage</div>
+                        <div class="h-8 w-px bg-zinc-800 hidden sm:block"></div>
+                        <div>
+                            <div class="text-3xl font-black text-white italic tracking-tighter">24/7</div>
+                            <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mt-1">Agent Availability</div>
                         </div>
-                        <div class="h-8 w-px bg-zinc-800"></div>
-                        <div class="text-center">
-                            <div class="text-2xl font-bold text-white leading-none">0</div>
-                            <div class="text-[10px] text-zinc-500 uppercase font-black tracking-widest">Missed Ops</div>
+                        <div class="h-8 w-px bg-zinc-800 hidden sm:block"></div>
+                        <div>
+                            <div class="text-3xl font-black text-white italic tracking-tighter">100%</div>
+                            <div class="text-[9px] text-zinc-500 uppercase font-black tracking-widest mt-1">Lead Capture</div>
                         </div>
                     </div>
                 </div>
 
+                <!-- RIGHT: The Demo Form (Sticky) -->
                 <div class="relative sticky top-8">
-                    <div class="absolute -top-6 -left-6 bg-orange-500 text-black px-4 py-1 text-xs font-black uppercase tracking-widest rotate-[-2deg] z-20">
-                        Workflow Audit
+                    <div class="absolute -top-6 -left-6 bg-orange-600 text-white px-4 py-1.5 text-[10px] font-black uppercase tracking-widest rotate-[-2deg] z-20 shadow-xl shadow-orange-900/20">
+                        Book A Demo
                     </div>
+                    <!-- The Volt Component -->
                     <livewire:lead-demo-form />
                 </div>
 
             </main>
 
+            <!-- FOOTER / TRUST -->
             <div class="border-t border-zinc-900 py-12 mt-12">
-                <p class="text-center text-zinc-600 text-xs font-mono uppercase tracking-widest mb-8">Built on Enterprise Standards</p>
-                <div class="flex justify-center items-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                    <span class="text-xl font-bold font-['Space_Grotesk']">Laravel</span>
-                    <span class="text-xl font-bold font-['Space_Grotesk']">n8n</span>
-                    <span class="text-xl font-bold font-['Space_Grotesk']">Vapi</span>
-                    <span class="text-xl font-bold font-['Space_Grotesk']">Meta</span>
+                <p class="text-center text-zinc-600 text-[10px] font-mono uppercase tracking-[0.3em] mb-8">
+                    Built on Enterprise Infrastructure
+                </p>
+                <div class="flex justify-center items-center gap-12 opacity-40 grayscale hover:grayscale-0 transition-all duration-500">
+                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter">VAPI</span>
+                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter">OPENAI</span>
+                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter">META</span>
+                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter">TWILIO</span>
                 </div>
             </div>
 
