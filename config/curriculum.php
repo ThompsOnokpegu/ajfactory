@@ -115,5 +115,15 @@ return [
             'has_blueprint' => true,
             'description' => "Our second group build. We covered:\n\n• Webhook Concepts - a simple notification that an event happened. \n Webhooks have payload (the accompanying data).\n• Live Q&A regarding individual expectations from the course."
         ],
+        [
+            'id' => 'live-03',
+            'title' => 'Live Session #3: n8n Build & Q&A',
+            'release_at' => '2026-02-14 00:00:00',
+            'library_id' => '589383', // Bunny Library ID
+            'video_id' => 'eb4cf5bc-4bb8-4062-b9d4-a701f45444af', // Upload your Google Meet recording here
+            'duration' => '35:00 Mins',
+            'has_blueprint' => true,
+            'description' => "Our third group build. We covered:\n\n• Resolved Gemini dimension mismatch issue in the RAG workflow. \n• Discussed requirements for WhatsApp automation - Verified Meta Business, Twilio Account etc.\n• Benefits of GCL Hosting and alternatives \n• Live Q&A regarding local vs international phone numbers."
+        ],
     ]
 ];
