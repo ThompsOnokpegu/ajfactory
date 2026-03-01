@@ -125,5 +125,15 @@ return [
             'has_blueprint' => true,
             'description' => "Our third group build. We covered:\n\n• Resolved Gemini dimension mismatch issue in the RAG workflow. \n• Discussed requirements for WhatsApp automation - Verified Meta Business, Twilio Account etc.\n• Benefits of GCL Hosting and alternatives \n• Live Q&A regarding local vs international phone numbers."
         ],
+        [
+            'id' => 'live-04',
+            'title' => 'Live Session #4: Customer Acquisition Playbook',
+            'release_at' => '2026-02-21 00:00:00',
+            'library_id' => '589383', // Bunny Library ID
+            'video_id' => '05429538-2ef9-48cc-b452-034d0127c8d9', // Upload your Google Meet recording here
+            'duration' => '32:41 Mins',
+            'has_blueprint' => false,
+            'description' => "Our fourth group build. We covered:\n\n• The Mindset Shift: Selling results, not \"AI\". \n• The \"Loom Audit\" outreach method. \n• The 7-day free trials.\n• How to price your setup fees and monthly retainers."
+        ],
     ]
 ];
