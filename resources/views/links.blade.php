@@ -45,7 +45,29 @@
                 <div class="absolute inset-0 border border-cyan-500/0 rounded-xl transition-all group-hover:border-cyan-500/20"></div>
             </a>
 
-            <!-- 2. Accelerator Waitlist -->
+            <!-- 2. Masterclass Waitlist -->
+            <a href="/builders" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl transition-all duration-300 btn-hover-effect hover:-translate-y-1 hover:border-zinc-700 hover:bg-zinc-900/90">
+                <div class="flex items-start gap-2">
+                    <!-- Icon: Centered vertically with the first line of text -->
+                    <div class="flex-shrink-0 mt-1">
+                        <span class="text-lg">🧠</span>
+                    </div>
+                    
+                    <!-- Text Block: Title on top, Description below -->
+                    <div class="flex flex-col text-left">
+                        <span class="font-bold text-white text-lg tracking-wide group-hover:text-cyan-400 transition-colors">
+                            AI Masterclass-March.18th
+                        </span>
+                        <p class="text-sm text-zinc-400 mt-1 leading-relaxed max-w-[90%]">
+                            The ₦800k Workflow: How to Build & Sell AI Employees in 2026. (Waitlist Open)
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Status Indicator: Pulsing cyan dot -->
+                <span class="absolute top-6 right-6 h-2 w-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_12px_rgba(6,182,212,0.6)]"></span>
+            </a>
+            <!-- 3. Accelerator Waitlist -->
             <a href="/accelerator" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
                 <div class="flex items-center justify-center gap-3">
                     <span class="text-lg">⚡️</span>
@@ -55,7 +77,7 @@
                 <span class="absolute top-1/2 -translate-y-1/2 right-4 h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
             </a>
 
-            <!-- 3. The Playbook (Lead Magnet) -->
+            <!-- 4. The Playbook (Lead Magnet) -->
             <a href="#" class="group relative block w-full bg-white text-zinc-950 border border-white p-4 rounded-xl text-center transition-all duration-300 hover:bg-cyan-400 hover:border-cyan-400 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(34,211,238,0.4)]">
                 <div class="flex items-center justify-center gap-3">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>

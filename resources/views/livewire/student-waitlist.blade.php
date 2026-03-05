@@ -60,10 +60,10 @@ new class extends Component {
             For Developers & Builders
         </span>
         <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">
-            Want to build <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">systems like this?</span>
+            How to Build <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">& Sell AI Employees for ₦800k+</span>
         </h2>
         <p class="text-zinc-400 mt-6 max-w-lg mx-auto text-lg leading-relaxed">
-            I'm documenting the exact stack (Laravel + n8n + Vapi) I use to scale service businesses. Join the list for the upcoming workshop & community.
+            Join the waitlist for the March 18th Masterclass. Only 20 seats for the Accelerator.
         </p>
     </div>
 
@@ -76,9 +76,10 @@ new class extends Component {
         @else
             <div class="flex flex-col gap-3">
                 <select wire:model="interest" class="w-full bg-zinc-950 border-zinc-800 text-zinc-400 text-sm rounded-lg focus:ring-cyan-500 focus:border-cyan-500 block p-3">
-                    <option value="course">I want a Course</option>
+                    <option value="course">AI Masterclass</option>
+                    {{-- <option value="course">I want a Course</option>
                     <option value="mentorship">1-on-1 Mentorship</option>
-                    <option value="community">Community Access</option>
+                    <option value="community">Community Access</option> --}}
                 </select>
                 
                 <input type="email" wire:model="email" placeholder="Email Address" 
