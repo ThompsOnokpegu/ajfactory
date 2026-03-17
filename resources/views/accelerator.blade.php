@@ -152,7 +152,7 @@
                         <ul class="space-y-4">
                             <li class="flex items-start gap-3 text-sm text-zinc-400">
                                 <span class="text-cyan-500 mt-1">→</span>
-                                You're tired of watching "YouTube gurus" and want to actually ship code.
+                                You're tired of watching "YouTube gurus" and want to actually ship AI Workflows.
                             </li>
                             <li class="flex items-start gap-3 text-sm text-zinc-400">
                                 <span class="text-cyan-500 mt-1">→</span>

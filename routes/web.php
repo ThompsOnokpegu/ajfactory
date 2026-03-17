@@ -13,6 +13,11 @@ use App\Http\Controllers\VaultController;
 Route::get('/links', function () {
     return view('links');
 })->name('links');
+
+Route::get('/resume', function () {
+    return view('resume');
+})->name('resume');
+
 // Agency Landing Page (Business Clients)
 Route::get('/', function () {
     return view('welcome');
