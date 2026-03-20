@@ -10,6 +10,10 @@ use App\Http\Controllers\VaultController;
 | Public Marketing & Sales Routes
 |--------------------------------------------------------------------------
 */
+Route::get('/onboarding', function () {
+    return view('onboarding');
+})->name('onboarding'); // Create this view and wrap the component inside it
+
 Route::get('/links', function () {
     return view('links');
 })->name('links');

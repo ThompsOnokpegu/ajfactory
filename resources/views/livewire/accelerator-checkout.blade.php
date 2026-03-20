@@ -38,7 +38,7 @@ new class extends Component {
         // Server-side check using African/Lagos timezone
         $now = Carbon::now('Africa/Lagos');
         $deadlineDate = Carbon::parse($this->deadline, 'Africa/Lagos');
-        $this->isDiscountActive = false;//$now->lt($deadlineDate);
+        $this->isDiscountActive = $now->lt($deadlineDate);
     }
 
     // Called by AlpineJS when timer hits zero
