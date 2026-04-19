@@ -37,10 +37,10 @@
         <div class="w-full space-y-4">
             
             <!-- 1. Agency Lead Magnet (Generalized) -->
-            <a href="https://cal.com/thompson-ajegre" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
+            <a href="https://repetigo.co/book" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
                 <div class="flex items-center justify-center gap-3">
                     <span class="text-lg">💼</span>
-                    <span class="font-bold text-white tracking-wide">Service Business? Book AI Audit</span>
+                    <span class="font-bold text-white tracking-wide">Book Discovery Call</span>
                 </div>
                 <div class="absolute inset-0 border border-cyan-500/0 rounded-xl transition-all group-hover:border-cyan-500/20"></div>
             </a>
@@ -56,7 +56,7 @@
                     <!-- Text Block: Title on top, Description below -->
                     <div class="flex flex-col text-left">
                         <span class="font-bold text-white text-lg tracking-wide group-hover:text-cyan-400 transition-colors">
-                            AI Masterclass-March.18th
+                            AI Masterclass-May.2nd
                         </span>
                         <p class="text-sm text-zinc-400 mt-1 leading-relaxed max-w-[90%]">
                             The ₦800k Workflow: How to Build & Sell AI Employees in 2026. (Waitlist Open)
@@ -71,7 +71,7 @@
             <a href="/accelerator" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
                 <div class="flex items-center justify-center gap-3">
                     <span class="text-lg">⚡️</span>
-                    <span class="font-bold text-white tracking-wide">Join AI Accelerator (Cohort 2)</span>
+                    <span class="font-bold text-white tracking-wide">Join AI Accelerator (May 8th)</span>
                 </div>
                 <!-- Subtle "Closed" or "Waitlist" tag if needed -->
                 <span class="absolute top-1/2 -translate-y-1/2 right-4 h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
