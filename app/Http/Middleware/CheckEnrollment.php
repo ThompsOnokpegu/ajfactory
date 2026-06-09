@@ -28,6 +28,11 @@ class CheckEnrollment
             return redirect('/checkout')->with('error', 'Please complete your enrollment to access the terminal.');
         }
 
+        // Installment balance overdue past the grace period — access is paused until it clears.
+        if ($enrollment->access_suspended) {
+            return redirect('/checkout')->with('error', 'Your installment balance is overdue. Please clear it to restore access to the terminal.');
+        }
+
         return $next($request);
     }
 }

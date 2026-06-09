@@ -39,6 +39,9 @@ return [
         'webhook_url' => env('N8N_WEBHOOK_URL'),
         'student_webhook_url' => env('N8N_STUDENT_WEBHOOK_URL'),
         'enrollment_webhook' => env('N8N_ENROLLMENT_WEBHOOK'),
+        // Fires the installment payment-link / reminder / suspension flow.
+        // Falls back to enrollment_webhook if unset.
+        'installment_webhook' => env('N8N_INSTALLMENT_WEBHOOK'),
     ],
     'paystack' => [
         'public_key' => env('PAYSTACK_PUBLIC_KEY'),

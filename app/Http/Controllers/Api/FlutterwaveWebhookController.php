@@ -36,51 +36,123 @@ class FlutterwaveWebhookController extends Controller
             $reference = $data['tx_ref'];
             $flwId = $data['id'];
 
+            $secretKey = config('services.flutterwave.secret_key', env('FLW_SECRET_KEY'));
             $enrollment = Enrollment::where('payment_reference', $reference)->first();
 
-            // 3. Prevent Duplicate Processing
-            if ($enrollment && $enrollment->status !== 'paid') {
-                
-                // 4. Server-to-Server Verification (Critical)
-                $secretKey = config('services.flutterwave.secret_key', env('FLW_SECRET_KEY'));
-                $verify = Http::withToken($secretKey)->get("https://api.flutterwave.com/v3/transactions/{$flwId}/verify");
+            if ($enrollment) {
+                // ---- FIRST PAYMENT (full, early-bird, or 1st installment) ----
+                if ($enrollment->status !== 'paid') {
 
-                if ($verify->successful() && $verify->json('data.status') === 'successful') {
-                    $verifiedData = $verify->json('data');
-                    
-                    // Check Currency and Amount
-                    if ($verifiedData['currency'] === $enrollment->currency && $verifiedData['amount'] >= $enrollment->amount) {
-                        
-                        // A. Update Enrollment
-                        $enrollment->update([
-                            'status' => 'paid',
-                            'paid_at' => now(),
-                            'paystack_payload' => $verifiedData // Storing FLW data in the existing payload column
-                        ]);
+                    // Server-to-Server Verification (Critical)
+                    $verify = Http::withToken($secretKey)->get("https://api.flutterwave.com/v3/transactions/{$flwId}/verify");
 
-                        // B. Create User Account
-                        $tempPassword = Str::random(14);
-                        User::firstOrCreate(
-                            ['email' => $enrollment->email],
-                            [
-                                'name' => $enrollment->full_name,
-                                'password' => Hash::make($tempPassword)
-                            ]
-                        );
+                    if ($verify->successful() && $verify->json('data.status') === 'successful') {
+                        $verifiedData = $verify->json('data');
 
-                        // C. Trigger n8n Automation
-                        $this->triggerAutomation($enrollment, $tempPassword);
-                        
-                        Log::info("Flutterwave Payment Verified: {$reference}");
-                    } else {
-                        Log::error("Flutterwave Amount/Currency Mismatch: {$reference}");
-                        $enrollment->update(['status' => 'amount_mismatch']);
+                        // Check Currency and Amount
+                        if ($verifiedData['currency'] === $enrollment->currency && $verifiedData['amount'] >= $enrollment->amount) {
+
+                            // A. Update Enrollment
+                            $enrollment->update([
+                                'status' => 'paid',
+                                'paid_at' => now(),
+                                'paystack_payload' => $verifiedData // Storing FLW data in the existing payload column
+                            ]);
+
+                            // A2. Installment: schedule the 2nd payment due date.
+                            if ($enrollment->plan_type === 'installment' && (float)$enrollment->balance_due > 0) {
+                                $enrollment->update([
+                                    'second_payment_due_at' => now()->addDays((int) config('accelerator.installment_due_days', 14)),
+                                ]);
+                            }
+
+                            // B. Create User Account
+                            $tempPassword = Str::random(14);
+                            User::firstOrCreate(
+                                ['email' => $enrollment->email],
+                                [
+                                    'name' => $enrollment->full_name,
+                                    'password' => Hash::make($tempPassword)
+                                ]
+                            );
+
+                            // C. Trigger n8n Automation
+                            $this->triggerAutomation($enrollment, $tempPassword);
+
+                            Log::info("Flutterwave Payment Verified: {$reference}");
+                        } else {
+                            Log::error("Flutterwave Amount/Currency Mismatch: {$reference}");
+                            $enrollment->update(['status' => 'amount_mismatch']);
+                        }
                     }
                 }
+            } else {
+                // ---- SECOND INSTALLMENT PAYMENT (paid via the n8n link, different tx_ref) ----
+                $this->handleSecondInstallment($reference, $flwId, $secretKey);
             }
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * Reconcile a second installment payment (USD path). The tx_ref was
+     * pre-generated by installments:process and stored on the enrollment.
+     */
+    private function handleSecondInstallment(string $reference, $flwId, string $secretKey): void
+    {
+        $enrollment = Enrollment::where('second_payment_reference', $reference)
+            ->where('second_payment_status', '!=', 'paid')
+            ->first();
+
+        if (! $enrollment) {
+            return;
+        }
+
+        $verify = Http::withToken($secretKey)->get("https://api.flutterwave.com/v3/transactions/{$flwId}/verify");
+
+        if (! $verify->successful() || $verify->json('data.status') !== 'successful') {
+            return;
+        }
+
+        $verifiedData = $verify->json('data');
+
+        if ($verifiedData['currency'] === $enrollment->currency && $verifiedData['amount'] >= (float)$enrollment->balance_due) {
+            $enrollment->update([
+                'second_payment_status' => 'paid',
+                'balance_due' => 0,
+                'access_suspended' => false,
+            ]);
+
+            $this->triggerInstallmentCompleted($enrollment);
+        } else {
+            Log::error("Flutterwave Installment Amount/Currency Mismatch: {$reference}");
+        }
+    }
+
+    private function triggerInstallmentCompleted($enrollment): void
+    {
+        $url = config('services.n8n.installment_webhook') ?: config('services.n8n.enrollment_webhook');
+
+        if (! $url) {
+            return;
+        }
+
+        try {
+            Http::post($url, [
+                'event' => 'installment_completed',
+                'gateway' => 'flutterwave',
+                'full_name' => $enrollment->full_name,
+                'email' => $enrollment->email,
+                'phone' => $enrollment->whatsapp,
+                'amount' => $enrollment->amount_total,
+                'currency' => $enrollment->currency,
+                'reference' => $enrollment->second_payment_reference,
+                'original_reference' => $enrollment->payment_reference,
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Installment completion trigger failed for {$enrollment->email}: " . $e->getMessage());
+        }
     }
 
     private function triggerAutomation($enrollment, $tempPassword)
@@ -96,6 +168,10 @@ class FlutterwaveWebhookController extends Controller
                 'login_url' => url('/login'),
                 'amount' => $enrollment->amount,
                 'currency' => $enrollment->currency,
+                'plan_type' => $enrollment->plan_type,
+                'amount_total' => $enrollment->amount_total,
+                'balance_due' => $enrollment->balance_due,
+                'second_payment_status' => $enrollment->second_payment_status,
                 'reference' => $enrollment->payment_reference,
                 'paid_at' => $enrollment->paid_at->toIso8601String(),
             ]);
