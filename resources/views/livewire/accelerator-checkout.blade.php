@@ -2,24 +2,33 @@
 
 use Livewire\Volt\Component;
 use App\Models\Enrollment;
+use App\Support\Accelerator;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 new class extends Component {
     public string $email = '';
     public string $full_name = '';
     public string $whatsapp = '';
-    
-    // Currency State
-    public string $currency = 'NGN'; 
-    public float $amount = 79000; 
-    
-    public bool $isWaitlisted = false;
-    public string $statusMessage = '';
 
-    // Flash Sale State
-    public string $deadline = '2026-03-18 23:59:59'; // SET YOUR DEADLINE HERE (Format: YYYY-MM-DD HH:MM:SS)
-    public bool $isDiscountActive = false;
+    // Plan + currency
+    public string $plan = 'full';      // full | installment
+    public string $currency = 'NGN';   // NGN | USD
+
+    // Required "no-surprises" acknowledgement (gates the pay button)
+    public bool $acknowledged = false;
+
+    // Derived pricing (set by recalculate())
+    public float $amountToday = 0;     // charged now — also stored as Enrollment.amount
+    public float $amountTotal = 0;     // total cost of the chosen plan
+    public float $balanceDue = 0;      // outstanding after today's charge
+
+    // Cohort state
+    public bool $soldOut = false;
+    public int $seatsLeft = 0;
+    public bool $earlybird = false;
+
+    public bool $isReturning = false;
+    public string $statusMessage = '';
 
     protected $rules = [
         'full_name' => 'required|string|max:255',
@@ -29,233 +38,319 @@ new class extends Component {
 
     public function mount()
     {
-        $this->checkDiscount();
-        $this->recalculatePrice();
+        // Preselect the plan passed from the landing CTA (?plan=full|installment)
+        $requested = request('plan');
+        if (in_array($requested, ['full', 'installment'], true)) {
+            $this->plan = $requested;
+        }
+
+        $this->refreshCohortState();
+        $this->recalculate();
     }
 
-    public function checkDiscount()
+    public function refreshCohortState(): void
     {
-        // Server-side check using African/Lagos timezone
-        $now = Carbon::now('Africa/Lagos');
-        $deadlineDate = Carbon::parse($this->deadline, 'Africa/Lagos');
-        $this->isDiscountActive = $now->lt($deadlineDate);
+        $this->soldOut   = Accelerator::isSoldOut();
+        $this->seatsLeft = Accelerator::seatsLeft();
+        $this->earlybird = Accelerator::earlybirdActive();
     }
 
-    // Called by AlpineJS when timer hits zero
-    public function expireDiscount()
+    public function updatedPlan()
     {
-        $this->isDiscountActive = false;
-        $this->recalculatePrice();
+        $this->recalculate();
     }
 
-    public function updatedCurrency($value)
+    public function updatedCurrency()
     {
-        $this->recalculatePrice();
+        $this->recalculate();
     }
 
     public function updatedEmail($value)
     {
         if (!filter_var($value, FILTER_VALIDATE_EMAIL)) return;
 
+        // Pre-fill from an existing waitlist/student record if we recognise them
         $student = DB::table('students')->where('email', $value)->first();
-
         if ($student) {
-            $this->isWaitlisted = true;
+            $this->isReturning = true;
             $this->whatsapp = $student->whatsapp ?? $this->whatsapp;
             $this->full_name = $student->name ?? $this->full_name;
         } else {
-            $this->isWaitlisted = false;
+            $this->isReturning = false;
         }
-        
-        $this->recalculatePrice();
     }
 
-    public function recalculatePrice()
+    public function recalculate(): void
     {
-        // Always check the clock first before assigning price
-        $this->checkDiscount();
+        // Always recompute cohort state so prices never go stale mid-session
+        $this->refreshCohortState();
 
-        if ($this->currency === 'NGN') {
-            $this->amount = $this->isDiscountActive ? 59000 : 79000;
+        if ($this->plan === 'installment') {
+            $each = Accelerator::installmentEach($this->currency);
+            $this->amountToday = $each;
+            $this->amountTotal = $each * Accelerator::installmentCount();
+            $this->balanceDue  = $this->amountTotal - $each;
         } else {
-            // Equivalent USD pricing
-            $this->amount = $this->isDiscountActive ? 42 : 57; 
+            $this->amountToday = Accelerator::fullPrice($this->currency);
+            $this->amountTotal = $this->amountToday;
+            $this->balanceDue  = 0;
         }
     }
 
     public function initiatePayment()
     {
         $this->validate();
-        
-        // Final server-side security check right before generating the payment
-        $this->recalculatePrice();
+
+        // Server-side guards (UI also enforces these)
+        $this->refreshCohortState();
+        if ($this->soldOut) {
+            $this->statusMessage = 'This cohort is full. Please join the waitlist.';
+            return;
+        }
+        if (! $this->acknowledged) {
+            $this->statusMessage = 'Please confirm you have read the Requirements & Costs.';
+            return;
+        }
+
+        // Final server-side price lock right before generating the charge
+        $this->recalculate();
 
         try {
             $prefix = ($this->currency === 'NGN') ? 'ACC_' : 'INT_';
             $reference = $prefix . bin2hex(random_bytes(8));
 
             Enrollment::create([
-                'full_name' => $this->full_name,
-                'email' => $this->email,
-                'whatsapp' => $this->whatsapp,
-                'payment_reference' => $reference,
-                'amount' => $this->amount,
-                'currency' => $this->currency, 
-                'status' => 'pending',
+                'full_name'             => $this->full_name,
+                'email'                 => $this->email,
+                'whatsapp'              => $this->whatsapp,
+                'payment_reference'     => $reference,
+                'amount'                => $this->amountToday,   // charged now — matched by the webhook
+                'plan_type'             => $this->plan,
+                'amount_total'          => $this->amountTotal,
+                'balance_due'           => $this->balanceDue,
+                'second_payment_status' => $this->plan === 'installment' ? 'pending' : 'none',
+                'currency'              => $this->currency,
+                'status'                => 'pending',
             ]);
 
             if ($this->currency === 'NGN') {
                 $this->dispatch('launch-paystack', [
                     'email' => $this->email,
-                    'amount' => $this->amount * 100, 
+                    'amount' => $this->amountToday * 100, // kobo
                     'reference' => $reference,
                     'key' => config('services.paystack.public_key'),
-                    'metadata' => ['full_name' => $this->full_name]
+                    'metadata' => ['full_name' => $this->full_name, 'plan' => $this->plan],
                 ]);
             } else {
                 $this->dispatch('launch-flutterwave', [
                     'email' => $this->email,
-                    'amount' => $this->amount,
+                    'amount' => $this->amountToday,
                     'currency' => 'USD',
                     'reference' => $reference,
-                    'key' => env('FLW_PUBLIC_KEY'), 
+                    'key' => config('services.flutterwave.public_key'),
                     'name' => $this->full_name,
-                    'phone' => $this->whatsapp
+                    'phone' => $this->whatsapp,
                 ]);
             }
-
         } catch (\Exception $e) {
             $this->statusMessage = "Initialization failed. Please refresh.";
             \Log::error("Checkout Error: " . $e->getMessage());
         }
     }
+
+    public function with(): array
+    {
+        return [
+            'symbol'      => $this->currency === 'NGN' ? '₦' : '$',
+            'cap'         => (int) config('accelerator.cohort_cap'),
+            'fullNow'     => Accelerator::fullPrice($this->currency),
+            'fullRegular' => Accelerator::regularFullPrice($this->currency),
+            'instEach'    => Accelerator::installmentEach($this->currency),
+            'instCount'   => Accelerator::installmentCount(),
+        ];
+    }
 }; ?>
 
-<div class="flex flex-col lg:flex-row max-w-6xl mx-auto w-full">
-    <!-- LEFT: ENROLLMENT FORM -->
-    <div class="flex-1 p-8 lg:p-16 border-r border-zinc-900">
-        <div class="max-w-md mx-auto">
-            
-            <!-- MASTERCLASS FLASH SALE BANNER -->
-            @if($isDiscountActive)
-            <div x-data="countdown('{{ $deadline }}')" class="mb-8 p-4 bg-orange-500/10 border border-orange-500/30 rounded-xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-orange-500/20 blur-3xl rounded-full pointer-events-none"></div>
-                <div class="flex items-center justify-between relative z-10">
-                    <div>
-                        <p class="text-[10px] font-black uppercase text-orange-500 tracking-widest animate-pulse">Masterclass Offer Active</p>
-                        <p class="text-white font-bold text-sm mt-1">Special price locks in:</p>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-2xl font-black font-mono text-white tracking-tighter" x-text="timeLeft">00:00:00</div>
-                    </div>
-                </div>
-            </div>
-            @endif
+<div x-data="{ ack: @entangle('acknowledged'), showReq: false }" class="flex flex-col lg:flex-row max-w-6xl mx-auto w-full">
 
-            <div class="mb-8">
-                <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter mb-4">Join Cohort 02.</h1>
-                
+    @if($soldOut)
+        <!-- SOLD OUT STATE -->
+        <div class="flex-1 p-8 lg:p-16 flex items-center justify-center">
+            <div class="max-w-md text-center space-y-6">
+                <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 border border-amber-500/40 text-amber-400">
+                    <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                </div>
+                <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Cohort 2 is full.</h1>
+                <p class="text-zinc-500 text-sm leading-relaxed">All {{ $cap }} seats are taken. Join the waitlist and we'll reach out the moment a seat opens or the next cohort is announced.</p>
+                <a href="/builders" class="inline-block px-8 py-4 bg-cyan-500 text-black font-black uppercase tracking-tighter text-lg rounded-2xl hover:bg-white transition-all">Join The Waitlist</a>
+            </div>
+        </div>
+    @else
+        <!-- LEFT: ENROLLMENT FORM -->
+        <div class="flex-1 p-8 lg:p-16 border-r border-zinc-900">
+            <div class="max-w-md mx-auto">
+                <div class="mb-8">
+                    <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Join Cohort 02.</h1>
+                    <p class="text-[11px] font-mono uppercase tracking-widest {{ $earlybird ? 'text-cyan-400' : 'text-zinc-500' }}">
+                        {{ $seatsLeft }} of {{ $cap }} seats left @if($earlybird) · early-bird active @endif
+                    </p>
+                </div>
+
+                <!-- PLAN SELECTION -->
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button type="button" wire:click="$set('plan', 'full')"
+                        class="text-left p-4 rounded-2xl border transition-all {{ $plan === 'full' ? 'border-cyan-500/60 bg-cyan-950/20' : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700' }}">
+                        <div class="text-[10px] font-black uppercase tracking-widest {{ $plan === 'full' ? 'text-cyan-400' : 'text-zinc-500' }}">Pay in full</div>
+                        <div class="text-xl font-black text-white mt-1">{{ $symbol }}{{ number_format($fullNow) }}</div>
+                        @if($earlybird)<div class="text-[10px] text-zinc-500 line-through">{{ $symbol }}{{ number_format($fullRegular) }}</div>@endif
+                    </button>
+                    <button type="button" wire:click="$set('plan', 'installment')"
+                        class="text-left p-4 rounded-2xl border transition-all {{ $plan === 'installment' ? 'border-cyan-500/60 bg-cyan-950/20' : 'border-zinc-800 bg-zinc-900/40 hover:border-zinc-700' }}">
+                        <div class="text-[10px] font-black uppercase tracking-widest {{ $plan === 'installment' ? 'text-cyan-400' : 'text-zinc-500' }}">{{ $instCount }} payments</div>
+                        <div class="text-xl font-black text-white mt-1">{{ $symbol }}{{ number_format($instEach) }} <span class="text-sm text-zinc-500">× {{ $instCount }}</span></div>
+                    </button>
+                </div>
+
                 <!-- CURRENCY TOGGLE -->
-                <div class="inline-flex bg-zinc-900 rounded-lg p-1 border border-zinc-800">
-                    <button wire:click="$set('currency', 'NGN')" 
+                <div class="inline-flex bg-zinc-900 rounded-lg p-1 border border-zinc-800 mb-8">
+                    <button type="button" wire:click="$set('currency', 'NGN')"
                         class="px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all {{ $currency === 'NGN' ? 'bg-cyan-900/30 text-cyan-400 shadow-sm border border-cyan-500/20' : 'text-zinc-500 hover:text-zinc-300' }}">
                         NGN (Local)
                     </button>
-                    <button wire:click="$set('currency', 'USD')" 
+                    <button type="button" wire:click="$set('currency', 'USD')"
                         class="px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all {{ $currency === 'USD' ? 'bg-cyan-900/30 text-cyan-400 shadow-sm border border-cyan-500/20' : 'text-zinc-500 hover:text-zinc-300' }}">
                         USD (Global)
                     </button>
                 </div>
-            </div>
-            
-            <form wire:submit.prevent="initiatePayment" class="space-y-6">
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest ml-1">Email Address</label>
-                    <input type="email" wire:model.blur="email" required 
-                           class="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-xl focus:border-cyan-500 focus:ring-0 transition-all font-medium placeholder:text-zinc-800" 
-                           placeholder="john@example.com">
-                    @error('email') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
-                </div>
 
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest ml-1">Full Name</label>
-                    <input type="text" wire:model="full_name" required 
-                           class="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-xl focus:border-cyan-500 focus:ring-0 transition-all font-medium placeholder:text-zinc-800" 
-                           placeholder="John Doe">
-                    @error('full_name') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
-                </div>
-
-                <div class="space-y-2">
-                    <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest ml-1">WhatsApp Number</label>
-                    <input type="text" wire:model="whatsapp" 
-                           class="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-xl focus:border-cyan-500 focus:ring-0 transition-all font-medium placeholder:text-zinc-800" 
-                           placeholder="+1 555...">
-                    @error('whatsapp') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
-                </div>
-
-                @if($statusMessage)
-                    <div class="p-3 bg-red-900/20 border border-red-500/50 text-red-500 text-xs font-mono">
-                        {{ $statusMessage }}
+                <form wire:submit.prevent="initiatePayment" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest ml-1">Email Address</label>
+                        <input type="email" wire:model.blur="email" required
+                               class="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-xl focus:border-cyan-500 focus:ring-0 transition-all font-medium placeholder:text-zinc-800"
+                               placeholder="john@example.com">
+                        @error('email') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
                     </div>
-                @endif
 
-                <div class="pt-6">
-                    <button type="submit" wire:loading.attr="disabled" 
-                            class="w-full py-5 bg-cyan-500 text-black font-black uppercase text-xl rounded-2xl hover:bg-white transition-all shadow-xl shadow-cyan-500/10 disabled:opacity-50">
-                        <span wire:loading.remove>
-                            {{ $currency === 'NGN' ? 'Pay ₦'.number_format($this->amount) : 'Pay $'.number_format($this->amount) }}
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest ml-1">Full Name</label>
+                        <input type="text" wire:model="full_name" required
+                               class="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-xl focus:border-cyan-500 focus:ring-0 transition-all font-medium placeholder:text-zinc-800"
+                               placeholder="John Doe">
+                        @error('full_name') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest ml-1">WhatsApp Number</label>
+                        <input type="text" wire:model="whatsapp"
+                               class="w-full bg-zinc-900 border border-zinc-800 text-white p-4 rounded-xl focus:border-cyan-500 focus:ring-0 transition-all font-medium placeholder:text-zinc-800"
+                               placeholder="+234 80...">
+                        @error('whatsapp') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
+                    </div>
+
+                    <!-- REQUIRED: No-surprises acknowledgement -->
+                    <label class="flex items-start gap-3 p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 cursor-pointer">
+                        <input type="checkbox" x-model="ack"
+                               class="mt-0.5 h-5 w-5 rounded border-zinc-700 bg-zinc-950 text-cyan-500 focus:ring-0 focus:ring-offset-0 shrink-0">
+                        <span class="text-xs text-zinc-400 leading-snug">
+                            I've read the
+                            <button type="button" @click.prevent="showReq = true" class="text-cyan-400 underline underline-offset-2 hover:text-cyan-300">Requirements &amp; Costs</button>
+                            and understand that beyond tuition I'll need ~one cheap domain (₦8–15k) and ~$5–10 of optional voice credits, plus a card that works for international/USD payments.
                         </span>
-                        <span wire:loading>Syncing Gateways...</span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+                    </label>
 
-    <!-- RIGHT: ORDER SUMMARY -->
-    <div class="w-full lg:w-[450px] p-8 lg:p-16 bg-zinc-900/10">
-        <div class="sticky top-32">
-            <h2 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-600 mb-8">Summary // Cohort_002</h2>
-            <div class="space-y-6">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <div class="text-lg font-bold text-white uppercase italic tracking-tighter">Accelerator</div>
-                        <div class="text-[10px] text-zinc-500 uppercase mt-1">AI Automation Factory</div>
+                    @if($statusMessage)
+                        <div class="p-3 bg-red-900/20 border border-red-500/50 text-red-500 text-xs font-mono rounded-lg">
+                            {{ $statusMessage }}
+                        </div>
+                    @endif
+
+                    <div class="pt-2">
+                        <button type="submit" wire:loading.attr="disabled" x-bind:disabled="!ack"
+                                class="w-full py-5 bg-cyan-500 text-black font-black uppercase text-xl rounded-2xl hover:bg-white transition-all shadow-xl shadow-cyan-500/10 disabled:opacity-40 disabled:cursor-not-allowed">
+                            <span wire:loading.remove>
+                                Pay {{ $symbol }}{{ number_format($amountToday) }}{{ $plan === 'installment' ? ' today' : '' }}
+                            </span>
+                            <span wire:loading>Syncing Gateways...</span>
+                        </button>
+                        <p x-show="!ack" x-cloak class="text-center text-[10px] text-zinc-600 uppercase tracking-widest mt-3">Tick the box above to continue</p>
                     </div>
-                    <div class="text-right">
-                        @if($isDiscountActive)
-                            <div class="text-xs text-zinc-500 line-through">
-                                {{ $currency === 'NGN' ? '₦79,000' : '$57' }}
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT: ORDER SUMMARY -->
+        <div class="w-full lg:w-[450px] p-8 lg:p-16 bg-zinc-900/10">
+            <div class="sticky top-32">
+                <h2 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-600 mb-8">Summary // Cohort_002</h2>
+                <div class="space-y-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="text-lg font-bold text-white uppercase italic tracking-tighter">Accelerator</div>
+                            <div class="text-[10px] text-zinc-500 uppercase mt-1">{{ $plan === 'installment' ? $instCount.' payments' : 'Pay in full' }}@if($earlybird && $plan === 'full') · early-bird @endif</div>
+                        </div>
+                        <div class="text-right">
+                            @if($earlybird && $plan === 'full')
+                                <div class="text-xs text-zinc-500 line-through">{{ $symbol }}{{ number_format($fullRegular) }}</div>
+                            @endif
+                            <div class="text-xl font-black {{ $earlybird && $plan === 'full' ? 'text-cyan-400' : 'text-white' }}">{{ $symbol }}{{ number_format($amountTotal) }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Today / balance breakdown -->
+                    <div class="space-y-2 pt-6 border-t border-zinc-900 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-zinc-500">Due today</span>
+                            <span class="text-white font-bold">{{ $symbol }}{{ number_format($amountToday) }}</span>
+                        </div>
+                        @if($plan === 'installment')
+                            <div class="flex justify-between">
+                                <span class="text-zinc-500">Balance ({{ $instCount - 1 }} × {{ $symbol }}{{ number_format($instEach) }})</span>
+                                <span class="text-zinc-400">{{ $symbol }}{{ number_format($balanceDue) }}</span>
                             </div>
-                            <div class="text-xl font-black text-cyan-400">
-                                {{ $currency === 'NGN' ? '₦' . number_format($amount) : '$' . $amount }}
-                            </div>
-                        @else
-                            <div class="text-xl font-black text-white">
-                                {{ $currency === 'NGN' ? '₦' . number_format($amount) : '$' . $amount }}
+                            <div class="flex justify-between pt-2 border-t border-zinc-900/60">
+                                <span class="text-zinc-500">Total</span>
+                                <span class="text-white font-bold">{{ $symbol }}{{ number_format($amountTotal) }}</span>
                             </div>
                         @endif
                     </div>
-                </div>
 
-                <div class="space-y-4 pt-8 border-t border-zinc-900">
-                    <div class="flex items-center gap-3 text-xs text-zinc-400">
-                        <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                        n8n Snapshot Vault (deployment ready)
+                    <div class="space-y-4 pt-8 border-t border-zinc-900">
+                        @foreach([
+                            '9 production workflows + full curriculum',
+                            'Ship-to-unlock + weekly live clinics',
+                            'n8n Snapshot Vault (deployment ready)',
+                            'Lifetime LMS access + future updates',
+                            'Completion guarantee',
+                        ] as $perk)
+                            <div class="flex items-center gap-3 text-xs text-zinc-400">
+                                <svg class="w-4 h-4 text-cyan-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+                                {{ $perk }}
+                            </div>
+                        @endforeach
                     </div>
-                    <div class="flex items-center gap-3 text-xs text-zinc-400">
-                        <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                        Private Community Access
-                    </div>
-                    <div class="flex items-center gap-3 text-xs text-zinc-400">
-                        <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                        Lifetime Strategy Updates
-                    </div>
-                    <div class="flex items-center gap-3 text-xs text-zinc-400">
-                        <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                        Weekly Live Q&A Sessions
+
+                    <!-- Trust: completion guarantee + secure payment -->
+                    <div class="pt-6 border-t border-zinc-900 space-y-3">
+                        <p class="text-[11px] text-zinc-500 leading-relaxed"><strong class="text-zinc-300">Finish, or we finish with you.</strong> If your stack isn't live by the end, you get free 1-on-1 sessions until it works.</p>
+                        <div class="flex items-center gap-2 text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
+                            <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                            Secure payment · {{ $currency === 'NGN' ? 'Paystack' : 'Flutterwave' }}
+                        </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    @endif
+
+    <!-- REQUIREMENTS & COSTS MODAL -->
+    <div x-show="showReq" x-cloak x-transition.opacity
+         class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/80 backdrop-blur-sm p-4 sm:p-8">
+        <div @click.outside="showReq = false" class="relative w-full max-w-3xl my-8 rounded-3xl border border-zinc-800 bg-zinc-950 p-6 sm:p-10">
+            <button type="button" @click="showReq = false" class="absolute top-5 right-5 text-zinc-500 hover:text-white text-2xl leading-none">&times;</button>
+            <x-requirements-costs />
+            <div class="mt-8 text-center">
+                <button type="button" @click="ack = true; showReq = false" class="px-8 py-4 bg-cyan-500 text-black font-black uppercase tracking-tighter rounded-2xl hover:bg-white transition-all">Got it — I understand</button>
             </div>
         </div>
     </div>
@@ -263,41 +358,8 @@ new class extends Component {
     <!-- ALPINE & PAYMENT SCRIPTS -->
     <script src="https://js.paystack.co/v1/inline.js"></script>
     <script src="https://checkout.flutterwave.com/v3.js"></script>
-    
+
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('countdown', (deadline) => ({
-                timeLeft: '00:00:00',
-                init() {
-                    // Adjust string format to ensure proper parsing across browsers (WAT is UTC+1)
-                    const deadlineString = deadline.replace(' ', 'T') + '+01:00';
-                    const endTime = new Date(deadlineString).getTime();
-                    
-                    const updateTimer = () => {
-                        const now = new Date().getTime();
-                        const distance = endTime - now;
-
-                        if (distance < 0) {
-                            this.timeLeft = '00:00:00';
-                            clearInterval(this.interval);
-                            // Tell Livewire the discount expired so it updates the price backend
-                            @this.call('expireDiscount');
-                            return;
-                        }
-
-                        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                        this.timeLeft = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                    };
-
-                    updateTimer(); // Initial call
-                    this.interval = setInterval(updateTimer, 1000); // Tick every second
-                }
-            }));
-        });
-
         document.addEventListener('livewire:init', () => {
             // PAYSTACK (NGN)
             Livewire.on('launch-paystack', (event) => {

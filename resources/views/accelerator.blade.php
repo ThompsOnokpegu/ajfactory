@@ -3,19 +3,19 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Master n8n, Vapi, and Meta Cloud API to build production-grade AI automations.">
+        <meta name="description" content="Build 9 real AI automations in 6 weeks — Telegram, WhatsApp & Voice AI on your own infrastructure, even if you can't code. Finish, or we coach you 1-on-1 until you do.">
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ config('app.url') }}">
-        <meta property="og:title" content="Automation Factory | AI Accelerator">
-        <meta property="og:description" content="Join the founding batch and master the AI automation stack.">
+        <meta property="og:title" content="AI Automation Accelerator | Cohort 2">
+        <meta property="og:description" content="Build 9 real AI automations in 6 weeks — and the playbook to charge for them.">
         <meta property="og:image" content="{{ asset('img/og-preview.jpg') }}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:image" content="{{ asset('img/og-preview.jpg') }}">
-        <title>AI Automation Builder Accelerator | AJ Thompson</title>
+        <title>AI Automation Accelerator | Cohort 2</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,6 +29,22 @@
             @keyframes pulse-border { 0% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } 50% { border-color: rgba(6, 182, 212, 0.6); box-shadow: 0 0 20px 0 rgba(6, 182, 212, 0.1); } 100% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } }
         </style>
     </head>
+    @php
+        use App\Support\Accelerator;
+
+        $seatsLeft   = Accelerator::seatsLeft();
+        $cap         = (int) config('accelerator.cohort_cap');
+        $soldOut     = Accelerator::isSoldOut();
+        $earlybird   = Accelerator::earlybirdActive();
+        $fullPrice   = Accelerator::fullPrice('NGN');
+        $regular     = Accelerator::regularFullPrice('NGN');
+        $instEach    = Accelerator::installmentEach('NGN');
+        $instCount   = Accelerator::installmentCount();
+        $startsAt    = Accelerator::cohortStartsAt();
+        $startLabel  = $startsAt ? $startsAt->format('l jS F') : '{{TODO: cohort start date}}';
+        $primaryCta  = $soldOut ? '/builders' : '/checkout?plan=full';
+        $primaryText = $soldOut ? 'Join The Waitlist' : 'Join Cohort 2 — ₦'.number_format($fullPrice);
+    @endphp
     <body class="bg-zinc-950 text-zinc-300 font-sans antialiased selection:bg-cyan-500 selection:text-black">
 
         <!-- Background grid & Orbs -->
@@ -45,203 +61,354 @@
                     </div>
                     <div class="hidden md:flex items-center gap-8">
                         <a href="#curriculum" class="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Curriculum</a>
+                        <a href="#pricing" class="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Pricing</a>
                         <a href="#guarantee" class="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Guarantee</a>
-                        <a href="/checkout" class="px-5 py-2 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded hover:bg-cyan-500 transition-all">Secure Spot</a>
+                        <a href="{{ $primaryCta }}" class="px-5 py-2 bg-white text-black text-[10px] font-black uppercase tracking-widest rounded hover:bg-cyan-500 transition-all">{{ $soldOut ? 'Waitlist' : 'Secure Spot' }}</a>
                     </div>
                 </div>
             </nav>
 
-            <!-- HERO SECTION -->
+            <!-- 3.1 HERO -->
             <section class="max-w-6xl mx-auto px-6 pt-20 pb-32 text-center">
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/30 text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] mb-10 badge-pulse">
                     <span class="h-2 w-2 rounded-full bg-cyan-500 shadow-[0_0_10px_#06b6d4] animate-pulse"></span>
-                    Limited to First 20 Builders
+                    AI Automation Accelerator · Cohort 2
                 </div>
-                
-                <h1 class="text-6xl md:text-8xl font-black text-white leading-[0.85] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
-                    BUILD COMMERCIAL <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 bg-300% animate-gradient">AI AGENTS.</span>
+
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-[0.95] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
+                    Build 9 real AI automations<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400">— and charge for them.</span>
                 </h1>
-                
-                <p class="text-xl md:text-2xl text-zinc-400 max-w-3xl mx-auto font-medium mb-12 leading-snug">
-                    I'm handing you the keys to the <span class="text-white border-b-2 border-cyan-500">exact automation stack</span> I use to build $1,500/mo systems for clinics and service businesses.
+
+                <p class="text-lg md:text-2xl text-zinc-400 max-w-3xl mx-auto font-medium mb-12 leading-snug">
+                    A hands-on, beginner-friendly cohort. Telegram, WhatsApp &amp; Voice AI on your own infrastructure — <span class="text-white border-b-2 border-cyan-500">even if you can't code.</span> Finish, or we coach you 1-on-1 until you do.
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                    <a href="/checkout" class="group relative px-10 py-5 bg-cyan-500 text-black font-black uppercase tracking-tighter text-xl hover:scale-105 transition-all rounded shadow-[0_0_30px_rgba(6,182,212,0.3)]">
-                        Join The Accelerator
-                        {{-- <span class="absolute -top-3 -right-3 bg-red-600 text-white text-[9px] px-2 py-1 rotate-3">Only 7 Spots Left</span> --}}
+                    <a href="{{ $primaryCta }}" class="group relative px-10 py-5 bg-cyan-500 text-black font-black uppercase tracking-tighter text-xl hover:scale-105 transition-all rounded shadow-[0_0_30px_rgba(6,182,212,0.3)]">
+                        {{ $primaryText }}
                     </a>
                 </div>
-                
-                <div class="mt-16 flex justify-center items-center gap-5 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
+
+                <!-- Trust line -->
+                <div class="mt-8 text-xs font-mono text-zinc-500 uppercase tracking-widest flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
+                    <span>{{ $startLabel }}</span>
+                    <span class="text-zinc-700">·</span>
+                    @if($soldOut)
+                        <span class="text-amber-400">Cohort full — join the waitlist</span>
+                    @else
+                        <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
+                    @endif
+                    <span class="text-zinc-700">·</span>
+                    <span>Installments available</span>
+                </div>
+
+                <div class="mt-16 flex flex-wrap justify-center items-center gap-5 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">N8N</span>
+                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">TELEGRAM</span>
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">WHATSAPP</span>
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">VAPI</span>
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">PINECONE</span>
-                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">TWILIO</span>
                 </div>
             </section>
 
-            <!-- THE STACK: VISUAL BREAKDOWN -->
+            <!-- 3.2 PROBLEM -> OUTCOME -->
+            <section class="max-w-6xl mx-auto px-6 py-20 border-t border-zinc-900">
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="p-10 rounded-3xl border border-zinc-800 bg-zinc-950/50">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-4">The Problem</div>
+                        <p class="text-lg text-zinc-400 leading-relaxed">
+                            Everyone's talking about AI automation. Most courses leave you with theory, surprise tool bills, and a half-built project you abandon.
+                        </p>
+                    </div>
+                    <div class="p-10 rounded-3xl border border-cyan-500/30 bg-cyan-950/10">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-cyan-500 mb-4">The Outcome</div>
+                        <p class="text-lg text-white leading-relaxed">
+                            You'll ship nine working automations, own your stack, and have a tested way to land paying clients.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3.3 WHAT YOU'LL BUILD -->
             <section id="curriculum" class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-900">
-                <div class="grid lg:grid-cols-3 gap-16">
-                    <div class="lg:col-span-1 space-y-6">
-                        <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Deployment Program</div>
-                        <h2 class="text-4xl font-black text-white uppercase italic tracking-tighter">Real-World <br>AI Agents.</h2>
-                        <p class="text-zinc-500 leading-relaxed">Most people build simple bots that break. We build <strong>resilient commercial-grade automation</strong> that handles errors, keeps logs, and scales with the business.</p>
-                        
-                        <div class="pt-8 space-y-4">
-                            <div class="flex items-center gap-3">
-                                <div class="h-5 w-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center">
-                                    <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                                </div>
-                                <span class="text-sm font-bold text-zinc-300">Self-Hosted n8n (Save $50/mo)</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="h-5 w-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center">
-                                    <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                                </div>
-                                <span class="text-sm font-bold text-zinc-300">WhatsApp Cloud API (Meta)</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="h-5 w-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center">
-                                    <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                                </div>
-                                <span class="text-sm font-bold text-zinc-300">Vapi Voice AI Architecture</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <div class="h-5 w-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center">
-                                    <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
-                                </div>
-                                <span class="text-sm font-bold text-zinc-300">Knowlegeable AI Agents</span>
-                            </div>
-                        </div>
+                <div class="text-center mb-16 space-y-3">
+                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// What You'll Build</div>
+                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">9 production-grade workflows,<br>built end-to-end.</h2>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <!-- Part 1 -->
+                    <div class="p-8 md:p-10 rounded-3xl border border-zinc-800 bg-zinc-900/40">
+                        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-2">Part 1 — Zero-Friction</div>
+                        <div class="text-zinc-500 text-xs mb-8">Free tools only.</div>
+                        <ul class="space-y-5">
+                            @foreach([
+                                ['Intake Funnel', 'form → email'],
+                                ['Automated Archivist', 'files invoices automatically'],
+                                ['Lead Qualifier', 'smart routing'],
+                                ['FX & Quotation Engine', 'live pricing'],
+                                ['AI Agent on Telegram', 'captures leads in real time'],
+                            ] as [$title, $desc])
+                                <li class="flex items-start gap-4">
+                                    <div class="mt-1 h-5 w-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center shrink-0">
+                                        <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-white">{{ $title }}</div>
+                                        <div class="text-xs text-zinc-500">{{ $desc }}</div>
+                                    </div>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
 
-                    <div class="lg:col-span-2 grid md:grid-cols-2 gap-4">
-                        <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl group hover:border-cyan-500/50 transition-all">
-                            <div class="text-[10px] font-mono text-zinc-600 mb-4 uppercase tracking-[0.2em]">Deployment_01</div>
-                            <h3 class="text-xl font-bold text-white mb-4 italic uppercase">The WhatsApp Interceptor</h3>
-                            <p class="text-sm text-zinc-500 leading-relaxed">Build the bot that doesn't just chat—it checks databases, confirms appointments, and triggers human-handoffs when things get serious.</p>
-                        </div>
-                        <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl group hover:border-cyan-500/50 transition-all">
-                            <div class="text-[10px] font-mono text-zinc-600 mb-4 uppercase tracking-[0.2em]">Deployment_02</div>
-                            <h3 class="text-xl font-bold text-white mb-4 italic uppercase">The AI Receptionist (Vapi)</h3>
-                            <p class="text-sm text-zinc-500 leading-relaxed">Master zero-latency voice agents. Learn how to prompt them for dental clinics, HVAC shops, and solar agencies.</p>
-                        </div>
-                        <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl group hover:border-cyan-500/50 transition-all">
-                            <div class="text-[10px] font-mono text-zinc-600 mb-4 uppercase tracking-[0.2em]">Deployment_03</div>
-                            <h3 class="text-xl font-bold text-white mb-4 italic uppercase">RAG & Vector Memory</h3>
-                            <p class="text-sm text-zinc-500 leading-relaxed">The AI needs to know the business. We connect Pinecone and PDFs so your agents speak with 100% accuracy from local data.</p>
-                        </div>
-                        <div class="p-8 bg-zinc-900 border border-cyan-900/30 rounded-3xl shimmer">
-                            <div class="text-[10px] font-mono text-cyan-500 mb-4 uppercase tracking-[0.2em]">The_Snapshot_Vault</div>
-                            <h3 class="text-xl font-bold text-white mb-4 italic uppercase">Import & Go.</h3>
-                            <p class="text-sm text-zinc-400 leading-relaxed">I am giving you the raw JSON files for every agent. Don't want to build from scratch? Click Import, paste your API keys, and deploy.</p>
+                    <!-- Part 2 -->
+                    <div class="p-8 md:p-10 rounded-3xl border border-cyan-900/40 bg-zinc-900 shimmer relative overflow-hidden">
+                        <div class="relative z-10">
+                            <div class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500 mb-2">Part 2 — Professional Agency</div>
+                            <div class="text-zinc-500 text-xs mb-8">Your own owned stack.</div>
+                            <ul class="space-y-5">
+                                @foreach([
+                                    ['Your own self-hosted server', '₦0 / month'],
+                                    ['RAG knowledge base', 'no hallucinations'],
+                                    ['Official WhatsApp bot', 'Meta Cloud API'],
+                                    ['AI voice receptionist', 'real-time, Vapi'],
+                                    ['The business/pricing playbook', 'land paying clients'],
+                                ] as [$title, $desc])
+                                    <li class="flex items-start gap-4">
+                                        <div class="mt-1 h-5 w-5 rounded-full bg-cyan-500/20 border border-cyan-500/50 flex items-center justify-center shrink-0">
+                                            <svg class="w-3 h-3 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" /></svg>
+                                        </div>
+                                        <div>
+                                            <div class="text-sm font-bold text-white">{{ $title }}</div>
+                                            <div class="text-xs text-zinc-500">{{ $desc }}</div>
+                                        </div>
+                                    </li>
+                                @endforeach
+                            </ul>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- WHO THIS IS FOR -->
-            <section class="max-w-7xl mx-auto px-6 py-24 bg-zinc-900/30 rounded-[3rem] border border-zinc-900">
-                <div class="grid md:grid-cols-2 gap-16">
-                    <div class="p-10 border-l-4 border-cyan-500 bg-zinc-900/50 rounded-r-3xl">
-                        <h4 class="text-xl font-bold text-white uppercase italic tracking-tighter mb-6">This is for you if...</h4>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3 text-sm text-zinc-400">
-                                <span class="text-cyan-500 mt-1">→</span>
-                                You're tired of watching "YouTube gurus" and want to actually ship AI Workflows.
-                            </li>
-                            <li class="flex items-start gap-3 text-sm text-zinc-400">
-                                <span class="text-cyan-500 mt-1">→</span>
-                                You want to charge businesses $1,500+ Setup Fees for automation.
-                            </li>
-                            <li class="flex items-start gap-3 text-sm text-zinc-400">
-                                <span class="text-cyan-500 mt-1">→</span>
-                                You want to master n8n, the most powerful visual logic engine on Earth.
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="p-10 border-l-4 border-zinc-800 bg-zinc-950/50 rounded-r-3xl">
-                        <h4 class="text-xl font-bold text-zinc-500 uppercase italic tracking-tighter mb-6">This is NOT for you if...</h4>
-                        <ul class="space-y-4">
-                            <li class="flex items-start gap-3 text-sm text-zinc-600 italic">
-                                <span class="text-zinc-700 mt-1">×</span>
-                                You're looking for a "get rich quick" button without doing the work.
-                            </li>
-                            <li class="flex items-start gap-3 text-sm text-zinc-600 italic">
-                                <span class="text-zinc-700 mt-1">×</span>
-                                You're afraid of technical documentation and learning APIs.
-                            </li>
-                            <li class="flex items-start gap-3 text-sm text-zinc-600 italic">
-                                <span class="text-zinc-700 mt-1">×</span>
-                                You aren't ready to invest in your own deployment infrastructure.
-                            </li>
-                        </ul>
-                    </div>
+            <!-- 3.4 HOW IT WORKS -->
+            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-900">
+                <div class="text-center mb-16 space-y-3">
+                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// How It Works</div>
+                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Why you'll actually finish.</h2>
+                    <p class="text-zinc-500 font-mono text-xs uppercase tracking-widest">6 weeks · ~5–8 hours/week</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    @foreach([
+                        ['Self-paced video', 'Every module lives on this LMS — learn on your schedule.'],
+                        ['Ship-to-unlock', 'The next module opens when you submit proof the last build works, so you never silently fall behind.'],
+                        ['Weekly live clinics', 'Build & Debug sessions — get unblocked in real time.'],
+                        ['Accountability pods', '3–4 classmates working alongside you.'],
+                    ] as $i => [$title, $desc])
+                        <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl hover:border-cyan-500/50 transition-all">
+                            <div class="text-[10px] font-mono text-cyan-500 mb-4 uppercase tracking-[0.2em]">0{{ $i + 1 }}</div>
+                            <h3 class="text-lg font-bold text-white mb-3 italic uppercase">{{ $title }}</h3>
+                            <p class="text-sm text-zinc-500 leading-relaxed">{{ $desc }}</p>
+                        </div>
+                    @endforeach
                 </div>
             </section>
 
-            <!-- THE FOUNDING OFFER -->
-            <section id="pricing" class="max-w-4xl mx-auto px-6 py-32 text-center">
-                <div class="space-y-4 mb-12">
+            <!-- 3.5 PROOF -->
+            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-900">
+                <div class="text-center mb-12 space-y-3">
+                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Proof</div>
+                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Builders, not bystanders.</h2>
+                </div>
+
+                @php $testimonials = Accelerator::publishedTestimonials(); @endphp
+                @if($testimonials->isNotEmpty())
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        @foreach($testimonials as $t)
+                            <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl">
+                                <p class="text-sm text-zinc-300 leading-relaxed mb-6">"{{ $t['quote'] ?? '' }}"</p>
+                                <div class="flex items-center gap-3">
+                                    @if(!empty($t['photo']))
+                                        <img src="{{ $t['photo'] }}" alt="{{ $t['name'] ?? '' }}" class="h-10 w-10 rounded-full object-cover">
+                                    @endif
+                                    <div>
+                                        <div class="text-sm font-bold text-white">{{ $t['name'] ?? '' }}</div>
+                                        <div class="text-[10px] text-zinc-500 uppercase tracking-widest">{{ $t['role'] ?? '' }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <!-- Graceful empty state — no fabricated testimonials -->
+                    <div class="max-w-2xl mx-auto p-12 rounded-3xl border border-dashed border-zinc-800 bg-zinc-950/40 text-center">
+                        <p class="text-zinc-500 text-sm leading-relaxed">
+                            Cohort 2 results land here as builders ship. Want to be one of the first case studies?
+                        </p>
+                        <a href="{{ $primaryCta }}" class="inline-block mt-6 px-6 py-3 border border-zinc-800 text-zinc-400 hover:text-white hover:border-cyan-500/50 transition-all uppercase font-black text-[10px] tracking-widest rounded-lg">
+                            {{ $soldOut ? 'Join The Waitlist' : 'Claim Your Seat' }}
+                        </a>
+                        {{-- {{TODO: owner adds real testimonials + build/result clips via config('accelerator.testimonials')}} --}}
+                    </div>
+                @endif
+            </section>
+
+            <!-- 3.6 OFFER STACK -->
+            <section class="max-w-4xl mx-auto px-6 py-24 border-t border-zinc-900">
+                <div class="text-center mb-12 space-y-3">
+                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// What's Included</div>
+                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Everything in the box.</h2>
+                </div>
+
+                <div class="rounded-3xl border border-zinc-800 bg-zinc-900/40 divide-y divide-zinc-900">
+                    @foreach([
+                        '10 modules · 9 production workflows (full curriculum)',
+                        'Ship-to-unlock structure + weekly live Build & Debug clinics',
+                        'Accountability pod (3–4 peers)',
+                        'Done-for-you friction kit: one-command self-host script, Money & Tools Map, sandbox/credit budgets, Meta verification help',
+                        'The Agency Toolkit: intake form, outreach script, onboarding roadmap, pricing playbook',
+                        'Lifetime LMS access + all future updates & session recordings',
+                        'Alumni community + Demo Day',
+                        'Completion guarantee (see below)',
+                    ] as $item)
+                        <div class="flex items-start gap-4 p-5">
+                            <svg class="w-5 h-5 text-cyan-500 shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+                            <span class="text-sm text-zinc-300 leading-snug">{{ $item }}</span>
+                        </div>
+                    @endforeach
+                </div>
+
+                <p class="mt-8 text-center text-base text-zinc-400 leading-relaxed max-w-2xl mx-auto">
+                    Agencies charge <span class="text-amber-400 font-bold">₦300k–1M to build <em>one</em></span> of these. You'll learn to build all nine — and sell them — for <span class="text-white font-bold">₦{{ number_format(config('accelerator.price_full')) }}</span>.
+                </p>
+            </section>
+
+            <!-- 3.7 PRICING -->
+            <section id="pricing" class="max-w-6xl mx-auto px-6 py-24 border-t border-zinc-900">
+                <div class="text-center mb-16 space-y-3">
                     <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter">Cohort 02.</h2>
-                    <p class="text-zinc-500">I can only handle 20 students because I am personally reviewing your workflows. Once these spots are gone, the price doubles, and the bonuses disappear.</p>
+                    @if($soldOut)
+                        <p class="text-amber-400 font-bold">This cohort is full. Join the waitlist for the next one.</p>
+                    @else
+                        <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.@if($earlybird) <span class="text-cyan-400">Early-bird pricing is live.</span>@endif</p>
+                    @endif
                 </div>
 
-                <div class="bg-zinc-900 border border-zinc-800 p-8 md:p-16 rounded-[4rem] relative overflow-hidden">
-                    <div class="absolute inset-0 shimmer opacity-50"></div>
-                    
-                    <div class="relative z-10">
-                        <div class="flex flex-col items-center mb-12">
-                            <div class="text-zinc-500 line-through text-lg mb-2">Total Value: ₦150,000+</div>
-                            <div class="text-6xl md:text-8xl font-black text-white tracking-tighter italic">₦79,000</div>
-                            <div class="text-zinc-500 text-sm font-mono mt-2 tracking-widest uppercase">/ Early Signup Price</div>
+                <div class="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <!-- Pay in full -->
+                    <div class="relative p-8 md:p-10 rounded-[2.5rem] border {{ $earlybird ? 'border-cyan-500/50' : 'border-zinc-800' }} bg-zinc-900/50 flex flex-col">
+                        @if($earlybird)
+                            <div class="absolute -top-3 left-8 bg-cyan-500 text-black text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded">Early-bird active</div>
+                        @endif
+                        <div class="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-4">Pay in full</div>
+                        <div class="flex items-end gap-3 mb-2">
+                            <div class="text-5xl font-black text-white tracking-tighter italic">₦{{ number_format($fullPrice) }}</div>
+                            @if($earlybird)
+                                <div class="text-zinc-600 line-through text-lg mb-1">₦{{ number_format($regular) }}</div>
+                            @endif
                         </div>
-
-                        <div class="grid sm:grid-cols-2 gap-4 max-w-lg mx-auto mb-12 text-left">
-                            <div class="flex items-center gap-2 text-[10px] font-black uppercase text-zinc-400">
-                                <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                                30-Day Deployment Roadmap
-                            </div>
-                            <div class="flex items-center gap-2 text-[10px] font-black uppercase text-zinc-400">
-                                <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                                Live Weekly Build-Along Q&A
-                            </div>
-                            <div class="flex items-center gap-2 text-[10px] font-black uppercase text-zinc-400">
-                                <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                                The Full Snapshot Vault
-                            </div>
-                            <div class="flex items-center gap-2 text-[10px] font-black uppercase text-zinc-400">
-                                <svg class="w-4 h-4 text-cyan-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                                Private Community Access
-                            </div>
+                        <div class="text-zinc-500 text-xs font-mono uppercase tracking-widest mb-8">
+                            {{ $earlybird ? 'Early-bird price · one payment' : 'One payment' }}
                         </div>
+                        <a href="{{ $soldOut ? '/builders' : '/checkout?plan=full' }}" class="mt-auto block text-center w-full py-4 bg-cyan-500 text-black font-black uppercase tracking-tighter text-lg rounded-2xl hover:bg-white transition-all">
+                            {{ $soldOut ? 'Join Waitlist' : 'Choose Full' }}
+                        </a>
+                    </div>
 
-                        <a href="/checkout" class="block w-full py-6 bg-cyan-500 text-black font-black uppercase tracking-tighter text-2xl rounded-2xl hover:bg-cyan-500 transition-all shadow-[0_20px_50px_rgba(255,255,255,0.1)]">
-                            SECURE MY SPOT NOW
+                    <!-- Installment -->
+                    <div class="p-8 md:p-10 rounded-[2.5rem] border border-zinc-800 bg-zinc-950/50 flex flex-col">
+                        <div class="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-4">{{ $instCount }} payments</div>
+                        <div class="flex items-end gap-2 mb-2">
+                            <div class="text-5xl font-black text-white tracking-tighter italic">₦{{ number_format($instEach) }}</div>
+                            <div class="text-zinc-500 text-xl font-bold mb-1">× {{ $instCount }}</div>
+                        </div>
+                        <div class="text-zinc-500 text-xs font-mono uppercase tracking-widest mb-8">
+                            Pay ₦{{ number_format($instEach) }} today · total ₦{{ number_format($instEach * $instCount) }}
+                        </div>
+                        <a href="{{ $soldOut ? '/builders' : '/checkout?plan=installment' }}" class="mt-auto block text-center w-full py-4 border border-zinc-700 text-white font-black uppercase tracking-tighter text-lg rounded-2xl hover:border-cyan-500 hover:text-cyan-400 transition-all">
+                            {{ $soldOut ? 'Join Waitlist' : 'Pay in 2' }}
                         </a>
                     </div>
                 </div>
+
+                <p class="mt-8 text-center text-[11px] font-mono text-zinc-600 uppercase tracking-widest">
+                    Secure checkout · Paystack (card or bank transfer) · USD via Flutterwave available
+                </p>
             </section>
 
-            <!-- GUARANTEE -->
-            <section id="guarantee" class="max-w-3xl mx-auto px-6 py-20 text-center mb-32">
+            <!-- 3.8 COMPLETION GUARANTEE -->
+            <section id="guarantee" class="max-w-3xl mx-auto px-6 py-24 text-center border-t border-zinc-900">
                 <div class="mb-8 flex justify-center">
                     <div class="w-20 h-20 border-2 border-cyan-500/20 rounded-full flex items-center justify-center">
                         <svg class="w-10 h-10 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     </div>
                 </div>
-                <h3 class="text-2xl font-black text-white uppercase italic mb-6">The "Zero-Risk" Deployment Policy</h3>
-                <p class="text-zinc-500 text-sm leading-relaxed max-w-lg mx-auto">
-                    "I am so confident in this stack that if you complete the 30-day roadmap and don't have a working AI agent running on your computer, I will personally jump on a private Zoom call with you and fix your logic. I don't let my students fail."
+                <h3 class="text-3xl font-black text-white uppercase italic mb-6">Finish, or we finish with you.</h3>
+                <p class="text-zinc-400 text-base leading-relaxed max-w-xl mx-auto">
+                    Do the work, attend the clinics, and if your stack still isn't live by the end of the cohort, you get free 1-on-1 sessions until it works — at no extra cost.
                 </p>
-                <div class="mt-6 font-mono text-[10px] uppercase text-zinc-600">— AJ Thompson // Founder</div>
             </section>
 
-            <!-- [STITCHING FOOTER AT THE BOTTOM] -->
+            <!-- 3.9 REQUIREMENTS & COSTS -->
+            <section class="max-w-4xl mx-auto px-6 py-24 border-t border-zinc-900">
+                <x-requirements-costs />
+            </section>
+
+            <!-- 3.10 FAQ -->
+            <section class="max-w-3xl mx-auto px-6 py-24 border-t border-zinc-900">
+                <div class="text-center mb-12 space-y-3">
+                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// FAQ</div>
+                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Straight answers.</h2>
+                </div>
+
+                <div class="space-y-3" x-data="{ open: null }">
+                    @foreach([
+                        ['Do I need to know how to code?', "No. It's drag-and-drop automation. If you can follow step-by-step instructions, you can do this."],
+                        ['What will it cost beyond the ₦79,000?', 'About one cheap domain (~₦8–15k/yr) and ~$5–10 of optional voice credits. Everything else runs on free tiers.'],
+                        ['Do I need a registered business (CAC)?', 'No — not to start or to finish. It\'s only needed for the optional WhatsApp module; without it you complete via the Telegram path.'],
+                        ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
+                        ['Do I need an international card?', 'Only for free Google Cloud verification and the optional voice credits — a virtual USD card works, or use our shared option.'],
+                        ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
+                        ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
+                        ['Can I pay in installments?', 'Yes — ₦42,000 × 2.'],
+                        ['What\'s the guarantee?', 'Do the work and if your stack still isn\'t live by the end, we coach you 1-on-1 until it is.'],
+                    ] as $i => [$q, $a])
+                        <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">
+                            <button type="button" @click="open === {{ $i }} ? open = null : open = {{ $i }}" class="w-full flex justify-between items-center gap-4 text-left p-5">
+                                <span class="text-sm font-bold text-white">{{ $q }}</span>
+                                <span class="text-cyan-500 text-xl shrink-0" x-text="open === {{ $i }} ? '−' : '+'">+</span>
+                            </button>
+                            <div x-show="open === {{ $i }}" x-cloak class="px-5 pb-5 text-sm text-zinc-400 leading-relaxed">{{ $a }}</div>
+                        </div>
+                    @endforeach
+                </div>
+            </section>
+
+            <!-- 3.11 FINAL CTA + SCARCITY -->
+            <section class="max-w-4xl mx-auto px-6 py-24 text-center border-t border-zinc-900">
+                <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-6">
+                    {{ $soldOut ? 'Cohort 2 is full.' : 'Your seat is waiting.' }}
+                </h2>
+                <p class="text-zinc-400 max-w-xl mx-auto mb-4 leading-relaxed">
+                    Build nine real automations, own your stack, and finish — backed by the completion guarantee. Finish, or we finish with you.
+                </p>
+                <div class="mb-10 text-xs font-mono text-zinc-500 uppercase tracking-widest flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
+                    <span>{{ $startLabel }}</span>
+                    <span class="text-zinc-700">·</span>
+                    @if($soldOut)
+                        <span class="text-amber-400">Waitlist open</span>
+                    @else
+                        <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
+                    @endif
+                </div>
+                <a href="{{ $primaryCta }}" class="inline-block px-12 py-6 bg-cyan-500 text-black font-black uppercase tracking-tighter text-2xl rounded-2xl hover:bg-white transition-all shadow-[0_20px_50px_rgba(6,182,212,0.2)]">
+                    {{ $primaryText }}
+                </a>
+            </section>
+
+            <!-- FOOTER -->
             <footer class="py-20 border-t border-zinc-900 bg-zinc-950 relative overflow-hidden">
                 <div class="max-w-6xl mx-auto px-6 relative z-10">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-24 mb-16">
@@ -255,7 +422,7 @@
                                 Federal Capital Territory, Nigeria.
                             </div>
                             <div class="flex flex-col gap-2">
-                                <a href="mailto:tommyriode@gmail.com" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">hello@ajbuildai.com</a>
+                                <a href="mailto:hello@ajbuildai.com" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">hello@ajbuildai.com</a>
                                 <a href="tel:08068125034" class="text-xs font-bold text-zinc-400 hover:text-cyan-500 transition">+2348068125034</a>
                             </div>
                         </div>
@@ -263,11 +430,11 @@
                         <!-- Legal Navigation -->
                         <div class="flex flex-col md:items-end gap-8">
                             <div class="flex flex-wrap gap-8 md:justify-end">
-                                <a href="{{ route("legal") }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Terms</a>
-                                <a href="{{ route("legal") }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Privacy</a>
-                                <a href="{{ route("legal") }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Refunds</a>
+                                <a href="{{ route('legal') }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Terms</a>
+                                <a href="{{ route('legal') }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Privacy</a>
+                                <a href="{{ route('legal') }}" class="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">Refunds</a>
                             </div>
-                            
+
                             <div class="text-right">
                                 <p class="text-[9px] font-mono text-zinc-700 uppercase tracking-widest leading-relaxed">
                                     A High-Performance Training Division by <br>
