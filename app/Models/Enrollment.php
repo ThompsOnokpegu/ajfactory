@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Enrollment extends Model
 {
@@ -21,6 +22,7 @@ class Enrollment extends Model
         'payment_reference',
         'amount',
         'plan_type',
+        'cohort',
         'amount_total',
         'balance_due',
         'second_payment_status',
@@ -50,6 +52,35 @@ class Enrollment extends Model
         'second_payment_due_at' => 'datetime',
         'installment_reminder_sent_at' => 'datetime',
         'access_suspended' => 'boolean',
+        'cohort' => 'integer',
         'completed_lessons' => 'array',
     ];
+
+    public function checkpoints(): HasMany
+    {
+        return $this->hasMany(Checkpoint::class);
+    }
+
+    /**
+     * Cohort 2+ uses ship-to-unlock (proof-gated modules). Cohort 1 is legacy /
+     * fully open — no checkpoint gating — so existing students are never locked
+     * out of modules they already had.
+     */
+    public function usesShipToUnlock(): bool
+    {
+        return (int) $this->cohort >= 2;
+    }
+
+    /**
+     * Module ids whose checkpoint this student has had approved.
+     *
+     * @return array<int, string>
+     */
+    public function approvedModuleIds(): array
+    {
+        return $this->checkpoints()
+            ->where('status', 'approved')
+            ->pluck('module_id')
+            ->all();
+    }
 }

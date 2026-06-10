@@ -26,6 +26,7 @@ return [
     'installment_grace_hours' => 24, // suspend access this long after the due date if still unpaid
 
     // --- Scarcity / cohort ---
+    'cohort_number'     => 2,     // stamped on new enrollments; >= 2 enables ship-to-unlock
     'cohort_cap'        => 25,
     'earlybird_seats'   => 10,    // early-bird active while seats_sold < this
     'earlybird_ends_at' => '2026-06-29 23:59:59', // Monday 29th June 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
@@ -33,6 +34,9 @@ return [
     'cart_closes_at'    => '2026-07-06 23:59:59', // Monday 6th July 2026
 
     'payment_provider'  => 'paystack', // or 'flutterwave'
+
+    // Telegram community — where students post their proof checkpoints.
+    'telegram_community_url' => env('ACCELERATOR_TELEGRAM_URL'), // {{TODO: Telegram group invite link}}
 
     /*
     | USD equivalents — powers the existing NGN/USD toggle (Flutterwave path).

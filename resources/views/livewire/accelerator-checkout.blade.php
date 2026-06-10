@@ -126,6 +126,7 @@ new class extends Component {
                 'payment_reference'     => $reference,
                 'amount'                => $this->amountToday,   // charged now — matched by the webhook
                 'plan_type'             => $this->plan,
+                'cohort'                => (int) config('accelerator.cohort_number', 2),
                 'amount_total'          => $this->amountTotal,
                 'balance_due'           => $this->balanceDue,
                 'second_payment_status' => $this->plan === 'installment' ? 'pending' : 'none',
