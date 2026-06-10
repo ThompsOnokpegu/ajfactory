@@ -68,6 +68,9 @@ Route::middleware(['auth', CheckEnrollment::class])->group(function () {
     // The Main Member Dashboard
     Volt::route('/dashboard', 'dashboard.terminal')->name('dashboard');
 
+    // Admin: review ship-to-unlock proof checkpoints (gated to admins inside the component)
+    Volt::route('/admin/checkpoints', 'admin.checkpoints')->name('admin.checkpoints');
+
     // Secure Snapshot Vault Downloads
     Route::get('/vault/download/{lessonId}', [VaultController::class, 'download'])
         ->name('vault.download');

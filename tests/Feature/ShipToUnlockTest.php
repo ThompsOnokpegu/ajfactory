@@ -87,6 +87,53 @@ it('rejects an invalid proof URL', function () {
     expect(Checkpoint::count())->toBe(0);
 });
 
+function makeAdmin(): User
+{
+    $admin = User::factory()->create();
+    $admin->forceFill(['is_admin' => true])->save();
+
+    return $admin;
+}
+
+function submittedCheckpoint(string $moduleId = 'module-01'): Checkpoint
+{
+    $student = makeStudent(2);
+    $enrollment = Enrollment::where('email', $student->email)->first();
+
+    return Checkpoint::create([
+        'enrollment_id' => $enrollment->id,
+        'module_id' => $moduleId,
+        'status' => 'submitted',
+        'proof_url' => 'https://loom.com/share/abc123',
+        'submitted_at' => now(),
+    ]);
+}
+
+it('lets an admin approve a checkpoint', function () {
+    $cp = submittedCheckpoint();
+    $this->actingAs(makeAdmin());
+
+    Volt::test('admin.checkpoints')->call('approve', $cp->id);
+
+    expect($cp->fresh()->status)->toBe('approved');
+    expect($cp->fresh()->reviewed_at)->not->toBeNull();
+});
+
+it('lets an admin reject a checkpoint with a note', function () {
+    $cp = submittedCheckpoint();
+    $this->actingAs(makeAdmin());
+
+    Volt::test('admin.checkpoints')->call('reject', $cp->id, 'Show the workflow actually running.');
+
+    expect($cp->fresh()->status)->toBe('rejected');
+    expect($cp->fresh()->note)->toBe('Show the workflow actually running.');
+});
+
+it('forbids non-admins from the review screen', function () {
+    $this->actingAs(makeStudent(2)); // paid student, not an admin
+    $this->get('/admin/checkpoints')->assertForbidden();
+});
+
 it('unlocks the next module once the previous checkpoint is approved', function () {
     config(['accelerator.cohort_starts_at' => now()->subDay()]);
 
