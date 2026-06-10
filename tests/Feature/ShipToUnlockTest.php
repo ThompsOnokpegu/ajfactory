@@ -129,6 +129,11 @@ it('lets an admin reject a checkpoint with a note', function () {
     expect($cp->fresh()->note)->toBe('Show the workflow actually running.');
 });
 
+it('renders the review screen for an admin', function () {
+    $this->actingAs(makeAdmin());
+    $this->get('/admin/checkpoints')->assertOk()->assertSee('Proof Checkpoints');
+});
+
 it('forbids non-admins from the review screen', function () {
     $this->actingAs(makeStudent(2)); // paid student, not an admin
     $this->get('/admin/checkpoints')->assertForbidden();
