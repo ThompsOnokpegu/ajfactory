@@ -74,6 +74,17 @@ it('lets a Cohort 2 student submit a proof checkpoint', function () {
     expect($cp->proof_url)->toBe('https://loom.com/share/abc123');
 });
 
+it('deep-links the proof panel to the module thread', function () {
+    config([
+        'accelerator.cohort_starts_at' => now()->subDay(),
+        'accelerator.telegram_threads' => ['module-01' => 'https://t.me/c/123456/45'],
+    ]);
+
+    $this->actingAs(makeStudent(2));
+
+    Volt::test('dashboard.terminal')->assertSee('https://t.me/c/123456/45');
+});
+
 it('rejects an invalid proof URL', function () {
     config(['accelerator.cohort_starts_at' => now()->subDay()]);
 

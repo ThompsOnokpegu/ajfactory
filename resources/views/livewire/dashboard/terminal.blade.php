@@ -23,7 +23,8 @@ state([
     'checkpoints' => [],           // module_id => ['status','proof_url','note']
     'lockMap' => [],               // "sIndex-mIndex" => ['locked','reason','label']
     'proofUrl' => '',              // bound to the submit form for the active module
-    'telegramUrl' => '',
+    'telegramUrl' => '',           // group-level fallback link
+    'telegramThreads' => [],       // module_id => per-module thread deep link
 ]);
 
 // Build the embeddable Bunny URL for a given video (videos inherit the module's library_id).
@@ -127,6 +128,7 @@ $applyActiveLock = function () {
 
 mount(function () use ($normalizeModule) {
     $this->telegramUrl = config('accelerator.telegram_community_url') ?? '';
+    $this->telegramThreads = config('accelerator.telegram_threads', []);
 
     // 1. Load + normalize curriculum into sections of modules
     $rawConfig = config('curriculum') ?? [];
@@ -544,8 +546,9 @@ $submitCheckpoint = function () {
                             <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
                                 Post a short screen-record (Loom) or screenshot proving your build works in the Telegram thread, then paste the link below.
                             </p>
-                            @if(!empty($telegramUrl))
-                                <a href="{{ $telegramUrl }}" target="_blank" class="inline-flex items-center gap-2 mt-3 text-[11px] font-bold text-cyan-500 hover:underline">Open the Telegram thread →</a>
+                            @php $threadUrl = $telegramThreads[$curModule['id']] ?? $telegramUrl; @endphp
+                            @if(!empty($threadUrl))
+                                <a href="{{ $threadUrl }}" target="_blank" class="inline-flex items-center gap-2 mt-3 text-[11px] font-bold text-cyan-500 hover:underline">Open the {{ $curModule['title'] ?? 'module' }} thread →</a>
                             @endif
                             @include('livewire.dashboard.partials.checkpoint-form', ['label' => 'Submit proof'])
                         @endif

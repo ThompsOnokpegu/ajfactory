@@ -39,6 +39,25 @@ return [
     'telegram_community_url' => env('ACCELERATOR_TELEGRAM_URL'), // {{TODO: Telegram group invite link}}
 
     /*
+    | Per-module Telegram topic/thread deep links. Enable Topics in the group,
+    | then paste each module's thread URL here (forum topic links look like
+    | https://t.me/c/<chatId>/<topicId> for private supergroups, or
+    | https://t.me/<groupUsername>/<topicId> for public ones). Any module left
+    | null falls back to telegram_community_url. {{TODO: paste thread URLs}}
+    */
+    'telegram_threads' => [
+        'module-01' => null,
+        'module-02' => null,
+        'module-03' => null,
+        'module-04' => null,
+        'module-05' => null,
+        'module-06' => null,
+        'module-07' => null,
+        'module-08' => null,
+        'module-09' => null,
+    ],
+
+    /*
     | USD equivalents — powers the existing NGN/USD toggle (Flutterwave path).
     | Fixed values (not auto-converted). Adjust here if the FX rate moves.
     | Implied rate ≈ ₦1,400/$.
