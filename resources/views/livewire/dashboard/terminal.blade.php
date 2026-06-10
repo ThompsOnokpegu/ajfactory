@@ -2,6 +2,7 @@
 
 use function Livewire\Volt\{state, layout, mount};
 use App\Models\Enrollment;
+use App\Models\Checkpoint;
 use Carbon\Carbon;
 
 layout('components.layouts.dashboard');
@@ -14,7 +15,15 @@ state([
     'curriculum' => [],
     'completedLessons' => [],
     'isLocked' => false,
-    'unlockDate' => '',
+    'lockReason' => 'open',        // open | date | checkpoint
+    'unlockLabel' => '',           // date string, or the title of the module that gates this one
+    // Ship-to-unlock state
+    'shipToUnlock' => false,       // false for Cohort 1 (legacy/open)
+    'approvedModuleIds' => [],
+    'checkpoints' => [],           // module_id => ['status','proof_url','note']
+    'lockMap' => [],               // "sIndex-mIndex" => ['locked','reason','label']
+    'proofUrl' => '',              // bound to the submit form for the active module
+    'telegramUrl' => '',
 ]);
 
 // Build the embeddable Bunny URL for a given video (videos inherit the module's library_id).
@@ -43,21 +52,83 @@ $normalizeModule = function ($module) {
     return $module;
 };
 
-// A module unlocks (all its videos) at its release_at.
-$moduleReleaseAt = function ($module) {
-    return isset($module['release_at'])
-        ? Carbon::parse($module['release_at'], 'Africa/Lagos')
-        : Carbon::now('Africa/Lagos')->subDay();
+// Load this student's progress + checkpoint state from the DB.
+$loadProgress = function () {
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+
+    $this->completedLessons = is_array($enrollment?->completed_lessons) ? $enrollment->completed_lessons : [];
+    $this->shipToUnlock = $enrollment ? $enrollment->usesShipToUnlock() : false;
+
+    $cps = $enrollment ? $enrollment->checkpoints()->get() : collect();
+    $this->checkpoints = $cps->mapWithKeys(fn($c) => [
+        $c->module_id => ['status' => $c->status, 'proof_url' => $c->proof_url, 'note' => $c->note],
+    ])->all();
+    $this->approvedModuleIds = $cps->where('status', 'approved')->pluck('module_id')->all();
 };
 
-mount(function () use ($updateVideoSource, $normalizeModule, $moduleReleaseAt) {
-    // 1. Progress
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
-    $this->completedLessons = is_array($enrollment?->completed_lessons)
-        ? $enrollment->completed_lessons
-        : [];
+/*
+ * Compute the lock state of every module.
+ *  - Cohort 1 (legacy/open): nothing is ever locked.
+ *  - Cohort 2 (ship-to-unlock): Core Training is proof-gated — module 1 is gated
+ *    only by the cohort start floor, every later module unlocks when the PREVIOUS
+ *    module's checkpoint is approved. The Live Archive stays date-gated.
+ */
+$rebuildGate = function () {
+    $now = Carbon::now('Africa/Lagos');
+    $start = config('accelerator.cohort_starts_at');
+    $map = [];
 
-    // 2. Load + normalize curriculum into sections of modules
+    foreach ($this->curriculum as $sIndex => $section) {
+        $isCore = ($section['title'] === 'Core Training');
+
+        foreach ($section['modules'] as $mIndex => $module) {
+            $key = "{$sIndex}-{$mIndex}";
+
+            if (!$this->shipToUnlock) {
+                $map[$key] = ['locked' => false, 'reason' => 'open', 'label' => ''];
+                continue;
+            }
+
+            if ($isCore) {
+                if ($mIndex === 0) {
+                    $locked = $start ? $now->lt(Carbon::parse($start, 'Africa/Lagos')) : false;
+                    $map[$key] = ['locked' => $locked, 'reason' => 'date', 'label' => $start ? Carbon::parse($start, 'Africa/Lagos')->format('M d, Y') : ''];
+                } else {
+                    $prev = $section['modules'][$mIndex - 1];
+                    $approved = in_array($prev['id'] ?? '', $this->approvedModuleIds, true);
+                    $map[$key] = ['locked' => !$approved, 'reason' => 'checkpoint', 'label' => $prev['title'] ?? 'the previous module'];
+                }
+            } else {
+                $releaseAt = isset($module['release_at'])
+                    ? Carbon::parse($module['release_at'], 'Africa/Lagos')
+                    : $now->copy()->subDay();
+                $map[$key] = ['locked' => $releaseAt->isFuture(), 'reason' => 'date', 'label' => $releaseAt->format('M d, Y @ h:i A')];
+            }
+        }
+    }
+
+    $this->lockMap = $map;
+};
+
+// Sync the main-stage player + lock banner + proof field to the active module/video.
+$applyActiveLock = function () {
+    $module = $this->curriculum[$this->activeSection]['modules'][$this->activeModule] ?? null;
+    $video  = $module['videos'][$this->activeVideo] ?? null;
+
+    $info = $this->lockMap["{$this->activeSection}-{$this->activeModule}"] ?? ['locked' => false, 'reason' => 'open', 'label' => ''];
+    $this->isLocked = $info['locked'];
+    $this->lockReason = $info['reason'];
+    $this->unlockLabel = $info['label'];
+    $this->currentVideoId = (!$info['locked'] && $video) ? $this->updateVideoSource($video, $module) : '';
+
+    // Pre-fill the proof field with any existing submission for this module.
+    $this->proofUrl = $module ? ($this->checkpoints[$module['id']]['proof_url'] ?? '') : '';
+};
+
+mount(function () use ($normalizeModule) {
+    $this->telegramUrl = config('accelerator.telegram_community_url') ?? '';
+
+    // 1. Load + normalize curriculum into sections of modules
     $rawConfig = config('curriculum') ?? [];
     $this->curriculum = [];
 
@@ -79,26 +150,17 @@ mount(function () use ($updateVideoSource, $normalizeModule, $moduleReleaseAt) {
         $this->curriculum[] = $buildSection('Course Roadmap', $rawConfig);
     }
 
+    // 2. Progress + gate
+    $this->loadProgress();
+    $this->rebuildGate();
+
     // 3. Initialize the first video of the first module
     if (!empty($this->curriculum[0]['modules'][0]['videos'][0])) {
-        $firstModule = $this->curriculum[0]['modules'][0];
-        $firstVideo = $firstModule['videos'][0];
-
-        $now = Carbon::now('Africa/Lagos');
-        $releaseAt = $moduleReleaseAt($firstModule);
-
-        if ($releaseAt->gt($now)) {
-            $this->isLocked = true;
-            $this->unlockDate = $releaseAt->format('M d, Y @ h:i A');
-            $this->currentVideoId = '';
-        } else {
-            $this->isLocked = false;
-            $this->currentVideoId = $updateVideoSource($firstVideo, $firstModule);
-        }
+        $this->applyActiveLock();
     }
 });
 
-$selectVideo = function ($sIndex, $mIndex, $vIndex) use ($updateVideoSource, $moduleReleaseAt) {
+$selectVideo = function ($sIndex, $mIndex, $vIndex) {
     $module = $this->curriculum[$sIndex]['modules'][$mIndex] ?? null;
     $video = $module['videos'][$vIndex] ?? null;
 
@@ -110,17 +172,7 @@ $selectVideo = function ($sIndex, $mIndex, $vIndex) use ($updateVideoSource, $mo
     $this->activeModule = $mIndex;
     $this->activeVideo = $vIndex;
 
-    $now = Carbon::now('Africa/Lagos');
-    $releaseAt = $moduleReleaseAt($module);
-
-    if ($releaseAt->gt($now)) {
-        $this->isLocked = true;
-        $this->unlockDate = $releaseAt->format('M d, Y @ h:i A');
-        $this->currentVideoId = '';
-    } else {
-        $this->isLocked = false;
-        $this->currentVideoId = $updateVideoSource($video, $module);
-    }
+    $this->applyActiveLock();
 };
 
 $toggleComplete = function ($videoId) {
@@ -139,6 +191,31 @@ $toggleComplete = function ($videoId) {
 
     $this->completedLessons = $completed->values()->all();
     $enrollment->update(['completed_lessons' => $this->completedLessons]);
+};
+
+// Ship-to-unlock: submit (or resubmit) the proof checkpoint for the active module.
+$submitCheckpoint = function () {
+    if (!$this->shipToUnlock || $this->isLocked) return;
+
+    $module = $this->curriculum[$this->activeSection]['modules'][$this->activeModule] ?? null;
+    if (!$module) return;
+
+    // Only Core Training modules carry checkpoints.
+    if (($this->curriculum[$this->activeSection]['title'] ?? '') !== 'Core Training') return;
+
+    $this->validate(['proofUrl' => 'required|url|max:2048']);
+
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    if (!$enrollment) return;
+
+    Checkpoint::updateOrCreate(
+        ['enrollment_id' => $enrollment->id, 'module_id' => $module['id']],
+        ['status' => 'submitted', 'proof_url' => $this->proofUrl, 'note' => null, 'submitted_at' => now(), 'reviewed_at' => null],
+    );
+
+    $this->loadProgress();
+    $this->rebuildGate();
+    $this->applyActiveLock();
 };
 
 ?>
@@ -185,8 +262,7 @@ $toggleComplete = function ($videoId) {
                     <div class="space-y-2">
                         @foreach($section['modules'] as $mIndex => $module)
                             @php
-                                $releaseTime = isset($module['release_at']) ? \Carbon\Carbon::parse($module['release_at'], 'Africa/Lagos') : \Carbon\Carbon::now()->subDay();
-                                $moduleLocked = $releaseTime->isFuture();
+                                $moduleLocked = $lockMap["{$sIndex}-{$mIndex}"]['locked'] ?? false;
                                 $moduleVideoIds = collect($module['videos'])->pluck('id')->all();
                                 $moduleDone = $totalVids = count($moduleVideoIds);
                                 $moduleCompletedCount = count(array_intersect($moduleVideoIds, $completedLessons));
@@ -314,9 +390,15 @@ $toggleComplete = function ($videoId) {
                             <div class="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center mb-4 border border-zinc-700">
                                 <svg class="w-8 h-8 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                             </div>
-                            <h3 class="text-xl font-black text-white uppercase italic tracking-tighter">Classified Module</h3>
-                            <p class="text-xs text-zinc-400 font-mono mt-2 uppercase tracking-widest">
-                                Unlocks: {{ $unlockDate }}
+                            <h3 class="text-xl font-black text-white uppercase italic tracking-tighter">
+                                {{ $lockReason === 'checkpoint' ? 'Ship to Unlock' : 'Classified Module' }}
+                            </h3>
+                            <p class="text-xs text-zinc-400 font-mono mt-2 uppercase tracking-widest max-w-sm">
+                                @if($lockReason === 'checkpoint')
+                                    Unlocks when your <span class="text-cyan-500">{{ $unlockLabel }}</span> proof checkpoint is approved.
+                                @else
+                                    Unlocks: {{ $unlockLabel }}
+                                @endif
                             </p>
                         </div>
 
@@ -334,8 +416,7 @@ $toggleComplete = function ($videoId) {
                         <!-- UPLOAD PENDING STATE (No 404) -->
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-zinc-600 bg-zinc-950">
                             <span class="text-[10px] font-mono uppercase tracking-widest animate-pulse">Stream Offline</span>
-                            <span class="text-[9px] font-mono text-zinc-100 mt-1 uppercase tracking-widest text-center">This video is being prepared. <br>Every Monday a new deployment module unlocks. <br>
-                                Every Thursday we meet live for technical build sessions and real-time Q&A.</span>
+                            <span class="text-[9px] font-mono text-zinc-100 mt-1 uppercase tracking-widest text-center">This video is being prepared. <br>Check back shortly.</span>
                         </div>
                     @endif
                 </div>
@@ -426,6 +507,50 @@ $toggleComplete = function ($videoId) {
                         </div>
                     </div>
                 </div>
+
+                {{-- SHIP-TO-UNLOCK: proof checkpoint panel (Core Training, Cohort 2 only) --}}
+                @php $isCoreSection = ($curriculum[$activeSection]['title'] ?? '') === 'Core Training'; @endphp
+                @if($shipToUnlock && $isCoreSection && !$isLocked && $curModule)
+                    @php
+                        $cp = $checkpoints[$curModule['id']] ?? null;
+                        $cpStatus = $cp['status'] ?? null;
+                    @endphp
+                    <div class="border rounded-2xl p-6 lg:p-8
+                        {{ $cpStatus === 'approved' ? 'border-green-500/30 bg-green-500/5' : ($cpStatus === 'rejected' ? 'border-amber-500/30 bg-amber-500/5' : 'border-cyan-900/40 bg-zinc-900/40') }}">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="h-1.5 w-1.5 rounded-full {{ $cpStatus === 'approved' ? 'bg-green-500' : 'bg-cyan-500' }} animate-pulse"></span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em] {{ $cpStatus === 'approved' ? 'text-green-500' : 'text-cyan-500' }}">Proof Checkpoint</span>
+                        </div>
+
+                        @if($cpStatus === 'approved')
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Checkpoint approved &check;</h3>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">Nice work — the next module is unlocked. Keep shipping.</p>
+
+                        @elseif($cpStatus === 'submitted')
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Submitted — pending review</h3>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">We're reviewing your proof. The next module unlocks once it's approved. Need to fix your link? Resubmit below.</p>
+                            @if(!empty($cp['proof_url']))
+                                <a href="{{ $cp['proof_url'] }}" target="_blank" class="inline-block mt-3 text-[11px] font-bold text-cyan-500 hover:underline break-all">View your submission →</a>
+                            @endif
+                            @include('livewire.dashboard.partials.checkpoint-form', ['label' => 'Update link'])
+
+                        @elseif($cpStatus === 'rejected')
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Needs another look</h3>
+                            <p class="text-xs text-amber-400 mt-2 leading-relaxed">{{ $cp['note'] ?: 'Your proof needs a tweak — please review and resubmit.' }}</p>
+                            @include('livewire.dashboard.partials.checkpoint-form', ['label' => 'Resubmit proof'])
+
+                        @else
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Ship it to unlock the next module</h3>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                                Post a short screen-record (Loom) or screenshot proving your build works in the Telegram thread, then paste the link below.
+                            </p>
+                            @if(!empty($telegramUrl))
+                                <a href="{{ $telegramUrl }}" target="_blank" class="inline-flex items-center gap-2 mt-3 text-[11px] font-bold text-cyan-500 hover:underline">Open the Telegram thread →</a>
+                            @endif
+                            @include('livewire.dashboard.partials.checkpoint-form', ['label' => 'Submit proof'])
+                        @endif
+                    </div>
+                @endif
                 @endif
             </div>
         </div>
