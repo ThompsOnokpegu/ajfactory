@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Middleware\CheckEnrollment;
 use App\Http\Controllers\VaultController;
+use App\Http\Controllers\TaabLeadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -46,6 +47,12 @@ Route::get('/accelerator', function () {
 Route::get('/checkout', function () {
     return view('checkout');
 })->name('checkout');
+
+// TAAB — The AI Automation Bootcamp lead-magnet tools (top of funnel)
+Route::view('/taab/scorecard', 'taab.scorecard')->name('taab.scorecard');
+Route::view('/taab/roi-calculator', 'taab.roi-calculator')->name('taab.roi');
+Route::view('/taab/tool-stack', 'taab.tool-stack-guide')->name('taab.tools');
+Route::post('/taab/lead', [TaabLeadController::class, 'store'])->name('taab.lead.store');
 
 // Thank You / Verification Page
 Volt::route('/thank-you', 'thank-you')->name('thank-you');
