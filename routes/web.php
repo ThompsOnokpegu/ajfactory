@@ -5,6 +5,7 @@ use Livewire\Volt\Volt;
 use App\Http\Middleware\CheckEnrollment;
 use App\Http\Controllers\VaultController;
 use App\Http\Controllers\TaabLeadController;
+use App\Http\Controllers\MasterclassController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,7 +49,11 @@ Route::get('/checkout', function () {
     return view('checkout');
 })->name('checkout');
 
-// TAAB — The AI Automation Bootcamp lead-magnet tools (top of funnel)
+// TAAB — The AI Automation Bootcamp (hub + masterclass registration)
+Route::view('/taab', 'taab.index')->name('taab.index');
+Route::post('/taab/register', [MasterclassController::class, 'register'])->name('taab.register');
+
+// TAAB lead-magnet tools (top of funnel)
 Route::view('/taab/scorecard', 'taab.scorecard')->name('taab.scorecard');
 Route::view('/taab/roi-calculator', 'taab.roi-calculator')->name('taab.roi');
 Route::view('/taab/tool-stack', 'taab.tool-stack-guide')->name('taab.tools');
