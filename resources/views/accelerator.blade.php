@@ -75,7 +75,7 @@
                     AI Automation Accelerator · Cohort 2
                 </div>
 
-                <h1 class="text-6xl md:text-8xl font-black text-white leading-[0.95] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
+                <h1 class="text-5xl md:text-7xl font-black text-white leading-[0.95] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
                     You're one <br>
                     <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400">workflow away...</span>
                 </h1>
