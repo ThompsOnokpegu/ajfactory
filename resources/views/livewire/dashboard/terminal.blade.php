@@ -4,6 +4,7 @@ use function Livewire\Volt\{state, layout, mount};
 use App\Models\Enrollment;
 use App\Models\Checkpoint;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\URL;
 
 layout('components.layouts.dashboard');
 
@@ -25,6 +26,7 @@ state([
     'proofUrl' => '',              // bound to the submit form for the active module
     'telegramUrl' => '',           // group-level fallback link
     'telegramThreads' => [],       // module_id => per-module thread deep link
+    'balanceNotice' => null,       // installment balance reminder shown from 3 days before due
 ]);
 
 // Build the embeddable Bunny URL for a given video (videos inherit the module's library_id).
@@ -65,6 +67,27 @@ $loadProgress = function () {
         $c->module_id => ['status' => $c->status, 'proof_url' => $c->proof_url, 'note' => $c->note],
     ])->all();
     $this->approvedModuleIds = $cps->where('status', 'approved')->pluck('module_id')->all();
+
+    // Installment balance reminder — surfaces from 3 days before the due date,
+    // while the student still has access (suspended students never reach here).
+    $this->balanceNotice = null;
+    if ($enrollment
+        && $enrollment->plan_type === 'installment'
+        && (float) $enrollment->balance_due > 0
+        && $enrollment->second_payment_status !== 'paid'
+        && $enrollment->second_payment_due_at
+    ) {
+        $due = $enrollment->second_payment_due_at;
+        if (now()->gte($due->copy()->subDays(3))) {
+            $this->balanceNotice = [
+                'amount'  => (float) $enrollment->balance_due,
+                'symbol'  => ($enrollment->currency ?: 'NGN') === 'NGN' ? '₦' : '$',
+                'overdue' => now()->gt($due),
+                'due'     => $due->diffForHumans(),
+                'pay_url' => URL::signedRoute('installment.pay', ['enrollment' => $enrollment->id]),
+            ];
+        }
+    }
 };
 
 /*
@@ -380,6 +403,28 @@ $submitCheckpoint = function () {
 
         <div class="flex-1 overflow-y-auto p-4 lg:p-12 custom-scrollbar">
             <div class="max-w-5xl mx-auto space-y-8">
+
+                <!-- INSTALLMENT BALANCE NOTICE -->
+                @if($balanceNotice)
+                    <div class="rounded-2xl border p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4
+                        {{ $balanceNotice['overdue'] ? 'border-red-500/40 bg-red-500/5' : 'border-amber-500/40 bg-amber-500/5' }}">
+                        <div>
+                            <div class="text-[10px] font-black uppercase tracking-widest mb-1 {{ $balanceNotice['overdue'] ? 'text-red-400' : 'text-amber-400' }}">
+                                {{ $balanceNotice['overdue'] ? 'Balance overdue' : 'Installment balance due' }}
+                            </div>
+                            <p class="text-sm text-zinc-300 leading-snug">
+                                @if($balanceNotice['overdue'])
+                                    Your final payment of <strong class="text-white">{{ $balanceNotice['symbol'] }}{{ number_format($balanceNotice['amount']) }}</strong> is overdue ({{ $balanceNotice['due'] }}). Pay now to keep your access active.
+                                @else
+                                    Your final payment of <strong class="text-white">{{ $balanceNotice['symbol'] }}{{ number_format($balanceNotice['amount']) }}</strong> is due {{ $balanceNotice['due'] }}. Clear it to avoid any interruption to your access.
+                                @endif
+                            </p>
+                        </div>
+                        <a href="{{ $balanceNotice['pay_url'] }}" class="shrink-0 inline-block text-center px-6 py-3 rounded-xl bg-cyan-500 text-black font-black uppercase tracking-tighter text-sm hover:bg-white transition-all">
+                            Pay {{ $balanceNotice['symbol'] }}{{ number_format($balanceNotice['amount']) }}
+                        </a>
+                    </div>
+                @endif
 
                 <!-- DYNAMIC PLAYER AREA -->
                 <div class="relative w-full bg-black border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl"

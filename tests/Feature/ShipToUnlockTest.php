@@ -170,3 +170,50 @@ it('unlocks the next module once the previous checkpoint is approved', function 
     $locks = Volt::test('dashboard.terminal')->get('lockMap');
     expect($locks['0-1']['locked'])->toBeFalse(); // module 2 now unlocked
 });
+
+function installmentStudent(\Carbon\Carbon $dueAt, array $overrides = []): App\Models\User
+{
+    $user = App\Models\User::factory()->create();
+    Enrollment::create(array_merge([
+        'full_name' => $user->name,
+        'email' => $user->email,
+        'payment_reference' => 'ACC_' . uniqid(),
+        'amount' => 42000,
+        'plan_type' => 'installment',
+        'amount_total' => 84000,
+        'balance_due' => 42000,
+        'second_payment_status' => 'link_sent',
+        'second_payment_due_at' => $dueAt,
+        'currency' => 'NGN',
+        'status' => 'paid',
+        'cohort' => 1,
+    ], $overrides));
+
+    return $user;
+}
+
+it('shows the installment balance notice within 3 days of due', function () {
+    $this->actingAs(installmentStudent(now()->addDays(2)));
+
+    Volt::test('dashboard.terminal')
+        ->assertSee('Installment balance due')
+        ->assertSee('/installment/');
+});
+
+it('hides the balance notice when the due date is more than 3 days out', function () {
+    $this->actingAs(installmentStudent(now()->addDays(10)));
+
+    Volt::test('dashboard.terminal')->assertSet('balanceNotice', null);
+});
+
+it('shows an overdue balance notice', function () {
+    $this->actingAs(installmentStudent(now()->subDay()));
+
+    Volt::test('dashboard.terminal')->assertSee('Balance overdue');
+});
+
+it('shows no balance notice for a paid-in-full student', function () {
+    $this->actingAs(makeStudent(1));
+
+    Volt::test('dashboard.terminal')->assertSet('balanceNotice', null);
+});
