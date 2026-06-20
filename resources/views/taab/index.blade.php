@@ -150,7 +150,7 @@ footer a:hover { color: var(--lime); }
   <!-- Hero -->
   <section class="hero">
     <div class="hero-left">
-      <div class="hero-eyebrow">{{ $dateLong }} · Virtual · One day only</div>
+      <div class="hero-eyebrow">{{ $dateLong }} · Virtual</div>
       <div class="hero-wordmark">TAAB</div>
       <div class="hero-title">The AI Automation Bootcamp</div>
       <div class="hero-tagline">Clarity before you commit.<br>Everything you need to decide.</div>
@@ -232,13 +232,13 @@ footer a:hover { color: var(--lime); }
           </div>
 
           <button type="submit" class="form-submit">Reserve my seat →</button>
-          <div class="form-disclaimer">Free to attend. No spam. Zoom link sent to your email 24hrs before.</div>
+          <div class="form-disclaimer">Free to attend. No spam. Google Meet link sent to your email 24hrs before.</div>
         </form>
 
         <div class="form-success" id="form-success">
           <div class="success-icon">🎯</div>
           <h3>You're in. See you {{ $mcDate ? $mcDate->translatedFormat('l') : 'soon' }}.</h3>
-          <p>Check your inbox for a confirmation email. Zoom link arrives 24hrs before the event. We'll also send the link to join the attendee WhatsApp group.</p>
+          <p>Check your inbox for a confirmation email. Google Meet link arrives 24hrs before the event. We'll also send the link to join the attendee WhatsApp group.</p>
         </div>
       </div>
     </div>

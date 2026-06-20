@@ -43,7 +43,7 @@
         $startsAt    = Accelerator::cohortStartsAt();
         $startLabel  = $startsAt ? $startsAt->format('l jS F') : '{{TODO: cohort start date}}';
         $primaryCta  = $soldOut ? '/builders' : '/checkout?plan=full';
-        $primaryText = $soldOut ? 'Join The Waitlist' : 'Join Cohort 2 — ₦'.number_format($fullPrice);
+        $primaryText = $soldOut ? 'Join The Waitlist' : 'Join Cohort 2 - ₦'.number_format($fullPrice);
     @endphp
     <body class="bg-zinc-950 text-zinc-300 font-sans antialiased selection:bg-cyan-500 selection:text-black">
 
@@ -57,7 +57,7 @@
             <nav class="sticky top-0 w-full z-50 bg-zinc-950/80 backdrop-blur-md border-b border-zinc-900">
                 <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
                     <div class="text-xl font-black tracking-tighter italic text-white uppercase">
-                        AUTO<span class="text-cyan-500">MATION</span>.ACCELERATOR
+                        AI.<span class="text-cyan-500">ACCELERATOR</span>
                     </div>
                     <div class="hidden md:flex items-center gap-8">
                         <a href="#curriculum" class="text-xs font-bold uppercase tracking-widest text-zinc-500 hover:text-white transition">Curriculum</a>
@@ -76,8 +76,8 @@
                 </div>
 
                 <h1 class="text-6xl md:text-8xl font-black text-white leading-[0.95] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
-                    You're just <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400">one workflow away...</span>
+                    You're one <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400">workflow away...</span>
                 </h1>
 
                 <p class="text-lg md:text-2xl text-zinc-400 max-w-3xl mx-auto font-medium mb-12 leading-snug">
@@ -95,7 +95,7 @@
                     <span>{{ $startLabel }}</span>
                     <span class="text-zinc-700">·</span>
                     @if($soldOut)
-                        <span class="text-amber-400">Cohort full — join the waitlist</span>
+                        <span class="text-amber-400">Cohort full - join the waitlist</span>
                     @else
                         <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
                     @endif

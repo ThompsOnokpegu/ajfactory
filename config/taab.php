@@ -25,8 +25,8 @@ return [
     */
     'masterclass' => [
         'date' => '2026-06-27',                 // a Saturday
-        'time' => '9:00 AM – 5:00 PM WAT',
-        'location' => 'Live · Zoom',
+        'time' => '9:00 AM – 11:00 PM WAT',
+        'location' => 'Live · Google Meet',
         'registration_closes' => '2026-06-26',  // the Friday before
         'host' => 'AJ Thompson',
     ],
