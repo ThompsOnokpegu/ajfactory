@@ -76,19 +76,22 @@ new #[Layout('components.layouts.admin', ['title' => 'Leads & Waitlist'])] class
         </div>
         <div class="divide-y divide-zinc-900">
             @forelse($leads as $l)
-                <div wire:key="lead-{{ $l->id }}" class="grid md:grid-cols-12 gap-3 px-5 py-3.5 items-center bg-zinc-900/30">
+                <div wire:key="lead-{{ $l->id }}" class="px-4 sm:px-5 py-3.5 md:grid md:grid-cols-12 md:gap-3 md:items-center bg-zinc-900/30">
                     <div class="md:col-span-5 flex items-center gap-3 min-w-0">
                         <x-admin.avatar :name="$l->name" />
-                        <div class="min-w-0">
-                            <div class="text-sm font-bold text-white truncate">{{ $l->name }}</div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="text-sm font-bold text-white truncate">{{ $l->name }}</span>
+                                <span class="md:hidden text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">{{ $l->source ?: $l->interest }}</span>
+                            </div>
                             <div class="text-[11px] text-zinc-500 truncate">{{ $l->email }}</div>
                         </div>
                     </div>
-                    <div class="md:col-span-3 text-xs font-mono text-zinc-500">{{ $l->whatsapp ?: '—' }}</div>
-                    <div class="md:col-span-2">
+                    <div class="md:col-span-3 text-xs font-mono text-zinc-500 mt-2 md:mt-0"><span class="md:hidden text-zinc-600 text-[10px] uppercase tracking-widest mr-1">WhatsApp</span>{{ $l->whatsapp ?: '—' }}</div>
+                    <div class="hidden md:block md:col-span-2">
                         <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">{{ $l->source ?: $l->interest }}</span>
                     </div>
-                    <div class="md:col-span-2 text-right text-[10px] font-mono text-zinc-600">{{ optional($l->created_at)->format('M j, Y') }}</div>
+                    <div class="md:col-span-2 md:text-right text-[10px] font-mono text-zinc-600 mt-1 md:mt-0">{{ optional($l->created_at)->format('M j, Y') }}</div>
                 </div>
             @empty
                 <div class="px-5 py-14 text-center bg-zinc-900/30 text-sm text-zinc-500">No leads yet.</div>

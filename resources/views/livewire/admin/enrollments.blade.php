@@ -209,93 +209,67 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
         @endif
     </div>
 
-    <!-- Table -->
-    <div class="rounded-2xl border border-zinc-800 overflow-hidden">
-        <!-- header -->
-        <div class="hidden md:grid grid-cols-12 gap-3 px-5 py-3 bg-zinc-900/60 border-b border-zinc-800 text-[9px] font-black uppercase tracking-widest text-zinc-600">
-            <div class="col-span-5">Student</div>
-            <div class="col-span-2">Plan</div>
-            <div class="col-span-2">Status</div>
-            <div class="col-span-2">Balance</div>
-            <div class="col-span-1 text-right">Actions</div>
-        </div>
-
-        <div class="divide-y divide-zinc-900">
-            @forelse($enrollments as $e)
-                @php $sym = ($e->currency ?: 'NGN') === 'NGN' ? '₦' : '$'; $hasBalance = $e->plan_type === 'installment' && (float)$e->balance_due > 0; @endphp
-                <div wire:key="enr-{{ $e->id }}" x-data="{ menu: false, detail: false }" class="bg-zinc-900/30">
-                    <div class="grid md:grid-cols-12 gap-3 px-5 py-3.5 items-center">
-                        <!-- student -->
-                        <div class="md:col-span-5 flex items-center gap-3 min-w-0">
-                            <x-admin.avatar :name="$e->full_name" />
-                            <div class="min-w-0">
-                                <div class="text-sm font-bold text-white truncate">{{ $e->full_name }}</div>
-                                <div class="text-[11px] text-zinc-500 truncate">{{ $e->email }}</div>
-                            </div>
-                        </div>
-                        <!-- plan -->
-                        <div class="md:col-span-2 flex items-center gap-1.5">
+    <!-- List -->
+    <div class="rounded-2xl border border-zinc-800 divide-y divide-zinc-900 overflow-hidden">
+        @forelse($enrollments as $e)
+            @php $sym = ($e->currency ?: 'NGN') === 'NGN' ? '₦' : '$'; $hasBalance = $e->plan_type === 'installment' && (float)$e->balance_due > 0; @endphp
+            <div wire:key="enr-{{ $e->id }}" x-data="{ menu: false, detail: false }" class="bg-zinc-900/30">
+                <div class="flex items-start gap-3 px-4 sm:px-5 py-3.5">
+                    <x-admin.avatar :name="$e->full_name" />
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            <span class="text-sm font-bold text-white">{{ $e->full_name }}</span>
                             <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">{{ $e->plan_type }}</span>
                             <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-500">C{{ $e->cohort }}</span>
-                        </div>
-                        <!-- status -->
-                        <div class="md:col-span-2 flex items-center gap-1.5">
                             <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded {{ $e->status === 'paid' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-400' }}">{{ $e->status }}</span>
-                            @if($e->access_suspended)
-                                <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-red-500/10 text-red-400">Suspended</span>
+                            @if($e->access_suspended)<span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-red-500/10 text-red-400">Suspended</span>@endif
+                        </div>
+                        <div class="text-[11px] text-zinc-500 truncate mt-0.5">{{ $e->email }}</div>
+                        @if($hasBalance)<div class="text-[11px] font-mono text-amber-400 mt-1">Balance due {{ $sym }}{{ number_format($e->balance_due) }}</div>@endif
+                    </div>
+                    <div class="shrink-0 flex items-center gap-0.5 relative">
+                        <button @click="detail = !detail" class="p-2 rounded-md text-zinc-600 hover:text-white hover:bg-zinc-800 transition" title="Details">
+                            <svg class="w-4 h-4 transition-transform" :class="detail ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <button @click="menu = !menu" class="p-2 rounded-md text-zinc-600 hover:text-white hover:bg-zinc-800 transition" title="Actions">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 2a2 2 0 110 4 2 2 0 010-4zm0 6a2 2 0 110 4 2 2 0 010-4z"/></svg>
+                        </button>
+                        <div x-show="menu" x-cloak @click.outside="menu = false" x-transition
+                             class="absolute right-0 top-10 z-20 w-52 rounded-xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/50 py-1.5">
+                            <button wire:click="toggleSuspend({{ $e->id }})" wire:confirm="{{ $e->access_suspended ? 'Restore access?' : 'Suspend access for this student?' }}" @click="menu=false"
+                                class="w-full text-left px-4 py-2 text-xs font-bold {{ $e->access_suspended ? 'text-green-400' : 'text-red-400' }} hover:bg-zinc-800 transition">
+                                {{ $e->access_suspended ? 'Reinstate access' : 'Suspend access' }}
+                            </button>
+                            @if($hasBalance)
+                                <button wire:click="resendInstallmentLink({{ $e->id }})" @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-bold text-cyan-400 hover:bg-zinc-800 transition">Re-send pay link</button>
+                                <button wire:click="markBalancePaid({{ $e->id }})" wire:confirm="Mark this balance as paid in full?" @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-bold text-amber-400 hover:bg-zinc-800 transition">Mark balance paid</button>
                             @endif
-                        </div>
-                        <!-- balance -->
-                        <div class="md:col-span-2 text-xs font-mono {{ $hasBalance ? 'text-amber-400' : 'text-zinc-600' }}">
-                            {{ $hasBalance ? $sym.number_format($e->balance_due) : '—' }}
-                        </div>
-                        <!-- actions -->
-                        <div class="md:col-span-1 flex items-center justify-end gap-1 relative">
-                            <button @click="detail = !detail" class="p-1.5 rounded-md text-zinc-600 hover:text-white hover:bg-zinc-800 transition" title="Details">
-                                <svg class="w-4 h-4 transition-transform" :class="detail ? 'rotate-180' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
-                            </button>
-                            <button @click="menu = !menu" class="p-1.5 rounded-md text-zinc-600 hover:text-white hover:bg-zinc-800 transition" title="Actions">
-                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M10 6a2 2 0 110-4 2 2 0 010 4zm0 2a2 2 0 110 4 2 2 0 010-4zm0 6a2 2 0 110 4 2 2 0 010-4z"/></svg>
-                            </button>
-                            <!-- dropdown -->
-                            <div x-show="menu" x-cloak @click.outside="menu = false" x-transition
-                                 class="absolute right-0 top-9 z-20 w-52 rounded-xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/50 py-1.5">
-                                <button wire:click="toggleSuspend({{ $e->id }})" wire:confirm="{{ $e->access_suspended ? 'Restore access?' : 'Suspend access for this student?' }}" @click="menu=false"
-                                    class="w-full text-left px-4 py-2 text-xs font-bold {{ $e->access_suspended ? 'text-green-400' : 'text-red-400' }} hover:bg-zinc-800 transition">
-                                    {{ $e->access_suspended ? 'Reinstate access' : 'Suspend access' }}
-                                </button>
-                                @if($hasBalance)
-                                    <button wire:click="resendInstallmentLink({{ $e->id }})" @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-bold text-cyan-400 hover:bg-zinc-800 transition">Re-send pay link</button>
-                                    <button wire:click="markBalancePaid({{ $e->id }})" wire:confirm="Mark this balance as paid in full?" @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-bold text-amber-400 hover:bg-zinc-800 transition">Mark balance paid</button>
-                                @endif
-                                <div class="border-t border-zinc-800 my-1.5"></div>
-                                <div class="px-4 py-1.5 flex items-center gap-2">
-                                    <span class="text-[9px] font-black uppercase tracking-widest text-zinc-600">Cohort</span>
-                                    @foreach([1,2] as $c)
-                                        <button wire:click="setCohort({{ $e->id }}, {{ $c }})" @click="menu=false" class="text-[10px] font-black px-2 py-1 rounded border {{ $e->cohort === $c ? 'border-cyan-500 text-cyan-400' : 'border-zinc-700 text-zinc-500' }} hover:bg-zinc-800 transition">{{ $c }}</button>
-                                    @endforeach
-                                </div>
+                            <div class="border-t border-zinc-800 my-1.5"></div>
+                            <div class="px-4 py-1.5 flex items-center gap-2">
+                                <span class="text-[9px] font-black uppercase tracking-widest text-zinc-600">Cohort</span>
+                                @foreach([1,2] as $c)
+                                    <button wire:click="setCohort({{ $e->id }}, {{ $c }})" @click="menu=false" class="text-[10px] font-black px-2 py-1 rounded border {{ $e->cohort === $c ? 'border-cyan-500 text-cyan-400' : 'border-zinc-700 text-zinc-500' }} hover:bg-zinc-800 transition">{{ $c }}</button>
+                                @endforeach
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- detail -->
-                    <div x-show="detail" x-cloak class="px-5 pb-4 -mt-1">
-                        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-1.5 text-[11px] font-mono text-zinc-500 bg-zinc-950/40 rounded-xl p-4 border border-zinc-800/60">
-                            <div>Ref<br><span class="text-zinc-300">{{ $e->payment_reference }}</span></div>
-                            <div>Paid<br><span class="text-zinc-300">{{ optional($e->paid_at)->toFormattedDateString() ?? '—' }}</span></div>
-                            <div>Total<br><span class="text-zinc-300">{{ $sym }}{{ number_format((float)($e->amount_total ?: $e->amount)) }}</span></div>
-                            <div>2nd payment<br><span class="text-zinc-300">{{ $e->second_payment_status }}{{ $e->second_payment_due_at ? ' · due '.$e->second_payment_due_at->toFormattedDateString() : '' }}</span></div>
-                        </div>
+                <div x-show="detail" x-cloak class="px-4 sm:px-5 pb-4">
+                    <div class="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-2 text-[11px] font-mono text-zinc-500 bg-zinc-950/40 rounded-xl p-4 border border-zinc-800/60">
+                        <div>Ref<br><span class="text-zinc-300 break-all">{{ $e->payment_reference }}</span></div>
+                        <div>Paid<br><span class="text-zinc-300">{{ optional($e->paid_at)->toFormattedDateString() ?? '—' }}</span></div>
+                        <div>Total<br><span class="text-zinc-300">{{ $sym }}{{ number_format((float)($e->amount_total ?: $e->amount)) }}</span></div>
+                        <div>2nd payment<br><span class="text-zinc-300">{{ $e->second_payment_status }}{{ $e->second_payment_due_at ? ' · due '.$e->second_payment_due_at->toFormattedDateString() : '' }}</span></div>
                     </div>
                 </div>
-            @empty
-                <div class="px-5 py-14 text-center bg-zinc-900/30">
-                    <p class="text-sm text-zinc-500">No enrollments match your filters.</p>
-                    @if($hasFilters)<button wire:click="clearFilters" class="mt-3 text-[10px] font-black uppercase tracking-widest text-cyan-500">Clear filters</button>@endif
-                </div>
-            @endforelse
-        </div>
+            </div>
+        @empty
+            <div class="px-5 py-14 text-center bg-zinc-900/30">
+                <p class="text-sm text-zinc-500">No enrollments match your filters.</p>
+                @if($hasFilters)<button wire:click="clearFilters" class="mt-3 text-[10px] font-black uppercase tracking-widest text-cyan-500">Clear filters</button>@endif
+            </div>
+        @endforelse
     </div>
 
     <div>{{ $enrollments->links() }}</div>

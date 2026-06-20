@@ -17,14 +17,14 @@
 <div {{ $attributes->merge(['class' => 'group relative p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 ' . ($href ? 'hover:border-cyan-500/40 hover:bg-zinc-900 transition' : '')]) }}>
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
-            <div class="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500 mb-2">{{ $label }}</div>
-            <div class="text-[1.7rem] leading-none font-black tracking-tighter {{ $valColor }}">{{ $value }}</div>
+            <div class="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500 mb-2 truncate">{{ $label }}</div>
+            <div class="text-2xl sm:text-[1.7rem] leading-none font-black tracking-tighter {{ $valColor }} truncate">{{ $value }}</div>
             @isset($sub)
                 <div class="text-[11px] text-zinc-500 mt-2 leading-snug">{{ $sub }}</div>
             @endisset
         </div>
         @isset($icon)
-            <div class="shrink-0 h-9 w-9 rounded-lg border flex items-center justify-center {{ $iconTint }}">{{ $icon }}</div>
+            <div class="shrink-0 h-9 w-9 rounded-lg border hidden sm:flex items-center justify-center {{ $iconTint }}">{{ $icon }}</div>
         @endisset
     </div>
 

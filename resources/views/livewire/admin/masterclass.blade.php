@@ -77,7 +77,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Masterclass'])] class exte
         </div>
         <div class="divide-y divide-zinc-900">
             @forelse($regs as $r)
-                <div wire:key="mc-{{ $r->id }}" class="grid md:grid-cols-12 gap-3 px-5 py-3.5 items-center bg-zinc-900/30">
+                <div wire:key="mc-{{ $r->id }}" class="px-4 sm:px-5 py-3.5 md:grid md:grid-cols-12 md:gap-3 md:items-center bg-zinc-900/30">
                     <div class="md:col-span-4 flex items-center gap-3 min-w-0">
                         <x-admin.avatar :name="trim($r->first_name.' '.$r->last_name)" />
                         <div class="min-w-0">
@@ -85,9 +85,9 @@ new #[Layout('components.layouts.admin', ['title' => 'Masterclass'])] class exte
                             <div class="text-[11px] text-zinc-500 truncate">{{ $r->email }}</div>
                         </div>
                     </div>
-                    <div class="md:col-span-3 text-xs text-zinc-400 truncate">{{ $r->background ?: '—' }}</div>
-                    <div class="md:col-span-3 text-xs text-zinc-400 truncate">{{ $r->goal ?: '—' }}</div>
-                    <div class="md:col-span-2 text-[10px] font-mono text-zinc-500">{{ $r->session_date }}</div>
+                    <div class="md:col-span-3 text-xs text-zinc-400 md:truncate mt-2 md:mt-0"><span class="md:hidden text-zinc-600 font-mono text-[10px] uppercase tracking-widest mr-1">Background</span>{{ $r->background ?: '—' }}</div>
+                    <div class="md:col-span-3 text-xs text-zinc-400 md:truncate mt-1 md:mt-0"><span class="md:hidden text-zinc-600 font-mono text-[10px] uppercase tracking-widest mr-1">Goal</span>{{ $r->goal ?: '—' }}</div>
+                    <div class="md:col-span-2 text-[10px] font-mono text-zinc-500 mt-2 md:mt-0">{{ $r->session_date }}</div>
                 </div>
             @empty
                 <div class="px-5 py-14 text-center bg-zinc-900/30 text-sm text-zinc-500">No registrations for this filter.</div>
