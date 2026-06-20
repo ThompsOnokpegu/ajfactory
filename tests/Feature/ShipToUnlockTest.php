@@ -142,7 +142,7 @@ it('lets an admin reject a checkpoint with a note', function () {
 
 it('renders the review screen for an admin', function () {
     $this->actingAs(makeAdmin());
-    $this->get('/admin/checkpoints')->assertOk()->assertSee('Proof Checkpoints');
+    $this->get('/admin/checkpoints')->assertOk()->assertSee('Proof checkpoints');
 });
 
 it('forbids non-admins from the review screen', function () {

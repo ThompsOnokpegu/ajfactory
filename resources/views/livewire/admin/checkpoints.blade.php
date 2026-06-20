@@ -48,30 +48,38 @@ new #[Layout('components.layouts.admin', ['title' => 'Checkpoints'])] class exte
     }
 }; ?>
 
-<div class="max-w-4xl mx-auto p-6 lg:p-10 space-y-10">
+<div class="max-w-5xl mx-auto space-y-8">
     <div>
-        <h1 class="text-2xl font-black uppercase italic tracking-tighter text-white">Proof Checkpoints</h1>
-        <p class="text-sm text-zinc-400 mt-1">Review student build proofs. Approving unlocks the next module for that student.</p>
+        <h2 class="text-xl font-black tracking-tighter text-white">Proof checkpoints</h2>
+        <p class="text-[11px] text-zinc-500 mt-0.5">Review student build proofs — approving unlocks the next module for that student.</p>
     </div>
 
     <!-- PENDING -->
     <section class="space-y-3">
-        <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500">Pending review ({{ $pending->count() }})</h2>
+        <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-cyan-500">Pending review ({{ $pending->count() }})</h3>
 
         @forelse($pending as $cp)
             <div wire:key="cp-{{ $cp->id }}" x-data="{ rejecting: false, note: '' }"
                  class="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
                 <div class="flex flex-wrap items-start justify-between gap-4">
-                    <div class="min-w-0">
-                        <p class="text-sm font-bold text-white">{{ $cp->enrollment->full_name ?? 'Unknown' }}</p>
-                        <p class="text-[11px] text-zinc-500">{{ $cp->enrollment->email ?? '' }}</p>
-                        <p class="text-[11px] font-mono text-cyan-500 mt-1">{{ $moduleTitles[$cp->module_id] ?? $cp->module_id }}</p>
-                        <p class="text-[10px] text-zinc-600 mt-1">Submitted {{ optional($cp->submitted_at)->diffForHumans() }}</p>
+                    <div class="flex items-start gap-3 min-w-0">
+                        <x-admin.avatar :name="$cp->enrollment->full_name ?? '?'" />
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-white truncate">{{ $cp->enrollment->full_name ?? 'Unknown' }}</p>
+                            <p class="text-[11px] text-zinc-500 truncate">{{ $cp->enrollment->email ?? '' }}</p>
+                            <div class="flex items-center gap-2 mt-1.5">
+                                <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400">{{ $moduleTitles[$cp->module_id] ?? $cp->module_id }}</span>
+                                <span class="text-[10px] text-zinc-600">{{ optional($cp->submitted_at)->diffForHumans() }}</span>
+                            </div>
+                        </div>
                     </div>
                     <div class="flex flex-col items-end gap-2">
                         @if($cp->proof_url)
                             <a href="{{ $cp->proof_url }}" target="_blank" rel="noopener"
-                               class="text-[11px] font-bold text-cyan-500 hover:underline break-all max-w-[220px] text-right">View proof →</a>
+                               class="inline-flex items-center gap-1 text-[11px] font-bold text-cyan-500 hover:underline break-all max-w-[220px] text-right">
+                                <svg class="w-3.5 h-3.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                View proof
+                            </a>
                         @endif
                         <div class="flex items-center gap-2">
                             <button wire:click="approve({{ $cp->id }})" wire:loading.attr="disabled"
@@ -97,7 +105,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Checkpoints'])] class exte
                 </div>
             </div>
         @empty
-            <div class="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/40 p-8 text-center">
+            <div class="rounded-2xl border border-dashed border-zinc-800 bg-zinc-950/40 p-10 text-center">
                 <p class="text-sm text-zinc-500">No checkpoints awaiting review. 🎉</p>
             </div>
         @endforelse
@@ -106,12 +114,13 @@ new #[Layout('components.layouts.admin', ['title' => 'Checkpoints'])] class exte
     <!-- RECENTLY REVIEWED -->
     @if($recent->isNotEmpty())
         <section class="space-y-3">
-            <h2 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Recently reviewed</h2>
+            <h3 class="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500">Recently reviewed</h3>
             <div class="rounded-2xl border border-zinc-800 bg-zinc-900/20 divide-y divide-zinc-900">
                 @foreach($recent as $cp)
-                    <div wire:key="recent-{{ $cp->id }}" class="flex items-center justify-between gap-4 px-5 py-3">
-                        <div class="min-w-0">
-                            <span class="text-xs text-zinc-300">{{ $cp->enrollment->full_name ?? 'Unknown' }}</span>
+                    <div wire:key="recent-{{ $cp->id }}" class="flex items-center gap-3 px-5 py-3">
+                        <x-admin.avatar :name="$cp->enrollment->full_name ?? '?'" class="h-7 w-7 text-[10px]" />
+                        <div class="min-w-0 flex-1">
+                            <span class="text-xs font-bold text-white">{{ $cp->enrollment->full_name ?? 'Unknown' }}</span>
                             <span class="text-[10px] font-mono text-zinc-600"> · {{ $moduleTitles[$cp->module_id] ?? $cp->module_id }}</span>
                         </div>
                         <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded
