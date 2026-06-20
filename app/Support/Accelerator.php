@@ -14,10 +14,12 @@ use Illuminate\Support\Collection;
  */
 class Accelerator
 {
-    /** Number of confirmed (paid) enrolments. */
+    /** Confirmed (paid) enrolments in the CURRENT cohort — drives seats/early-bird. */
     public static function seatsSold(): int
     {
-        return (int) Enrollment::where('status', 'paid')->count();
+        return (int) Enrollment::where('status', 'paid')
+            ->where('cohort', (int) config('accelerator.cohort_number', 2))
+            ->count();
     }
 
     /** Seats remaining against the cohort cap (never negative). */
