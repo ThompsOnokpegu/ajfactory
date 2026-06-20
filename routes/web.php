@@ -82,15 +82,28 @@ Route::get('/home', function () {
 
 // 2. Protected Member Terminal
 Route::middleware(['auth', CheckEnrollment::class])->group(function () {
-    
+
     // The Main Member Dashboard
     Volt::route('/dashboard', 'dashboard.terminal')->name('dashboard');
-
-    // Admin: review ship-to-unlock proof checkpoints (gated to admins inside the component)
-    Volt::route('/admin/checkpoints', 'admin.checkpoints')->name('admin.checkpoints');
 
     // Secure Snapshot Vault Downloads
     Route::get('/vault/download/{lessonId}', [VaultController::class, 'download'])
         ->name('vault.download');
 
+});
+
+/*
+|--------------------------------------------------------------------------
+| Admin Dashboard (auth + is_admin)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+    Volt::route('/', 'admin.overview')->name('admin.overview');
+    Volt::route('/enrollments', 'admin.enrollments')->name('admin.enrollments');
+    Volt::route('/checkpoints', 'admin.checkpoints')->name('admin.checkpoints');
+    Volt::route('/masterclass', 'admin.masterclass')->name('admin.masterclass');
+    Volt::route('/leads', 'admin.leads')->name('admin.leads');
+
+    Route::get('/masterclass/export', [\App\Http\Controllers\Admin\ExportController::class, 'masterclass'])->name('admin.masterclass.export');
+    Route::get('/leads/export', [\App\Http\Controllers\Admin\ExportController::class, 'leads'])->name('admin.leads.export');
 });

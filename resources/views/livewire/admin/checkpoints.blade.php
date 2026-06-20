@@ -4,7 +4,7 @@ use Livewire\Volt\Component;
 use Livewire\Attributes\Layout;
 use App\Models\Checkpoint;
 
-new #[Layout('components.layouts.student')] class extends Component {
+new #[Layout('components.layouts.admin', ['title' => 'Checkpoints'])] class extends Component {
     public function mount(): void
     {
         abort_unless(auth()->check() && auth()->user()->is_admin, 403);
