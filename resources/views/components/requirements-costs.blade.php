@@ -71,7 +71,7 @@
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A computer + stable internet.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A smartphone.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A Google account.</span></li>
-                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A card that works for international/USD payments (or a virtual USD card) for free Google Cloud verification and the optional voice credits — <em class="text-zinc-300">if you can't get one, we have a shared option so it never blocks you</em>.</span></li>
+                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A card that works for international/USD payments — for free Google Cloud verification and the optional voice credits.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>~5–8 hours/week for 6 weeks.</span></li>
                 </ul>
             </div>

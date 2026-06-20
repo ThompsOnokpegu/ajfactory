@@ -75,13 +75,13 @@
                     AI Automation Accelerator · Cohort 2
                 </div>
 
-                <h1 class="text-5xl md:text-7xl font-black text-white leading-[0.95] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
-                    Build 9 real AI automations<br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400">— and charge for them.</span>
+                <h1 class="text-6xl md:text-8xl font-black text-white leading-[0.95] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
+                    You're just <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400">one workflow away...</span>
                 </h1>
 
                 <p class="text-lg md:text-2xl text-zinc-400 max-w-3xl mx-auto font-medium mb-12 leading-snug">
-                    A hands-on, beginner-friendly cohort. Telegram, WhatsApp &amp; Voice AI on your own infrastructure — <span class="text-white border-b-2 border-cyan-500">even if you can't code.</span> Finish, or we coach you 1-on-1 until you do.
+                    A hands-on, <span class="text-white border-b-2 border-cyan-500">beginner-friendly AI Automation</span>. Build enterprise-level workflows: Telegram, WhatsApp &amp; Voice AI on your own infrastructure - <span class="text-white border-b-2 border-cyan-500">even if you can't code.</span> Finish, or we coach you 1-on-1 until you do.
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -369,7 +369,7 @@
                         ['What will it cost beyond the ₦79,000?', 'About one cheap domain (~₦8–15k/yr) and ~$5–10 of optional voice credits. Everything else runs on free tiers.'],
                         ['Do I need a registered business (CAC)?', 'No — not to start or to finish. It\'s only needed for the optional WhatsApp module; without it you complete via the Telegram path.'],
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
-                        ['Do I need an international card?', 'Only for free Google Cloud verification and the optional voice credits — a virtual USD card works, or use our shared option.'],
+                        ['Do I need an international card?', 'Only for free Google Cloud verification and the optional voice credits — you\'ll need a card that works for international/USD payments.'],
                         ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
                         ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
                         ['Can I pay in installments?', 'Yes — ₦42,000 × 2.'],

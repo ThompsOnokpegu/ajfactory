@@ -68,7 +68,7 @@
 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
                     <a href="{{ route('taab.index') }}" class="group relative px-10 py-5 bg-cyan-500 text-black font-black uppercase tracking-tighter text-xl hover:scale-105 transition-all rounded shadow-[0_0_30px_rgba(6,182,212,0.3)]">
-                        Start Free at the Bootcamp
+                        Start Free
                     </a>
                     <a href="{{ route('accelerator') }}" class="px-10 py-5 border border-zinc-800 text-white font-black uppercase tracking-tighter text-xl rounded hover:border-cyan-500/50 hover:text-cyan-400 transition-all">
                         See the Accelerator
