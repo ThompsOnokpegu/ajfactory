@@ -6,6 +6,7 @@ use App\Models\Enrollment;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 
 class ProcessInstallments extends Command
 {
@@ -28,17 +29,15 @@ class ProcessInstallments extends Command
             ->get();
 
         foreach ($due as $enrollment) {
-            // Pre-generate the reference so the eventual charge maps back to this enrollment.
-            $reference = 'INST2_' . bin2hex(random_bytes(8));
-
+            // The signed pay page generates the charge reference itself at pay-time,
+            // so the scheduler only flips state + sends the link.
             $enrollment->update([
-                'second_payment_reference'    => $reference,
-                'second_payment_status'       => 'link_sent',
+                'second_payment_status'        => 'link_sent',
                 'installment_reminder_sent_at' => $now,
             ]);
 
-            $this->fireWebhook('installment_due', $enrollment, $reference);
-            $this->info("Payment link requested for {$enrollment->email} (ref {$reference})");
+            $this->fireWebhook('installment_due', $enrollment);
+            $this->info("Payment link sent to {$enrollment->email}");
         }
 
         // 2. Grace period elapsed and still unpaid — suspend LMS access.
@@ -54,7 +53,7 @@ class ProcessInstallments extends Command
 
         foreach ($overdue as $enrollment) {
             $enrollment->update(['access_suspended' => true]);
-            $this->fireWebhook('installment_overdue_suspended', $enrollment, $enrollment->second_payment_reference);
+            $this->fireWebhook('installment_overdue_suspended', $enrollment);
             $this->warn("Access suspended for {$enrollment->email} (balance {$enrollment->balance_due})");
         }
 
@@ -63,7 +62,7 @@ class ProcessInstallments extends Command
         return self::SUCCESS;
     }
 
-    private function fireWebhook(string $event, Enrollment $enrollment, ?string $reference): void
+    private function fireWebhook(string $event, Enrollment $enrollment): void
     {
         $url = config('services.n8n.installment_webhook') ?: config('services.n8n.enrollment_webhook');
 
@@ -71,6 +70,10 @@ class ProcessInstallments extends Command
             Log::warning("Installment webhook skipped ({$event}) — no n8n URL configured. Enrollment {$enrollment->id}");
             return;
         }
+
+        // Untamperable link to the hosted "clear your balance" page. No expiry —
+        // an overdue student should still be able to pay.
+        $payUrl = URL::signedRoute('installment.pay', ['enrollment' => $enrollment->id]);
 
         try {
             Http::post($url, [
@@ -80,7 +83,7 @@ class ProcessInstallments extends Command
                 'phone'              => $enrollment->whatsapp,
                 'amount'             => $enrollment->balance_due, // remaining balance to collect
                 'currency'           => $enrollment->currency,
-                'reference'          => $reference,                // use this as the 2nd charge reference
+                'pay_url'            => $payUrl,                   // send this to the student
                 'original_reference' => $enrollment->payment_reference,
                 'plan_type'          => $enrollment->plan_type,
                 'due_at'             => optional($enrollment->second_payment_due_at)->toIso8601String(),

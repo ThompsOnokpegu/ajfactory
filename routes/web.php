@@ -59,10 +59,16 @@ Route::view('/taab/roi-calculator', 'taab.roi-calculator')->name('taab.roi');
 Route::view('/taab/tool-stack', 'taab.tool-stack-guide')->name('taab.tools');
 Route::post('/taab/lead', [TaabLeadController::class, 'store'])->name('taab.lead.store');
 
+// Installment balance — minimal signed pay page (link sent via n8n; no expiry)
+Volt::route('/installment/{enrollment}/pay', 'installment-pay')
+    ->name('installment.pay')
+    ->middleware('signed');
+
 // Thank You / Verification Page
 Volt::route('/thank-you', 'thank-you')->name('thank-you');
 
 Volt::route('/booking', 'booking-form');
+
 /*
 |--------------------------------------------------------------------------
 | Authenticated Member Routes
