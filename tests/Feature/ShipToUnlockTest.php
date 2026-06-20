@@ -5,8 +5,6 @@ use App\Models\Enrollment;
 use App\Models\User;
 use Livewire\Volt\Volt;
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 function makeStudent(int $cohort): User
 {
     $user = User::factory()->create();

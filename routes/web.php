@@ -107,3 +107,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/masterclass/export', [\App\Http\Controllers\Admin\ExportController::class, 'masterclass'])->name('admin.masterclass.export');
     Route::get('/leads/export', [\App\Http\Controllers\Admin\ExportController::class, 'leads'])->name('admin.leads.export');
 });
+
+/*
+|--------------------------------------------------------------------------
+| Account Settings (profile, password, appearance, 2FA)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::redirect('settings', 'settings/profile');
+
+    Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
+    Volt::route('settings/password', 'settings.password')->name('user-password.edit');
+    Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    Volt::route('settings/two-factor', 'settings.two-factor')
+        ->middleware('password.confirm')
+        ->name('two-factor.show');
+});

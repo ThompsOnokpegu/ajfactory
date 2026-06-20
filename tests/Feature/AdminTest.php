@@ -7,8 +7,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Http;
 use Livewire\Volt\Volt;
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 function adminUser(): User
 {
     $u = User::factory()->create();

@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
 use Livewire\Volt\Volt;
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 function makeInstallment(array $overrides = []): Enrollment
 {
     return Enrollment::create(array_merge([

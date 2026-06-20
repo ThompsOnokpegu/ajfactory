@@ -3,8 +3,6 @@
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
-uses(\Tests\TestCase::class, \Illuminate\Foundation\Testing\RefreshDatabase::class);
-
 it('renders the three TAAB tool pages', function () {
     $this->get('/taab/scorecard')->assertOk()->assertSee('Readiness Scorecard');
     $this->get('/taab/roi-calculator')->assertOk()->assertSee('ROI Calculator');
