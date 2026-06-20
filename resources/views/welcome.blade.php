@@ -63,7 +63,7 @@
                 </h1>
 
                 <p class="text-lg md:text-2xl text-zinc-400 max-w-3xl mx-auto font-medium mb-12 leading-snug">
-                    Learn to build and sell real AI automations — Telegram, WhatsApp &amp; voice agents on your own infrastructure. Nigeria-first, beginner-friendly, <span class="text-white border-b-2 border-cyan-500">no code required.</span>
+                    Learn to build and sell real AI automations — Telegram, WhatsApp &amp; voice agents on your own infrastructure. Hands-on, beginner-friendly, <span class="text-white border-b-2 border-cyan-500">no code required.</span>
                 </p>
 
                 <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -80,27 +80,24 @@
                 </p>
             </section>
 
-            <!-- WHAT YOU'LL BUILD -->
+            <!-- FREE TOOLS -->
             <section class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-900">
                 <div class="text-center mb-16 space-y-3">
-                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// What You'll Build</div>
-                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Real, production-grade automations.</h2>
+                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Free Tools</div>
+                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Get clarity in 5 minutes.</h2>
                 </div>
 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="grid sm:grid-cols-3 gap-4">
                     @foreach([
-                        ['The WhatsApp Bot', 'Official Meta Cloud API — the highest-demand channel in Nigeria.'],
-                        ['The Telegram Agent', 'An AI agent that captures and qualifies leads 24/7.'],
-                        ['The Voice Receptionist', 'Vapi-powered — books appointments while you sleep.'],
-                        ['Your Own Server', 'Self-hosted automation stack, ₦0/month hosting.'],
-                        ['RAG Knowledge Base', 'Answers from your data — no hallucinations.'],
-                        ['FX & Quotation Engine', 'Live pricing wired straight into your workflows.'],
-                    ] as $i => [$title, $desc])
-                        <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl hover:border-cyan-500/50 transition-all">
-                            <div class="text-[10px] font-mono text-zinc-600 mb-4 uppercase tracking-[0.2em]">Build_0{{ $i + 1 }}</div>
-                            <h3 class="text-xl font-bold text-white mb-3 italic uppercase">{{ $title }}</h3>
-                            <p class="text-sm text-zinc-500 leading-relaxed">{{ $desc }}</p>
-                        </div>
+                        ['Readiness Scorecard', 'Are you ready to go all in? Score yourself across 5 dimensions.', 'taab.scorecard'],
+                        ['ROI Calculator', 'What it costs and when it pays — with your real numbers.', 'taab.roi'],
+                        ['Tool Stack Guide', 'The right tools for your level, with honest monthly costs.', 'taab.tools'],
+                    ] as [$title, $desc, $route])
+                        <a href="{{ route($route) }}" class="group p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl hover:border-cyan-500/50 transition-all flex flex-col">
+                            <h3 class="text-xl font-bold text-white mb-3 italic uppercase group-hover:text-cyan-400 transition">{{ $title }}</h3>
+                            <p class="text-sm text-zinc-500 leading-relaxed flex-1">{{ $desc }}</p>
+                            <span class="mt-6 text-[10px] font-black text-cyan-500 uppercase tracking-widest">Open tool →</span>
+                        </a>
                     @endforeach
                 </div>
             </section>
@@ -145,28 +142,6 @@
                             </a>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- FREE TOOLS -->
-            <section class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-900">
-                <div class="text-center mb-16 space-y-3">
-                    <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Free Tools</div>
-                    <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Get clarity in 5 minutes.</h2>
-                </div>
-
-                <div class="grid sm:grid-cols-3 gap-4">
-                    @foreach([
-                        ['Readiness Scorecard', 'Are you ready to go all in? Score yourself across 5 dimensions.', 'taab.scorecard'],
-                        ['ROI Calculator', 'What it costs and when it pays — with your real numbers.', 'taab.roi'],
-                        ['Tool Stack Guide', 'The right tools for your level, with honest monthly costs.', 'taab.tools'],
-                    ] as [$title, $desc, $route])
-                        <a href="{{ route($route) }}" class="group p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl hover:border-cyan-500/50 transition-all flex flex-col">
-                            <h3 class="text-xl font-bold text-white mb-3 italic uppercase group-hover:text-cyan-400 transition">{{ $title }}</h3>
-                            <p class="text-sm text-zinc-500 leading-relaxed flex-1">{{ $desc }}</p>
-                            <span class="mt-6 text-[10px] font-black text-cyan-500 uppercase tracking-widest">Open tool →</span>
-                        </a>
-                    @endforeach
                 </div>
             </section>
 
