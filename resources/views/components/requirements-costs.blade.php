@@ -30,17 +30,19 @@
             <tbody class="divide-y divide-zinc-900">
                 @php
                     $rows = [
-                        ['n8n cloud trial', 'first builds (14-day free trial, no card)', '₦0', false],
-                        ['Tally', 'the lead form (Module 1)', '₦0 free plan', false],
-                        ['Google (Gmail/Sheets/Drive/Docs)', 'throughout', '₦0', false],
-                        ['Telegram + a free bot', 'first automation + AI agent', '₦0', false],
-                        ['Loom / any screen recorder', 'weekly proof clips', '₦0', false],
-                        ['LLM API key (Gemini free path)', 'AI agent brain', '₦0', false],
-                        ['Domain name (Namecheap)', 'your self-hosted server', '~₦8,000–15,000 / year', true],
-                        ['Google Cloud Always-Free server', 'hosting', '₦0 / month', false],
-                        ['Pinecone', 'AI knowledge base', '₦0 free tier', false],
-                        ['Meta WhatsApp Cloud API', 'official WhatsApp bot (optional)', '₦0 service tier', false],
-                        ['Vapi voice credits', 'AI phone receptionist (optional)', '~$5–10 one time', true],
+                        ['n8n', 'first builds (free trial)', '₦0', false],
+                        ['Tally', 'lead form', '₦0', false],
+                        ['Google Workspace', 'docs, sheets & email', '₦0', false],
+                        ['Airtable', 'no-code database', '₦0', false],
+                        ['Telegram', 'first automation + AI agent', '₦0', false],
+                        ['Slack', 'alerts & notifications', '₦0', false],
+                        ['Loom', 'weekly proof clips', '₦0', false],
+                        ['Gemini API Key', 'AI agent brain', '₦0', false],
+                        ['Pinecone', 'AI knowledge base', '₦0', false],
+                        ['Meta WhatsApp API', 'WhatsApp bot (optional)', '₦0', false],
+                        ['Google Cloud Hosting', 'self-hosted server', '₦0', false],
+                        ['Domain name', 'your server address', 'from $2 / yr', true],
+                        ['Vapi', 'AI receptionist (optional)', 'Free $10 credit', false],
                     ];
                 @endphp
                 @foreach($rows as [$tool, $for, $cost, $highlight])
@@ -58,8 +60,8 @@
     <div class="mt-6 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
         <p class="text-sm text-zinc-300 leading-relaxed">
             <span class="font-black text-amber-400 uppercase tracking-wide text-xs">Bottom line:</span>
-            beyond tuition, plan for about <strong class="text-white">one cheap domain (~₦8–15k) + ~$5–10 of voice credits.</strong>
-            No servers to rent, no monthly bills, no surprise charges.
+            the only real cost is <strong class="text-white">one cheap domain (from $2/year).</strong>
+            Vapi even gives you a free $10 credit — enough to test through the whole course. No servers to rent, no monthly bills, no surprise charges.
         </p>
     </div>
 
@@ -71,7 +73,7 @@
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A computer + stable internet.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A smartphone.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A Google account.</span></li>
-                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A card that works for international/USD payments — for free Google Cloud verification and the optional voice credits.</span></li>
+                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A card that works for international/USD payments — for free Google Cloud verification (and the optional Vapi credits).</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>~5–8 hours/week for 6 weeks.</span></li>
                 </ul>
             </div>

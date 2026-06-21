@@ -72,7 +72,7 @@
             <section class="max-w-6xl mx-auto px-6 pt-20 pb-32 text-center">
                 <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/30 text-cyan-400 text-[10px] font-black uppercase tracking-[0.2em] mb-10 badge-pulse">
                     <span class="h-2 w-2 rounded-full bg-cyan-500 shadow-[0_0_10px_#06b6d4] animate-pulse"></span>
-                    AI Automation Accelerator · Cohort 2
+                    AI Automation Accelerator
                 </div>
 
                 <h1 class="text-5xl md:text-7xl font-black text-white leading-[0.95] tracking-tighter uppercase italic font-['Space_Grotesk'] mb-8">
@@ -366,10 +366,10 @@
                 <div class="space-y-3" x-data="{ open: null }">
                     @foreach([
                         ['Do I need to know how to code?', "No. It's drag-and-drop automation. If you can follow step-by-step instructions, you can do this."],
-                        ['What will it cost beyond the ₦79,000?', 'About one cheap domain (~₦8–15k/yr) and ~$5–10 of optional voice credits. Everything else runs on free tiers.'],
+                        ['What will it cost beyond the ₦79,000?', 'About one cheap domain (from $2/yr). Vapi gives a free $10 credit for the optional voice module, and everything else runs on free tiers.'],
                         ['Do I need a registered business (CAC)?', 'No — not to start or to finish. It\'s only needed for the optional WhatsApp module; without it you complete via the Telegram path.'],
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
-                        ['Do I need an international card?', 'Only for free Google Cloud verification and the optional voice credits — you\'ll need a card that works for international/USD payments.'],
+                        ['Do I need an international card?', 'Only for free Google Cloud verification (and the optional Vapi credits) — you\'ll need a card that works for international/USD payments.'],
                         ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
                         ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
                         ['Can I pay in installments?', 'Yes — ₦42,000 × 2.'],

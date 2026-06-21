@@ -176,7 +176,7 @@ new class extends Component {
 
     @if($soldOut)
         <!-- SOLD OUT STATE -->
-        <div class="flex-1 p-8 lg:p-16 flex items-center justify-center">
+        <div class="flex-1 p-6 sm:p-8 lg:p-16 flex items-center justify-center">
             <div class="max-w-md text-center space-y-6">
                 <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 border border-amber-500/40 text-amber-400">
                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
@@ -188,7 +188,7 @@ new class extends Component {
         </div>
     @else
         <!-- LEFT: ENROLLMENT FORM -->
-        <div class="flex-1 p-8 lg:p-16 border-r border-zinc-900">
+        <div class="flex-1 p-6 sm:p-8 lg:p-16 border-r border-zinc-900">
             <div class="max-w-md mx-auto">
                 <div class="mb-8">
                     <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Join Cohort 02.</h1>
@@ -256,7 +256,7 @@ new class extends Component {
                         <span class="text-xs text-zinc-400 leading-snug">
                             I've read the
                             <button type="button" @click.prevent="showReq = true" class="text-cyan-400 underline underline-offset-2 hover:text-cyan-300">Requirements &amp; Costs</button>
-                            and understand that beyond tuition I'll need ~one cheap domain (₦8–15k) and ~$5–10 of optional voice credits, plus a card that works for international/USD payments.
+                            and understand that beyond tuition I'll need ~one cheap domain (from $2/yr) plus a card that works for international/USD payments.
                         </span>
                     </label>
 
@@ -281,7 +281,7 @@ new class extends Component {
         </div>
 
         <!-- RIGHT: ORDER SUMMARY -->
-        <div class="w-full lg:w-[450px] p-8 lg:p-16 bg-zinc-900/10">
+        <div class="w-full lg:w-[450px] p-6 sm:p-8 lg:p-16 bg-zinc-900/10">
             <div class="sticky top-32">
                 <h2 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-600 mb-8">Summary // Cohort_002</h2>
                 <div class="space-y-6">
@@ -346,8 +346,8 @@ new class extends Component {
 
     <!-- REQUIREMENTS & COSTS MODAL -->
     <div x-show="showReq" x-cloak x-transition.opacity
-         class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/80 backdrop-blur-sm p-4 sm:p-8">
-        <div @click.outside="showReq = false" class="relative w-full max-w-3xl my-8 rounded-3xl border border-zinc-800 bg-zinc-950 p-6 sm:p-10">
+         class="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/80 backdrop-blur-sm p-3 sm:p-6">
+        <div @click.outside="showReq = false" class="relative w-full max-w-3xl my-6 rounded-3xl border border-zinc-800 bg-zinc-950 p-5 sm:p-8">
             <button type="button" @click="showReq = false" class="absolute top-5 right-5 text-zinc-500 hover:text-white text-2xl leading-none">&times;</button>
             <x-requirements-costs />
             <div class="mt-8 text-center">
