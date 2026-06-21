@@ -41,7 +41,7 @@
                         ['Pinecone', 'AI knowledge base', '₦0', false],
                         ['Meta WhatsApp API', 'WhatsApp bot (optional)', '₦0', false],
                         ['Google Cloud Hosting', 'self-hosted server', '₦0', false],
-                        ['Domain name', 'your server address', 'from $2 / yr', true],
+                        ['Domain name', 'your server address', 'from ~$10 / yr', true],
                         ['Vapi', 'AI receptionist (optional)', 'Free $10 credit', false],
                     ];
                 @endphp
@@ -60,7 +60,7 @@
     <div class="mt-6 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
         <p class="text-sm text-zinc-300 leading-relaxed">
             <span class="font-black text-amber-400 uppercase tracking-wide text-xs">Bottom line:</span>
-            the only real cost is <strong class="text-white">one cheap domain (from $2/year).</strong>
+            the only real cost is <strong class="text-white">one cheap domain (from ~$10/year).</strong>
             Vapi even gives you a free $10 credit — enough to test through the whole course. No servers to rent, no monthly bills, no surprise charges.
         </p>
     </div>
