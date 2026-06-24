@@ -12,3 +12,9 @@ Artisan::command('inspire', function () {
 Schedule::command('installments:process')
     ->dailyAt('09:00')
     ->timezone('Africa/Lagos');
+
+// Masterclass: fire the reminder (Meet link + WhatsApp group), day-of nudge,
+// and post-session Accelerator follow-up — each once, when due.
+Schedule::command('masterclass:remind')
+    ->hourly()
+    ->timezone('Africa/Lagos');
