@@ -1,0 +1,1 @@
+cd ~/domains/ajbuildai.com/public_html/laravel && git pull origin main && bash deploy.sh
