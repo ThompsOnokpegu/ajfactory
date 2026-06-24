@@ -37,17 +37,17 @@ Every masterclass event carries these (use as n8n expressions, e.g. `{{ $json.em
 | `email` | `adebayo@example.com` | lower-cased |
 | `whatsapp` | `+2348000000000` | may be empty → guard the WhatsApp node |
 | `session_date` | `2026-06-27` | the session this person is tied to |
-| `starts_at` | `2026-06-27T09:00:00+01:00` | ISO 8601, Africa/Lagos. Format for display. |
+| `session_label` | `Saturday 27 June · 9:00 AM – 11:00 AM WAT` | ready-to-print; templates use it as `{{SESSION}}` |
+| `starts_at` | `2026-06-27T09:00:00+01:00` | ISO 8601, Africa/Lagos (use if you need the raw datetime) |
 | `timestamp` | ISO 8601 | when the event fired |
 
-**Per-event extras** are listed with each template below.
+**Per-event extras** are listed with each template below. `session_label` is present
+on every event except `masterclass_waitlist` (which isn't tied to a session).
 
-**Two gotchas**
+**Gotchas**
 - `accelerator_url` arrives as a **relative** path (`/accelerator`). Prepend the
   domain in emails: `https://ajbuildai.com/accelerator`.
-- Format `starts_at` for humans with an n8n DateTime expression, e.g.
-  `{{ $json.starts_at.toDateTime().format('cccc d LLLL, t') }}` →
-  "Saturday 27 June, 9:00 AM". The templates below write this as `{{SESSION}}`.
+- Wherever a template shows `{{SESSION}}`, use `{{ $json.session_label }}`.
 
 ---
 

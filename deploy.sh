@@ -9,8 +9,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-# If a deploy ships new migrations, review them first, then uncomment:
-# php artisan migrate --force
+php artisan migrate --force
 
 # Publish the freshly-pulled build assets to the web root (the parent dir,
 # i.e. public_html). Copies — the original stays in public/build.

@@ -100,6 +100,7 @@ class ProcessMasterclass extends Command
                 'email' => $reg->email,
                 'whatsapp' => $reg->whatsapp,
                 'session_date' => $reg->session_date,
+                'session_label' => Masterclass::sessionLabel(),
                 'starts_at' => optional(Masterclass::startsAt())->toIso8601String(),
                 'timestamp' => now()->toIso8601String(),
             ], $extra));

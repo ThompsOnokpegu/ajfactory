@@ -136,6 +136,7 @@ class MasterclassController extends Controller
                 'background' => $data['background'] ?? null,
                 'goal' => $data['goal'] ?? null,
                 'session_date' => $session,
+                'session_label' => Masterclass::sessionLabel(),
                 'timestamp' => now()->toIso8601String(),
             ]);
         } catch (\Throwable $e) {
