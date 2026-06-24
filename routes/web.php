@@ -52,6 +52,7 @@ Route::get('/checkout', function () {
 // TAAB — The AI Automation Bootcamp (hub + masterclass registration)
 Route::view('/taab', 'taab.index')->name('taab.index');
 Route::post('/taab/register', [MasterclassController::class, 'register'])->name('taab.register');
+Route::post('/taab/waitlist', [MasterclassController::class, 'waitlist'])->name('taab.waitlist');
 
 // TAAB lead-magnet tools (top of funnel)
 Route::view('/taab/scorecard', 'taab.scorecard')->name('taab.scorecard');

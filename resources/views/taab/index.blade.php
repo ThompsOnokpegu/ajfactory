@@ -177,6 +177,7 @@ footer a:hover { color: var(--lime); }
 
     <!-- Registration form -->
     <div id="register">
+      @if(\App\Support\Masterclass::registrationOpen())
       <div class="form-card">
         <div class="form-card-header">
           <div class="form-card-label">Secure your seat</div>
@@ -241,6 +242,38 @@ footer a:hover { color: var(--lime); }
           <p>Check your inbox for a confirmation email. Google Meet link arrives 24hrs before the event. We'll also send the link to join the attendee WhatsApp group.</p>
         </div>
       </div>
+      @else
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="form-card-label">Next cohort</div>
+          <div class="form-card-title">Registration is closed</div>
+          <div class="form-card-sub">The {{ $dateLong }} session has closed. Leave your details and you'll be first to know when the next date opens.</div>
+        </div>
+
+        <form id="wait-form">
+          <div class="form-group">
+            <label class="form-label" for="w-name">Full name</label>
+            <input class="form-input" type="text" id="w-name" name="name" placeholder="Adebayo Okafor" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="w-email">Email address</label>
+            <input class="form-input" type="email" id="w-email" name="email" placeholder="you@email.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="w-whatsapp">WhatsApp number</label>
+            <input class="form-input" type="tel" id="w-whatsapp" name="whatsapp" placeholder="+234 800 000 0000">
+          </div>
+          <button type="submit" class="form-submit">Notify me about the next session →</button>
+          <div class="form-disclaimer">No spam. Just a heads-up when the next bootcamp date is announced.</div>
+        </form>
+
+        <div class="form-success" id="wait-success">
+          <div class="success-icon">✅</div>
+          <h3>You're on the list.</h3>
+          <p>We'll email you the moment the next TAAB session is scheduled.</p>
+        </div>
+      </div>
+      @endif
     </div>
   </section>
 
@@ -359,43 +392,83 @@ document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 // Registration form → /taab/register
 const form = document.getElementById('reg-form');
 const success = document.getElementById('form-success');
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = form.querySelector('.form-submit');
-  const original = btn.textContent;
-  btn.textContent = 'Sending…'; btn.disabled = true;
+if (form) {
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = form.querySelector('.form-submit');
+    btn.textContent = 'Sending…'; btn.disabled = true;
 
-  const payload = {
-    first_name: form.first_name.value.trim(),
-    last_name: form.last_name.value.trim(),
-    email: form.email.value.trim(),
-    whatsapp: form.whatsapp.value.trim(),
-    background: form.background.value,
-    goal: form.goal.value,
-  };
+    const payload = {
+      first_name: form.first_name.value.trim(),
+      last_name: form.last_name.value.trim(),
+      email: form.email.value.trim(),
+      whatsapp: form.whatsapp.value.trim(),
+      background: form.background.value,
+      goal: form.goal.value,
+    };
 
-  try {
-    const res = await fetch('{{ route('taab.register') }}', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-      },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      form.style.display = 'none';
-      success.style.display = 'block';
-    } else {
-      btn.textContent = 'Check your details — try again';
+    try {
+      const res = await fetch('{{ route('taab.register') }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        form.style.display = 'none';
+        success.style.display = 'block';
+      } else {
+        btn.textContent = 'Check your details — try again';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Network error — please try again';
       btn.disabled = false;
     }
-  } catch {
-    btn.textContent = 'Network error — please try again';
-    btn.disabled = false;
-  }
-});
+  });
+}
+
+// Waitlist form (shown when registration is closed) → /taab/waitlist
+const waitForm = document.getElementById('wait-form');
+if (waitForm) {
+  const waitSuccess = document.getElementById('wait-success');
+  waitForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = waitForm.querySelector('.form-submit');
+    btn.textContent = 'Sending…'; btn.disabled = true;
+
+    const payload = {
+      name: document.getElementById('w-name').value.trim(),
+      email: document.getElementById('w-email').value.trim(),
+      whatsapp: document.getElementById('w-whatsapp').value.trim(),
+    };
+
+    try {
+      const res = await fetch('{{ route('taab.waitlist') }}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        waitForm.style.display = 'none';
+        waitSuccess.style.display = 'block';
+      } else {
+        btn.textContent = 'Check your details — try again';
+        btn.disabled = false;
+      }
+    } catch {
+      btn.textContent = 'Network error — please try again';
+      btn.disabled = false;
+    }
+  });
+}
 
 // Smooth scroll to the form
 document.querySelectorAll('a[href="#register"]').forEach(link => {
