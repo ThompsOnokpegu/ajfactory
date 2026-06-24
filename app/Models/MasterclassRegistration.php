@@ -15,5 +15,14 @@ class MasterclassRegistration extends Model
         'goal',
         'session_date',
         'status',
+        'reminder_sent_at',
+        'dayof_sent_at',
+        'followup_sent_at',
+    ];
+
+    protected $casts = [
+        'reminder_sent_at' => 'datetime',
+        'dayof_sent_at' => 'datetime',
+        'followup_sent_at' => 'datetime',
     ];
 }

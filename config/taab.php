@@ -25,9 +25,25 @@ return [
     */
     'masterclass' => [
         'date' => '2026-06-27',                 // a Saturday
-        'time' => '9:00 AM – 11:00 PM WAT',
+        'time' => '9:00 AM – 11:00 AM WAT',
         'location' => 'Live · Google Meet',
         'registration_closes' => '2026-06-26',  // the Friday before
         'host' => 'AJ Thompson',
+
+        // Real datetimes the reminder scheduler uses (display strings above are
+        // for the page). Interpreted in `timezone`, since app default is UTC.
+        'starts_at' => '2026-06-27 09:00',
+        'ends_at' => '2026-06-27 11:00',
+        'timezone' => 'Africa/Lagos',
+
+        // Links sent in the reminders. {{TODO: owner supplies the real links}}
+        'meet_url' => env('TAAB_MEET_URL'),
+        'whatsapp_group_url' => env('TAAB_WA_GROUP_URL'),
+        'recording_url' => env('TAAB_RECORDING_URL'), // optional, used in follow-up
+
+        // When each automated touch fires, relative to starts_at / ends_at.
+        'reminder_lead_hours' => 24,   // Meet link + WhatsApp group
+        'dayof_lead_hours' => 2,       // "starting soon" nudge
+        'followup_after_hours' => 2,   // post-session Accelerator follow-up
     ],
 ];
