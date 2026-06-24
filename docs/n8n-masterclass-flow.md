@@ -44,6 +44,11 @@ Every masterclass event carries these (use as n8n expressions, e.g. `{{ $json.em
 **Per-event extras** are listed with each template below. `session_label` is present
 on every event except `masterclass_waitlist` (which isn't tied to a session).
 
+> **Ready-made HTML emails** (branded, email-client-safe, merge fields baked in) live
+> in [`docs/emails/`](emails/) — one file per event. Open them in a browser to preview,
+> then paste into the n8n Send-Email node's HTML field. The plain-text bodies below are
+> the fallback / WhatsApp copy.
+
 **Gotchas**
 - `accelerator_url` arrives as a **relative** path (`/accelerator`). Prepend the
   domain in emails: `https://ajbuildai.com/accelerator`.
