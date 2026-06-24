@@ -83,6 +83,12 @@ new #[Layout('components.layouts.admin', ['title' => 'Masterclass'])] class exte
                         <div class="min-w-0">
                             <div class="text-sm font-bold text-white truncate">{{ $r->first_name }} {{ $r->last_name }}</div>
                             <div class="text-[11px] text-zinc-500 truncate">{{ $r->email }}</div>
+                            @if($r->reminder_sent_at || $r->followup_sent_at)
+                                <div class="flex flex-wrap items-center gap-1.5 mt-1">
+                                    @if($r->reminder_sent_at)<span class="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">Reminded</span>@endif
+                                    @if($r->followup_sent_at)<span class="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-zinc-700/40 text-zinc-400">Followed up</span>@endif
+                                </div>
+                            @endif
                         </div>
                     </div>
                     <div class="md:col-span-3 text-xs text-zinc-400 md:truncate mt-2 md:mt-0"><span class="md:hidden text-zinc-600 font-mono text-[10px] uppercase tracking-widest mr-1">Background</span>{{ $r->background ?: '—' }}</div>
