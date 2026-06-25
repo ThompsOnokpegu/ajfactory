@@ -110,7 +110,7 @@ TAAB kicks off {{SESSION}} (WAT) — tomorrow. Save these two links:
 Tips before we start:
 • Join 5 minutes early on a laptop if you can — you'll be following along live.
 • Have a notebook (or a fresh Google Doc) open.
-• Block the full window — the 5 sessions build on each other.
+• Block the full 2 hours — the 5 sessions build on each other.
 
 See you tomorrow.
 
