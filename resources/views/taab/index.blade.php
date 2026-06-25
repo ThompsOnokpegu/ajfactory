@@ -88,7 +88,7 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .section-title { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 800; color: var(--text); line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 3rem; }
 .section-title em { color: var(--lime); font-style: normal; }
 
-.sessions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1px; background: var(--faint); border: 1px solid var(--faint); border-radius: var(--radius); overflow: hidden; margin-bottom: 5rem; }
+.sessions-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1px; background: var(--faint); border: 1px solid var(--faint); border-radius: var(--radius); overflow: hidden; margin-bottom: 5rem; }
 .session-card { background: var(--surface); padding: 1.75rem; transition: background 0.2s; }
 .session-card:hover { background: var(--surface2); }
 .session-num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--lime); margin-bottom: 0.75rem; }
@@ -135,6 +135,46 @@ footer a:hover { color: var(--lime); }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ── Mobile polish ─────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .page-wrap { padding: 0 1.15rem; }
+
+  /* Header + CTA: tighter, comfortably tappable, no crowding */
+  nav { padding: 1.1rem 0; }
+  .nav-cta { padding: 9px 16px; letter-spacing: 0.04em; }
+
+  /* Hero */
+  .hero { padding: 2.75rem 0 2.5rem; gap: 2.5rem; }
+  .hero-eyebrow { margin-bottom: 1.25rem; }
+  .hero-tagline { margin-bottom: 1.5rem; }
+  .hero-meta { gap: 0.6rem; margin-bottom: 1.75rem; }
+  .form-card { padding: 1.5rem; }
+
+  /* Tighter vertical rhythm between sections */
+  .section-divider { margin: 3rem 0; }
+  .section-title { margin-bottom: 1.75rem; }
+  .sessions-grid, .takeaways-grid, .for-who, .facilitator { margin-bottom: 3rem; }
+
+  /* Cards */
+  .session-card { padding: 1.4rem; }
+  .takeaway-card { padding: 1.35rem; }
+
+  /* Who it's for */
+  .for-who { padding: 1.5rem; gap: 1.75rem; }
+
+  /* Bottom CTA */
+  .bottom-cta { padding: 2.5rem 1.5rem; margin-bottom: 2.5rem; }
+  .bottom-cta::before { font-size: 8rem; }
+  .bottom-cta-sub { font-size: 14px; margin-bottom: 1.5rem; }
+
+  footer { padding: 1.5rem 0 2.5rem; }
+}
+
+/* Very small screens: keep the header on one tidy line */
+@media (max-width: 400px) {
+  .nav-logo span { display: none; }
+}
 </style>
 @endpush
 
