@@ -58,6 +58,19 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .hero-proof { font-size: 13px; color: var(--muted); font-weight: 300; animation: fadeUp 0.6s 0.3s ease both; }
 .hero-proof strong { color: var(--lime); font-weight: 500; }
 
+/* Hero texture: subtle dot-grid + lime glow, masked so it fades out at the edges */
+.hero { position: relative; }
+.hero > * { position: relative; z-index: 1; }
+.hero::before {
+  content: ''; position: absolute; inset: -1.5rem 0 0; z-index: 0; pointer-events: none;
+  background-image:
+    radial-gradient(120% 90% at 22% 18%, rgba(200,240,100,0.12), transparent 60%),
+    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 1.6px);
+  background-size: 100% 100%, 22px 22px;
+  -webkit-mask-image: radial-gradient(135% 100% at 28% 22%, #000 42%, transparent 82%);
+          mask-image: radial-gradient(135% 100% at 28% 22%, #000 42%, transparent 82%);
+}
+
 .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; animation: fadeUp 0.6s 0.2s ease both; position: relative; overflow: hidden; }
 .form-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--lime); }
 .form-card-header { margin-bottom: 1.5rem; }
@@ -379,7 +392,7 @@ footer a:hover { color: var(--lime); }
     <div>
       <div class="for-who-col-title no">✗ &nbsp;This bootcamp is NOT for you if…</div>
       <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You're already earning from AI automation and want advanced technical training</div>
-      <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You want a step-by-step "build this exact workflow" tutorial (that's what the <a href="{{ config('taab.accelerator_url') }}" style="color:var(--lime);text-decoration:none">Accelerator</a> is for)</div>
+      <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span><span>You want a step-by-step "build this exact workflow" tutorial (that's what the <a href="{{ config('taab.accelerator_url') }}" style="color:var(--lime);text-decoration:none">Accelerator</a> is for)</span></div>
       <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You're looking for a get-rich-quick shortcut — this bootcamp is about honest clarity, not hype</div>
       <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You can't commit to the full 2 hours (the live sessions build on each other)</div>
     </div>
