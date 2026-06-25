@@ -32,21 +32,21 @@
         </td></tr>
         <tr><td class="px" style="padding:16px 36px 8px;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#f0ede8;">
           <p style="margin:0 0 6px;font-family:'Syne',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#c8f064;">Tomorrow</p>
-          <h1 style="margin:0 0 14px;font-family:'Syne',Arial,sans-serif;font-size:26px;font-weight:800;line-height:1.2;color:#ffffff;">Your bootcamp links, {{ $json.first_name }}.</h1>
-          <p style="margin:0 0 8px;font-size:15px;line-height:1.65;color:#cfc9d6;">TAAB kicks off <strong style="color:#f0ede8;">{{ $json.session_label }}</strong>. Save these two links now:</p>
+          <h1 style="margin:0 0 14px;font-family:'Syne',Arial,sans-serif;font-size:26px;font-weight:800;line-height:1.2;color:#ffffff;">Your bootcamp links, {{ $json.body.first_name }}.</h1>
+          <p style="margin:0 0 8px;font-size:15px;line-height:1.65;color:#cfc9d6;">TAAB kicks off <strong style="color:#f0ede8;">{{ $json.body.session_label }}</strong>. Save these two links now:</p>
 
           <!-- Primary CTA: Join the session -->
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 8px;">
             <tr><td align="center" bgcolor="#c8f064" style="border-radius:10px;">
-              <a href="{{ $json.meet_url }}" style="display:inline-block;padding:15px 34px;font-family:'Syne',Arial,sans-serif;font-size:14px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#0a0a10;text-decoration:none;border-radius:10px;">▶&nbsp; Join the session</a>
+              <a href="{{ $json.body.meet_url }}" style="display:inline-block;padding:15px 34px;font-family:'Syne',Arial,sans-serif;font-size:14px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#0a0a10;text-decoration:none;border-radius:10px;">▶&nbsp; Join the session</a>
             </td></tr>
           </table>
-          <p style="margin:0 0 18px;font-size:12px;line-height:1.5;color:#888096;">Or paste this into your browser: <a href="{{ $json.meet_url }}" style="color:#c8f064;">{{ $json.meet_url }}</a></p>
+          <p style="margin:0 0 18px;font-size:12px;line-height:1.5;color:#888096;">Or paste this into your browser: <a href="{{ $json.body.meet_url }}" style="color:#c8f064;">{{ $json.body.meet_url }}</a></p>
 
           <!-- Secondary CTA: WhatsApp group -->
           <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 18px;">
             <tr><td align="center" style="border:1px solid rgba(200,240,100,0.4);border-radius:10px;">
-              <a href="{{ $json.whatsapp_group_url }}" style="display:inline-block;padding:13px 30px;font-family:'Syne',Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#c8f064;text-decoration:none;border-radius:10px;">💬&nbsp; Join the attendee WhatsApp group</a>
+              <a href="{{ $json.body.whatsapp_group_url }}" style="display:inline-block;padding:13px 30px;font-family:'Syne',Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#c8f064;text-decoration:none;border-radius:10px;">💬&nbsp; Join the attendee WhatsApp group</a>
             </td></tr>
           </table>
 

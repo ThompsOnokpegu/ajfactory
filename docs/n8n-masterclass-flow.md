@@ -10,7 +10,7 @@ stamps `reminder_sent_at` / `dayof_sent_at` / `followup_sent_at`), so n8n does
 
 ```
 Webhook (POST, =N8N_STUDENT_WEBHOOK_URL)
-  └─ Switch  on  {{ $json.type }}
+  └─ Switch  on  {{ $json.body.type }}
        ├─ masterclass_registration   → Email + WhatsApp   (confirmation, immediate)
        ├─ masterclass_reminder        → Email + WhatsApp   (T-24h: Meet link + group)
        ├─ masterclass_starting_soon   → Email + WhatsApp   (T-2h nudge)
@@ -26,7 +26,7 @@ Webhook (POST, =N8N_STUDENT_WEBHOOK_URL)
 
 ## Common payload fields
 
-Every masterclass event carries these (use as n8n expressions, e.g. `{{ $json.email }}`):
+Every masterclass event carries these (use as n8n expressions, e.g. `{{ $json.body.email }}`):
 
 | Field | Example | Notes |
 |---|---|---|
@@ -50,9 +50,12 @@ on every event except `masterclass_waitlist` (which isn't tied to a session).
 > the fallback / WhatsApp copy.
 
 **Gotchas**
+- The Webhook node wraps the POSTed JSON under `body`, so every field is referenced as
+  `{{ $json.body.<field> }}` (as in the templates below). `recording_block` is the one
+  exception — it's a value you build in a Set node, so it stays `{{ $json.recording_block }}`.
 - `accelerator_url` arrives as a **relative** path (`/accelerator`). Prepend the
   domain in emails: `https://ajbuildai.com/accelerator`.
-- Wherever a template shows `{{SESSION}}`, use `{{ $json.session_label }}`.
+- Wherever a template shows `{{SESSION}}`, use `{{ $json.body.session_label }}`.
 
 ---
 
@@ -64,7 +67,7 @@ Extra fields: `background`, `goal`.
 - **Subject:** `You're in 🎯 TAAB Bootcamp — {{SESSION}}`
 - **Body:**
 ```
-Hi {{ $json.first_name }},
+Hi {{ $json.body.first_name }},
 
 You're registered for The AI Automation Bootcamp (TAAB).
 
@@ -84,7 +87,7 @@ Repetigo · TAAB
 
 **WhatsApp**
 ```
-Hi {{ $json.first_name }} 👋 You're registered for the TAAB Bootcamp — {{SESSION}}, live on Google Meet. We'll send your join link + the attendee group 24h before. See you there! — AJ, Repetigo
+Hi {{ $json.body.first_name }} 👋 You're registered for the TAAB Bootcamp — {{SESSION}}, live on Google Meet. We'll send your join link + the attendee group 24h before. See you there! — AJ, Repetigo
 ```
 
 ---
@@ -97,15 +100,15 @@ Extra fields: `meet_url`, `whatsapp_group_url`.
 - **Subject:** `Tomorrow: your TAAB Bootcamp link inside`
 - **Body:**
 ```
-Hi {{ $json.first_name }},
+Hi {{ $json.body.first_name }},
 
 TAAB kicks off {{SESSION}} (WAT) — tomorrow. Save these two links:
 
 ▶  Join the session (Google Meet):
-   {{ $json.meet_url }}
+   {{ $json.body.meet_url }}
 
 💬  Join the attendee WhatsApp group (announcements + Q&A):
-   {{ $json.whatsapp_group_url }}
+   {{ $json.body.whatsapp_group_url }}
 
 Tips before we start:
 • Join 5 minutes early on a laptop if you can — you'll be following along live.
@@ -121,8 +124,8 @@ See you tomorrow.
 ```
 Reminder: TAAB Bootcamp is {{SESSION}} (WAT) 🚀
 
-▶ Join (Google Meet): {{ $json.meet_url }}
-💬 Attendee group: {{ $json.whatsapp_group_url }}
+▶ Join (Google Meet): {{ $json.body.meet_url }}
+💬 Attendee group: {{ $json.body.whatsapp_group_url }}
 
 Join 5 mins early on a laptop. See you there! — AJ
 ```
@@ -137,11 +140,11 @@ Extra fields: `meet_url`.
 - **Subject:** `Starting soon — TAAB Bootcamp`
 - **Body:**
 ```
-Hi {{ $json.first_name }},
+Hi {{ $json.body.first_name }},
 
 We go live in a couple of hours ({{SESSION}}, WAT).
 
-▶  Join here: {{ $json.meet_url }}
+▶  Join here: {{ $json.body.meet_url }}
 
 Grab water, open a laptop, and come ready with your questions. See you shortly.
 
@@ -151,7 +154,7 @@ Grab water, open a laptop, and come ready with your questions. See you shortly.
 **WhatsApp**
 ```
 We're live soon ({{SESSION}}, WAT) ⏰
-▶ Join: {{ $json.meet_url }}
+▶ Join: {{ $json.body.meet_url }}
 See you there! — AJ
 ```
 
@@ -166,11 +169,11 @@ Extra fields: `accelerator_url` (relative — prepend `https://ajbuildai.com`),
 - **Subject:** `Your next step after TAAB`
 - **Body:**
 ```
-Hi {{ $json.first_name }},
+Hi {{ $json.body.first_name }},
 
-Thanks for spending the day at TAAB — I hope you walked away with real clarity.
+Thanks for joining TAAB — I hope you walked away with real clarity.
 
-{{#if recording_url}}📺  Session recording: {{ $json.recording_url }}{{/if}}
+{{#if recording_url}}📺  Session recording: {{ $json.body.recording_url }}{{/if}}
 
 If the bootcamp showed you that AI automation IS for you, the next step is the
 AI Automation Accelerator — the 6-week cohort where you build 9 real automations
@@ -205,7 +208,7 @@ Only `name`, `email`, `whatsapp`, `type`, `timestamp` (no `first_name`/session).
 - **Subject:** `You're on the list for the next TAAB`
 - **Body:**
 ```
-Hi {{ $json.name }},
+Hi {{ $json.body.name }},
 
 Registration for the current TAAB session has closed — but you're on the list,
 and I'll email you the moment the next date is set.
@@ -223,13 +226,13 @@ Talk soon.
 
 **WhatsApp**
 ```
-Hi {{ $json.name }} 👋 Registration for this TAAB session has closed, but you're on the waitlist — I'll message you when the next date is set. Meanwhile, try the free Readiness Scorecard: https://ajbuildai.com/taab/scorecard — AJ
+Hi {{ $json.body.name }} 👋 Registration for this TAAB session has closed, but you're on the waitlist — I'll message you when the next date is set. Meanwhile, try the free Readiness Scorecard: https://ajbuildai.com/taab/scorecard — AJ
 ```
 
 ---
 
 ## WhatsApp node notes
-- Guard the WhatsApp send on `{{ $json.whatsapp }}` being non-empty (an `IF` node)
+- Guard the WhatsApp send on `{{ $json.body.whatsapp }}` being non-empty (an `IF` node)
   — some registrants leave it blank.
 - The send node depends on your provider (Meta WhatsApp Cloud API, 360dialog,
   Whapi, etc.). Templates above are plain text; if you're on Meta Cloud API for the
