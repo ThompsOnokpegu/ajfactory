@@ -9,10 +9,10 @@ is three more variations of the winner.
 fabricated income claims or testimonials — only state earnings/results you can back.
 
 **Offer facts (keep accurate):**
-- Free · live · one day · Google Meet · **Saturday 27 June, 9–11 AM WAT** (registration closes Fri 26th).
+- Free · live · **2 hours** · Google Meet · **Saturday 27 June, 9–11 AM WAT** (registration closes Fri 26th).
 - Host: AJ Thompson — AI Automation Engineer, 7+ yrs, founder of Repetigo.
 - 5 sessions: what AI automation is · requirements & tools · cost & ROI · opportunities · readiness + open Q&A.
-- You keep 3 tools built live: Readiness Scorecard · ROI Calculator · Tool Stack Guide.
+- You **use** 3 tools to get clarity (and keep them after): Readiness Scorecard · ROI Calculator · Tool Stack Guide.
 - Positioning: *clarity before you commit* — is this right for YOU, what it really costs, who pays.
 
 ---
@@ -22,15 +22,15 @@ fabricated income claims or testimonials — only state earnings/results you can
 hype builds trust for a "clarity" offer.
 
 **Hooks (film 3, keep the best 3-sec retention):**
-- "AI automation will **not** make you rich — at least not how TikTok told you."
+- "AI automation will **not** make you rich — at least not how you're told"
 - "Stop trying to learn AI automation. Do *this* first."
 - "Everyone's selling AI automation. Nobody's telling you what it actually costs."
 
 **Script (~30s):**
 - **0–3s** Hook, straight to camera, hard jump-cut.
-- **3–8s** Re-hook: "Most people burn ₦100k on courses and tool subscriptions *before* they even know if it fits them."
-- **8–20s** Value: "The truth? You can find out if this fits your skills, your time, and your budget — in **one day, for free.** Real costs. Real skills. Real opportunities in Nigeria right now."
-- **20–27s** Offer: "Saturday I'm running a free live bootcamp — **TAAB.** 5 sessions, and you keep 3 tools you build live."
+- **3–8s** Re-hook: "Most people burn ₦500k on courses and tool subscriptions *before* they even know if it fit for them."
+- **8–20s** Value: "The truth is, you can find out if AI Automation fits your skills, your time, and your budget — in **2 hours, for free.** The real cost, skills and the opportunities in Nigeria or whereever you're right now."
+- **20–27s** Offer: "Saturday I'm running a free 2-hour live bootcamp — **TAAB.** 5 fast sessions, and you keep 3 clarity tools you use live."
 - **27–30s** CTA: "Free. Live. This Saturday. Link in bio — spots are limited."
 
 **On-screen text:** `THE HONEST VERSION 👇` → `cost` `skills` `who actually pays` → `Free live bootcamp — Sat`
@@ -48,10 +48,10 @@ hype builds trust for a "clarity" offer.
 **Script (~25–30s):**
 - **Problem (0–8s):** "n8n, Make, Zapier, agents, RAG… everybody says start somewhere different."
 - **Agitate (8–16s):** "So you freeze and do nothing. Or worse — you pay for a ₦80k course and quit by week 2."
-- **Solve (16–27s):** "One free day fixes the confusion. Not another tutorial — the map: what it is, what it costs, and whether *you're* ready. You leave with a personal readiness score."
+- **Solve (16–27s):** "One free 2-hour session fixes the confusion. Not another tutorial — the map: what it is, what it costs, and whether *you're* ready. You leave with a personal readiness score."
 - **CTA (27–30s):** "Free, live, Saturday. Link in bio."
 
-**On-screen text:** `too many tools 😵‍💫` → `that's why you've started nothing` → `get the map in 1 day (free)`
+**On-screen text:** `too many tools 😵‍💫` → `that's why you've started nothing` → `get the map in 2 hours (free)`
 **Caption:** The problem was never you — it's that nobody gave you the map. Free live bootcamp Sat 👉 ajbuildai.com/taab
 **Hashtags:** #learnAI #automation #naijatech #freelancenigeria #techtok
 **Metric to watch:** watch-through %.
