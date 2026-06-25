@@ -6,7 +6,7 @@
 @endphp
 <x-layouts.taab
     title="The AI Automation Bootcamp — Register | TAAB"
-    description="A one-day live bootcamp to get clarity before you commit to AI automation. {{ $dateLong }}, on Zoom. Free to attend.">
+    description="A free 2-hour live bootcamp to get clarity before you commit to AI automation. {{ $dateLong }}, on Google Meet. Free to attend.">
 
 @push('styles')
 <style>
@@ -291,7 +291,7 @@ footer a:hover { color: var(--lime); }
     <div class="session-card"><div class="session-num">Session 03</div><div class="session-title">The cost of entry & ROI reality</div><div class="session-desc">Real monthly numbers. How long to first client. Pricing frameworks. Your personalised break-even calculation — live.</div></div>
     <div class="session-card"><div class="session-num">Session 04</div><div class="session-title">Opportunities & where to play</div><div class="session-desc">The 5 highest-demand use cases. Industries spending now. The Nigerian SME market. Challenges you will face — honestly.</div></div>
     <div class="session-card"><div class="session-num">Session 05</div><div class="session-title">Readiness assessment + open Q&A</div><div class="session-desc">A live scorecard across 5 dimensions. Your outcome bucket. And an open floor — no agenda, attendees drive it.</div></div>
-    <div class="session-card" style="background: var(--lime-dim); border-color: var(--lime-border);"><div class="session-num" style="color: var(--lime);">Take away</div><div class="session-title">3 tools you keep forever</div><div class="session-desc" style="color: rgba(200,240,100,0.7);">Readiness Scorecard · ROI Calculator · Tool Stack Guide. Built during the session. Yours to use after.</div></div>
+    <div class="session-card" style="background: var(--lime-dim); border-color: var(--lime-border);"><div class="session-num" style="color: var(--lime);">Take away</div><div class="session-title">3 tools you keep forever</div><div class="session-desc" style="color: rgba(200,240,100,0.7);">Readiness Scorecard · ROI Calculator · Tool Stack Guide. Use them live to get clarity — yours to keep after.</div></div>
   </div>
 
   <!-- Takeaways -->
@@ -341,7 +341,7 @@ footer a:hover { color: var(--lime); }
       <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You're already earning from AI automation and want advanced technical training</div>
       <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You want a step-by-step "build this exact workflow" tutorial (that's what the <a href="{{ config('taab.accelerator_url') }}" style="color:var(--lime);text-decoration:none">Accelerator</a> is for)</div>
       <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You're looking for a get-rich-quick shortcut — this bootcamp is about honest clarity, not hype</div>
-      <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You can't commit to being present for the full day (the live sessions build on each other)</div>
+      <div class="for-item"><span class="for-item-icon" style="color:#e05555">✗</span> You can't commit to the full 2 hours (the live sessions build on each other)</div>
     </div>
   </div>
 
@@ -365,7 +365,7 @@ footer a:hover { color: var(--lime); }
   <!-- Bottom CTA -->
   <div class="bottom-cta reveal">
     <div class="bottom-cta-date">{{ $dateLong }} · {{ $mc['time'] }}</div>
-    <div class="bottom-cta-title">One day. One decision. Finally made.</div>
+    <div class="bottom-cta-title">Two hours. One decision. Finally made.</div>
     <div class="bottom-cta-sub">Free to attend. Limited spots.@if($closes) Registration closes {{ $closes }}.@endif</div>
     <a href="#register" class="bottom-cta-btn">Reserve your seat now</a>
   </div>

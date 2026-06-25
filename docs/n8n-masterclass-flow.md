@@ -71,7 +71,7 @@ Here's what happens next:
   attendee WhatsApp group.
 • Come with questions — Session 5 is an open floor and attendees drive it.
 
-It's one day to get real clarity before you commit to anything. See you there.
+It's a focused 2-hour session to get real clarity before you commit to anything. See you there.
 
 — AJ Thompson
 Repetigo · TAAB
@@ -103,7 +103,7 @@ TAAB kicks off {{SESSION}} (WAT) — tomorrow. Save these two links:
    {{ $json.whatsapp_group_url }}
 
 Tips before we start:
-• Join 5 minutes early on a laptop if you can — you'll be building alongside us.
+• Join 5 minutes early on a laptop if you can — you'll be following along live.
 • Have a notebook (or a fresh Google Doc) open.
 • Block the full window — the 5 sessions build on each other.
 
@@ -138,7 +138,7 @@ We go live in a couple of hours ({{SESSION}}, WAT).
 
 ▶  Join here: {{ $json.meet_url }}
 
-Grab water, open a laptop, and come ready to build. See you shortly.
+Grab water, open a laptop, and come ready with your questions. See you shortly.
 
 — AJ
 ```
@@ -205,7 +205,7 @@ Hi {{ $json.name }},
 Registration for the current TAAB session has closed — but you're on the list,
 and I'll email you the moment the next date is set.
 
-While you wait, the three free tools we build live in the bootcamp are already
+While you wait, the three free tools we use in the bootcamp are already
 yours to use:
 • Readiness Scorecard — https://ajbuildai.com/taab/scorecard
 • ROI Calculator     — https://ajbuildai.com/taab/roi-calculator
