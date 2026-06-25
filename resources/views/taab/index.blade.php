@@ -11,7 +11,7 @@
 @push('styles')
 <style>
 :root {
-  --bg: #060608;
+  --bg: #0a0a10;
   --surface: #111118;
   --surface2: #18181f;
   --border: rgba(255,255,255,0.07);
@@ -57,19 +57,6 @@ nav { display: flex; align-items: center; justify-content: space-between; paddin
 .meta-chip svg { opacity: 0.6; }
 .hero-proof { font-size: 13px; color: var(--muted); font-weight: 300; animation: fadeUp 0.6s 0.3s ease both; }
 .hero-proof strong { color: var(--lime); font-weight: 500; }
-
-/* Header + hero texture: dot-grid + lime glow across the whole top zone, fading into the page */
-.hero-zone { position: relative; }
-.hero-zone > * { position: relative; z-index: 1; }
-.hero-zone::before {
-  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    radial-gradient(70% 55% at 25% 12%, rgba(200,240,100,0.10), transparent 65%),
-    radial-gradient(circle at 1px 1px, rgba(255,255,255,0.05) 1px, transparent 1.6px);
-  background-size: 100% 100%, 22px 22px;
-  -webkit-mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
-          mask-image: linear-gradient(180deg, #000 70%, transparent 100%);
-}
 
 .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; animation: fadeUp 0.6s 0.2s ease both; position: relative; overflow: hidden; }
 .form-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--lime); }
@@ -194,8 +181,6 @@ footer a:hover { color: var(--lime); }
 <div class="bg-glow"></div>
 
 <div class="page-wrap">
-
-  <div class="hero-zone">
 
   <nav>
     <div class="nav-logo">TAAB <span>by Repetigo</span></div>
@@ -331,8 +316,6 @@ footer a:hover { color: var(--lime); }
       @endif
     </div>
   </section>
-
-  </div><!-- /hero-zone -->
 
   <hr class="section-divider">
 
