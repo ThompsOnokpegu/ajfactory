@@ -83,6 +83,17 @@
 
   .roi-cta { margin-top: 2rem; text-align: center; }
   .roi-cta a { display: inline-block; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; background: var(--accent); color: var(--bg); text-decoration: none; padding: 14px 28px; border-radius: var(--radius-sm); }
+
+  /* ── Mobile ─────────────────────────────────────────────── */
+  @media (max-width: 600px) {
+    .container { padding: 2rem 1.15rem 3.5rem; }
+    .panel, .summary-panel, .timeline-panel { padding: 1.25rem; }
+    .summary-big { font-size: 2rem; }
+    .timeline-months { gap: 3px; }
+    .month-amount { display: none; }      /* labels collide in narrow 12-bar layout */
+    .month-bar-wrap { height: 60px; }
+    .roi-cta a { display: block; }
+  }
 </style>
 @endpush
 

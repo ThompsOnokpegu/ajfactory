@@ -70,6 +70,22 @@
   .stack-cta a { display: inline-block; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; background: var(--accent); color: var(--bg); text-decoration: none; padding: 13px 26px; border-radius: var(--radius-sm); }
 
   .hidden { display: none !important; }
+
+  /* ── Mobile ─────────────────────────────────────────────── */
+  @media (max-width: 640px) {
+    .sticky-header { padding: 0 1rem; }
+    .sticky-inner { height: auto; padding: 8px 0; flex-direction: column; align-items: stretch; gap: 8px; }
+    .sticky-brand { font-size: 12px; }
+    .level-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
+    .level-tab { white-space: nowrap; padding: 6px 12px; }
+    .container { padding: 2rem 1.15rem 3.5rem; }
+    .tool-grid { grid-template-columns: 1fr; }
+    .level-header { flex-wrap: wrap; }
+    .level-who { margin-left: 0; flex-basis: 100%; }
+    .combo-card { flex-wrap: wrap; gap: 8px; }
+    .combo-cost { white-space: normal; }
+    .stack-cta { padding: 1.5rem; }
+  }
 </style>
 @endpush
 
