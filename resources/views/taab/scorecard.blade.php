@@ -301,7 +301,7 @@ function selectOption(i) {
 }
 
 function navigate(dir) {
-  if (dir === 1 && current === 9) { taabRequireLead('scorecard', showResults); return; }
+  if (dir === 1 && current === 9) { showResults(); return; }
   current = Math.max(0, Math.min(9, current + dir));
   document.getElementById('question-card').style.animation = 'none';
   requestAnimationFrame(() => { document.getElementById('question-card').style.animation = ''; render(); });

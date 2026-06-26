@@ -62,45 +62,6 @@
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
         pointer-events: none; z-index: 0; opacity: 0.5;
       }
-
-      /* ── Shared lead gate overlay ──────────────────────────────────── */
-      .taab-gate {
-        position: fixed; inset: 0; z-index: 200;
-        display: none;
-        align-items: center; justify-content: center;
-        background: rgba(8,8,10,0.85);
-        backdrop-filter: blur(6px);
-        padding: 1.5rem;
-      }
-      .taab-gate.show { display: flex; }
-      .taab-gate-card {
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: var(--radius); padding: 2rem; max-width: 420px; width: 100%;
-        animation: taabUp 0.35s ease both;
-      }
-      .taab-gate-eyebrow {
-        font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700;
-        letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.6rem;
-      }
-      .taab-gate-title { font-family: 'Syne', sans-serif; font-size: 1.35rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.4rem; }
-      .taab-gate-sub { font-size: 13px; color: var(--muted); font-weight: 300; margin-bottom: 1.5rem; }
-      .taab-input {
-        width: 100%; background: var(--bg); border: 1px solid var(--border-strong);
-        color: var(--text); padding: 11px 14px; border-radius: var(--radius-sm);
-        font-family: 'DM Sans', sans-serif; font-size: 14px; margin-bottom: 10px; outline: none;
-      }
-      .taab-input:focus { border-color: var(--accent); }
-      .taab-input::placeholder { color: var(--faint); }
-      .taab-gate-btn {
-        width: 100%; background: var(--accent); color: var(--bg);
-        font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: 0.02em;
-        border: none; padding: 13px; border-radius: var(--radius-sm); cursor: pointer; transition: background 0.15s; margin-top: 4px;
-      }
-      .taab-gate-btn:hover { background: #d4f474; }
-      .taab-gate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-      .taab-gate-err { color: var(--red); font-size: 12px; min-height: 16px; margin-top: 6px; }
-      .taab-gate-fine { font-size: 11px; color: var(--faint); font-weight: 300; margin-top: 12px; line-height: 1.5; }
-      @keyframes taabUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
     </style>
     @stack('styles')
 </head>
@@ -109,71 +70,7 @@
         {{ $slot }}
     </div>
 
-    <!-- Reusable email gate -->
-    <div class="taab-gate" id="taab-gate">
-      <div class="taab-gate-card">
-        <div class="taab-gate-eyebrow">One step left</div>
-        <div class="taab-gate-title" id="taab-gate-title">See your results</div>
-        <div class="taab-gate-sub">Enter your details and we'll show your results — plus the next masterclass invite.</div>
-        <input class="taab-input" type="text" id="taab-name" placeholder="Full name" autocomplete="name">
-        <input class="taab-input" type="email" id="taab-email" placeholder="Email address" autocomplete="email">
-        <input class="taab-input" type="text" id="taab-whatsapp" placeholder="WhatsApp (optional)" autocomplete="tel">
-        <div class="taab-gate-err" id="taab-gate-err"></div>
-        <button class="taab-gate-btn" id="taab-gate-btn" onclick="taabSubmitLead()">Show my results →</button>
-        <div class="taab-gate-fine">No spam. We'll only email you about The AI Automation Bootcamp.</div>
-      </div>
-    </div>
-
-    <script>
-      // Shows the gate, then runs onSuccess() once a lead is captured (or immediately
-      // for a returning lead). Used by the scorecard + ROI calculator.
-      window.taabRequireLead = function (source, onSuccess) {
-        window.__taabOnSuccess = onSuccess;
-        window.__taabSource = source;
-        if (localStorage.getItem('taab_lead')) { onSuccess(); return; }
-        document.getElementById('taab-gate-err').textContent = '';
-        document.getElementById('taab-gate').classList.add('show');
-        setTimeout(() => document.getElementById('taab-name').focus(), 50);
-      };
-
-      function taabSubmitLead() {
-        const name = document.getElementById('taab-name').value.trim();
-        const email = document.getElementById('taab-email').value.trim();
-        const whatsapp = document.getElementById('taab-whatsapp').value.trim();
-        const err = document.getElementById('taab-gate-err');
-        const btn = document.getElementById('taab-gate-btn');
-
-        if (name.length < 2) { err.textContent = 'Please enter your name.'; return; }
-        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { err.textContent = 'Please enter a valid email.'; return; }
-
-        err.textContent = '';
-        btn.disabled = true; btn.textContent = 'Saving…';
-
-        fetch('/taab/lead', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-          },
-          body: JSON.stringify({ name, email, whatsapp, source: window.__taabSource }),
-        })
-        .then(async (r) => {
-          if (!r.ok) { const d = await r.json().catch(() => ({})); throw new Error(d.message || 'Something went wrong.'); }
-          return r.json();
-        })
-        .then(() => {
-          localStorage.setItem('taab_lead', email);
-          document.getElementById('taab-gate').classList.remove('show');
-          btn.disabled = false; btn.textContent = 'Show my results →';
-          if (typeof window.__taabOnSuccess === 'function') window.__taabOnSuccess();
-        })
-        .catch((e) => {
-          btn.disabled = false; btn.textContent = 'Show my results →';
-          err.textContent = e.message || 'Network error — please try again.';
-        });
-      }
-    </script>
+    {{-- Lead gate removed — the TAAB tools are ungated. --}}
     @stack('scripts')
 </body>
 </html>

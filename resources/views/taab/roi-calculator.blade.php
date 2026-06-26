@@ -43,12 +43,6 @@
   .roi-results-wrap { position: relative; margin-top: 1.25rem; }
   .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
   @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
-  #roi-results.locked { filter: blur(8px); pointer-events: none; user-select: none; }
-  .roi-gate-overlay { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 1.5rem; }
-  .roi-gate-overlay.hidden { display: none; }
-  .reveal-btn { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; background: var(--accent); color: var(--bg); border: none; padding: 14px 28px; border-radius: var(--radius-sm); cursor: pointer; transition: background 0.15s; }
-  .reveal-btn:hover { background: #d4f474; }
-  .roi-gate-copy { font-size: 13px; color: var(--muted); font-weight: 300; max-width: 320px; }
 
   .summary-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
   .summary-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
@@ -165,12 +159,7 @@
 
   <!-- GATED RESULTS -->
   <div class="roi-results-wrap">
-    <div class="roi-gate-overlay" id="roi-gate-overlay">
-      <button class="reveal-btn" onclick="roiReveal()">See your full projection →</button>
-      <p class="roi-gate-copy">Unlock your break-even point, 12-month outlook, and personalised insights.</p>
-    </div>
-
-    <div id="roi-results" class="locked">
+    <div id="roi-results">
       <div class="results-grid">
         <!-- Summary -->
         <div class="summary-panel">
@@ -229,14 +218,6 @@ let model = 'freelancer';
 
 const fmt = (n) => '₦' + Math.round(n).toLocaleString();
 const fmtUSD = (n) => '$' + Math.round(n);
-
-function roiReveal() {
-  taabRequireLead('roi', () => {
-    document.getElementById('roi-results').classList.remove('locked');
-    document.getElementById('roi-gate-overlay').classList.add('hidden');
-    update();
-  });
-}
 
 function setTool(el, cost, label) {
   document.querySelectorAll('.toggle-group')[0].querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
