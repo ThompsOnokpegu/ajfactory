@@ -76,8 +76,8 @@
     .sticky-header { padding: 0 1rem; }
     .sticky-inner { height: auto; padding: 8px 0; flex-direction: column; align-items: stretch; gap: 8px; }
     .sticky-brand { font-size: 12px; }
-    .level-tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 2px; }
-    .level-tab { white-space: nowrap; padding: 6px 12px; }
+    .level-tabs { flex-wrap: wrap; }
+    .level-tab { padding: 6px 12px; }
     .container { padding: 2rem 1.15rem 3.5rem; }
     .tool-grid { grid-template-columns: 1fr; }
     .level-header { flex-wrap: wrap; }
