@@ -45,5 +45,9 @@ return [
         'reminder_lead_hours' => 24,   // Meet link + WhatsApp group
         'dayof_lead_hours' => 2,       // "starting soon" nudge
         'followup_after_hours' => 2,   // post-session Accelerator follow-up
+
+        // Delay between webhook sends (ms) so a burst (e.g. 30 nudges at once)
+        // doesn't trip SMTP / n8n rate limits and silently drop messages.
+        'send_throttle_ms' => 400,
     ],
 ];

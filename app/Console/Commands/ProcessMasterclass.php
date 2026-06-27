@@ -105,10 +105,19 @@ class ProcessMasterclass extends Command
                 'timestamp' => now()->toIso8601String(),
             ], $extra));
 
-            return $response->successful();
+            $ok = $response->successful();
         } catch (\Throwable $e) {
             Log::error("Masterclass n8n trigger failed ({$type}) for {$reg->email}: " . $e->getMessage());
-            return false;
+            $ok = false;
         }
+
+        // Throttle sends so a burst (e.g. 30 day-of nudges at once) doesn't trip
+        // SMTP / n8n rate limits and silently drop messages.
+        $throttleMs = (int) config('taab.masterclass.send_throttle_ms', 400);
+        if ($throttleMs > 0 && ! app()->runningUnitTests()) {
+            usleep($throttleMs * 1000);
+        }
+
+        return $ok;
     }
 }
