@@ -24,5 +24,6 @@ jobs:
           script: |
             set -e
             cd ~/domains/ajbuildai.com/public_html/laravel
-            git pull origin main
+            git fetch origin main
+            git reset --hard origin/main   # deploy server mirrors main — never blocked by a drifted tree
             bash deploy.sh

@@ -44,7 +44,7 @@ Run the workflow from the **Actions** tab (“Deploy to Hostinger” → *Run wo
 or over SSH:
 
 ```bash
-cd ~/domains/ajbuildai.com/public_html/laravel && git pull origin main && bash deploy.sh
+cd ~/domains/ajbuildai.com/public_html/laravel && git fetch origin main && git reset --hard origin/main && bash deploy.sh
 ```
 
 ## Notes
