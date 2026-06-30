@@ -4,14 +4,14 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <!-- Primary Meta Tags -->
-        <title>Automation Factory | Build AI Agents That Scale</title>
-        <meta name="description" content="Master n8n, Vapi, and Meta Cloud API to build production-grade AI automations.">
+        <title>Join the Waitlist | AI Automation Accelerator</title>
+        <meta name="description" content="The current cohort is closed. Join the waitlist to get first access — and early-bird pricing — when the next AI Automation Accelerator cohort opens.">
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ config('app.url') }}">
-        <meta property="og:title" content="Automation Factory | AI Accelerator">
-        <meta property="og:description" content="Join the founding batch and master the AI automation stack.">
+        <meta property="og:url" content="{{ config('app.url') }}/builders">
+        <meta property="og:title" content="AI Automation Accelerator — Waitlist">
+        <meta property="og:description" content="Seats are capped. Join the waitlist to be first in line when the next cohort opens.">
         <meta property="og:image" content="{{ asset('img/og-preview.jpg') }}">
 
         <!-- Twitter -->
@@ -34,9 +34,10 @@
         <div class="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 h-screen flex flex-col">
             
             <nav class="flex items-center justify-between py-8">
-                <a href="/" class="text-xl font-black tracking-tighter italic text-zinc-600 hover:text-white transition">
-                    AUTO<span class="text-zinc-700 hover:text-purple-500 transition">MATION</span>.FACTORY
+                <a href="/accelerator" class="text-xl font-black tracking-tighter italic text-zinc-500 hover:text-white transition">
+                    AJBUILDS<span class="text-cyan-500"> AI</span>
                 </a>
+                <a href="/accelerator" class="text-[10px] font-mono uppercase tracking-widest text-zinc-600 hover:text-cyan-400 transition">The Accelerator →</a>
             </nav>
 
             <main class="flex-1 flex items-center justify-center sm:-mt-20">
