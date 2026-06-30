@@ -24,6 +24,7 @@ new class extends Component {
 
     // Cohort state
     public bool $soldOut = false;
+    public bool $registrationOpen = true;
     public int $seatsLeft = 0;
     public bool $earlybird = false;
 
@@ -50,9 +51,10 @@ new class extends Component {
 
     public function refreshCohortState(): void
     {
-        $this->soldOut   = Accelerator::isSoldOut();
-        $this->seatsLeft = Accelerator::seatsLeft();
-        $this->earlybird = Accelerator::earlybirdActive();
+        $this->soldOut          = Accelerator::isSoldOut();
+        $this->registrationOpen = Accelerator::registrationOpen();
+        $this->seatsLeft        = Accelerator::seatsLeft();
+        $this->earlybird        = Accelerator::earlybirdActive();
     }
 
     public function updatedPlan()
@@ -103,6 +105,10 @@ new class extends Component {
 
         // Server-side guards (UI also enforces these)
         $this->refreshCohortState();
+        if (! $this->registrationOpen) {
+            $this->statusMessage = 'Registration is currently closed. Please join the waitlist.';
+            return;
+        }
         if ($this->soldOut) {
             $this->statusMessage = 'This cohort is full. Please join the waitlist.';
             return;
@@ -174,15 +180,20 @@ new class extends Component {
 
 <div x-data="{ ack: @entangle('acknowledged'), showReq: false }" class="flex flex-col lg:flex-row max-w-6xl mx-auto w-full">
 
-    @if($soldOut)
-        <!-- SOLD OUT STATE -->
+    @if($soldOut || ! $registrationOpen)
+        <!-- CLOSED STATE (sold out OR registration paused) -->
         <div class="flex-1 p-6 sm:p-8 lg:p-16 flex items-center justify-center">
             <div class="max-w-md text-center space-y-6">
                 <div class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-amber-500/10 border border-amber-500/40 text-amber-400">
                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                 </div>
-                <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Cohort 2 is full.</h1>
-                <p class="text-zinc-500 text-sm leading-relaxed">All {{ $cap }} seats are taken. Join the waitlist and we'll reach out the moment a seat opens or the next cohort is announced.</p>
+                @if($soldOut)
+                    <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Cohort 2 is full.</h1>
+                    <p class="text-zinc-500 text-sm leading-relaxed">All {{ $cap }} seats are taken. Join the waitlist and we'll reach out the moment a seat opens or the next cohort is announced.</p>
+                @else
+                    <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Registration is paused.</h1>
+                    <p class="text-zinc-500 text-sm leading-relaxed">Enrolment for this cohort is temporarily closed. Join the waitlist and we'll let you know the moment it reopens.</p>
+                @endif
                 <a href="/builders" class="inline-block px-8 py-4 bg-cyan-500 text-black font-black uppercase tracking-tighter text-lg rounded-2xl hover:bg-white transition-all">Join The Waitlist</a>
             </div>
         </div>

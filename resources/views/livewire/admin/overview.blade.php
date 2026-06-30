@@ -14,6 +14,13 @@ new #[Layout('components.layouts.admin', ['title' => 'Overview'])] class extends
         abort_unless(auth()->user()?->is_admin, 403);
     }
 
+    /** Pause / resume cohort registration (gates the checkout immediately). */
+    public function toggleRegistration(): void
+    {
+        abort_unless(auth()->user()?->is_admin, 403);
+        Accelerator::setRegistrationOpen(! Accelerator::registrationOpen());
+    }
+
     public function with(): array
     {
         $collected = Enrollment::where('status', 'paid')
@@ -35,6 +42,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Overview'])] class extends
             'cap' => $cap,
             'earlybird' => Accelerator::earlybirdActive(),
             'soldOut' => Accelerator::isSoldOut(),
+            'registrationOpen' => Accelerator::registrationOpen(),
             'outstandingTotal' => (float) (clone $outstanding)->sum('balance_due'),
             'outstandingCount' => (clone $outstanding)->count(),
             'suspended' => Enrollment::where('access_suspended', true)->count(),
@@ -49,9 +57,25 @@ new #[Layout('components.layouts.admin', ['title' => 'Overview'])] class extends
 
 <div class="max-w-6xl mx-auto space-y-10">
 
-    <div>
-        <h2 class="text-2xl font-black tracking-tighter text-white">Welcome back, {{ \Illuminate\Support\Str::of(auth()->user()->name)->before(' ') }}.</h2>
-        <p class="text-sm text-zinc-500 mt-1">Here's how the cohort and funnel are doing right now.</p>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-black tracking-tighter text-white">Welcome back, {{ \Illuminate\Support\Str::of(auth()->user()->name)->before(' ') }}.</h2>
+            <p class="text-sm text-zinc-500 mt-1">Here's how the cohort and funnel are doing right now.</p>
+        </div>
+
+        <!-- Registration ON/OFF switch -->
+        <div class="flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4 py-3 shrink-0">
+            <div class="text-right">
+                <div class="text-[10px] font-black uppercase tracking-[0.15em] text-zinc-500">Cohort registration</div>
+                <div class="text-sm font-black {{ $registrationOpen ? 'text-green-400' : 'text-amber-400' }}">{{ $registrationOpen ? 'Open' : 'Paused' }}</div>
+            </div>
+            <button type="button" wire:click="toggleRegistration"
+                    wire:confirm="{{ $registrationOpen ? 'Pause cohort registration? The checkout will stop accepting new sign-ups.' : 'Resume cohort registration? The checkout will accept sign-ups again.' }}"
+                    role="switch" aria-checked="{{ $registrationOpen ? 'true' : 'false' }}"
+                    class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors {{ $registrationOpen ? 'bg-green-500/80' : 'bg-zinc-700' }}">
+                <span class="inline-block h-5 w-5 transform rounded-full bg-white transition-transform {{ $registrationOpen ? 'translate-x-6' : 'translate-x-1' }}"></span>
+            </button>
+        </div>
     </div>
 
     <!-- KPIs -->

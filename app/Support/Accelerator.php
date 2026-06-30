@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Enrollment;
+use App\Models\Setting;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -14,6 +15,20 @@ use Illuminate\Support\Collection;
  */
 class Accelerator
 {
+    /** Settings key for the runtime registration ON/OFF switch. */
+    public const REGISTRATION_FLAG = 'accelerator_registration_open';
+
+    /** Is cohort registration accepting new sign-ups? Owner toggles this from the admin. */
+    public static function registrationOpen(): bool
+    {
+        return Setting::flag(self::REGISTRATION_FLAG, true);
+    }
+
+    /** Pause/resume cohort registration. */
+    public static function setRegistrationOpen(bool $open): void
+    {
+        Setting::put(self::REGISTRATION_FLAG, $open ? '1' : '0');
+    }
     /** Confirmed (paid) enrolments in the CURRENT cohort — drives seats/early-bird. */
     public static function seatsSold(): int
     {
