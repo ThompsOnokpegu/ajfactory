@@ -15,6 +15,8 @@ Schedule::command('installments:process')
 
 // Masterclass: fire the reminder (Meet link + WhatsApp group), day-of nudge,
 // and post-session Accelerator follow-up — each once, when due.
+// Every 15 min (not hourly) so a single missed cron tick can't swallow a
+// touch inside its 2-hour window. Each touch is idempotent, so extra ticks are safe.
 Schedule::command('masterclass:remind')
-    ->hourly()
+    ->everyFifteenMinutes()
     ->timezone('Africa/Lagos');

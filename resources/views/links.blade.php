@@ -36,52 +36,42 @@
         <!-- The Stack -->
         <div class="w-full space-y-4">
             
-            <!-- 1. Agency Lead Magnet (Generalized) -->
-            <a href="https://repetigo.co/book" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
-                <div class="flex items-center justify-center gap-3">
-                    <span class="text-lg">💼</span>
-                    <span class="font-bold text-white tracking-wide">Book Discovery Call</span>
-                </div>
-                <div class="absolute inset-0 border border-cyan-500/0 rounded-xl transition-all group-hover:border-cyan-500/20"></div>
-            </a>
-
-            <!-- 2. Masterclass Waitlist -->
-            <a href="/taab" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl transition-all duration-300 btn-hover-effect hover:-translate-y-1 hover:border-zinc-700 hover:bg-zinc-900/90">
-                <div class="flex items-start gap-2">
-                    <!-- Icon: Centered vertically with the first line of text -->
-                    <div class="flex-shrink-0 mt-1">
-                        <span class="text-lg">🧠</span>
-                    </div>
-                    
-                    <!-- Text Block: Title on top, Description below -->
+            <!-- 1. TAAB Masterclass — this Saturday (featured) -->
+            <a href="/taab" class="group relative block w-full bg-zinc-900/80 border border-cyan-500/30 p-5 rounded-2xl transition-all duration-300 btn-hover-effect hover:-translate-y-1 hover:bg-zinc-900/90">
+                <span class="absolute top-5 right-5 text-[9px] font-mono uppercase tracking-widest text-cyan-400">Free · Sat</span>
+                <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 mt-0.5"><span class="text-lg">🧠</span></div>
                     <div class="flex flex-col text-left">
-                        <span class="font-bold text-white text-lg tracking-wide group-hover:text-cyan-400 transition-colors">
-                            TAAB Masterclass
-                        </span>
-                        <p class="text-sm text-zinc-400 mt-1 leading-relaxed max-w-[90%]">
-                            The AI Automation Bootcamp: Clarity before you commit. Everything you need to decide.
+                        <span class="font-bold text-white text-lg tracking-wide group-hover:text-cyan-400 transition-colors">TAAB Masterclass — Register</span>
+                        <p class="text-sm text-zinc-400 mt-1 leading-relaxed max-w-[92%]">
+                            Free 2-hour live session this Saturday. Clarity before you commit to AI automation.
                         </p>
                     </div>
                 </div>
-
-                <!-- Status Indicator: Pulsing cyan dot -->
-                <span class="absolute top-6 right-6 h-2 w-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_12px_rgba(6,182,212,0.6)]"></span>
+                <span class="absolute bottom-5 right-5 h-2 w-2 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_12px_rgba(6,182,212,0.6)]"></span>
             </a>
-            <!-- 3. Accelerator Waitlist -->
+
+            <!-- 2. AI Automation Accelerator -->
             <a href="/accelerator" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
                 <div class="flex items-center justify-center gap-3">
                     <span class="text-lg">⚡️</span>
-                    <span class="font-bold text-white tracking-wide">Join The 6 Weeks Accelerator</span>
+                    <span class="font-bold text-white tracking-wide">AI Automation Accelerator</span>
                 </div>
-                <!-- Subtle "Closed" or "Waitlist" tag if needed -->
-                <span class="absolute top-1/2 -translate-y-1/2 right-4 h-1.5 w-1.5 rounded-full bg-cyan-500 animate-pulse"></span>
             </a>
 
-            <!-- 4. The Playbook (Lead Magnet) -->
-            <a href="#" class="group relative block w-full bg-white text-zinc-950 border border-white p-4 rounded-xl text-center transition-all duration-300 hover:bg-cyan-400 hover:border-cyan-400 hover:-translate-y-1 hover:shadow-[0_0_25px_rgba(34,211,238,0.4)]">
+            <!-- 3. Free Readiness Scorecard -->
+            <a href="/taab/scorecard" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
                 <div class="flex items-center justify-center gap-3">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    <span class="font-black uppercase tracking-tight">Get your Readiness Scorecard</span>
+                    <span class="text-lg">🎯</span>
+                    <span class="font-bold text-white tracking-wide">Free Readiness Scorecard</span>
+                </div>
+            </a>
+
+            <!-- 4. Agency — book a call -->
+            <a href="https://repetigo.co/book" target="_blank" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-4 rounded-xl text-center transition-all duration-300 btn-hover-effect hover:-translate-y-1">
+                <div class="flex items-center justify-center gap-3">
+                    <span class="text-lg">💼</span>
+                    <span class="font-bold text-white tracking-wide">Book a Discovery Call</span>
                 </div>
             </a>
 
