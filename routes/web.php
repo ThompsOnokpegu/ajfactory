@@ -24,6 +24,10 @@ Route::get('/resume', function () {
     return view('resume');
 })->name('resume');
 
+Route::get('/old-resume', function () {
+    return view('old-resume');
+})->name('old-resume');
+
 // Agency Landing Page (Business Clients)
 Route::get('/', function () {
     return view('welcome');
@@ -48,6 +52,16 @@ Route::get('/accelerator', function () {
 Route::get('/checkout', function () {
     return view('checkout');
 })->name('checkout');
+
+// Free resources hub (shared in comments) + click-through redirect
+Route::get('/free', function () {
+    return view('resources', ['resources' => \App\Models\Resource::published()->get()]);
+})->name('free');
+Route::get('/r/{resource}', function (\App\Models\Resource $resource) {
+    abort_unless($resource->is_published, 404);
+    $resource->increment('clicks');
+    return redirect()->away($resource->url);
+})->name('resources.go');
 
 // TAAB — The AI Automation Bootcamp (hub + masterclass registration)
 Route::view('/taab', 'taab.index')->name('taab.index');
@@ -104,6 +118,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Volt::route('/checkpoints', 'admin.checkpoints')->name('admin.checkpoints');
     Volt::route('/masterclass', 'admin.masterclass')->name('admin.masterclass');
     Volt::route('/leads', 'admin.leads')->name('admin.leads');
+    Volt::route('/resources', 'admin.resources')->name('admin.resources');
 
     Route::get('/masterclass/export', [\App\Http\Controllers\Admin\ExportController::class, 'masterclass'])->name('admin.masterclass.export');
     Route::get('/leads/export', [\App\Http\Controllers\Admin\ExportController::class, 'leads'])->name('admin.leads.export');
