@@ -1,0 +1,180 @@
+<!-- Event: scorecard_result  |  Subject: Your AI automation readiness score: {{ $json.body.score }}/100
+
+  ONE template covers all three tiers (🟢 ready / 🟡 almost / 🔴 not_yet) — the verdict
+  copy and the next steps ride in the payload, rendered exactly as the user saw them
+  on the results page. Nothing to duplicate here, nothing to drift.
+
+  Payload fields used (n8n nests the POST body under `body`):
+    body.name            — first name, may be null (falls back to "there")
+    body.score           — 0-100 total
+    body.tier            — ready | almost | not_yet   (drives only the CTA)
+    body.verdict_label   — e.g. "🟢 Ready to start"
+    body.verdict_title   — e.g. "You are built for this."
+    body.verdict_text    — the full narrative (already includes the hosting caveat when capped)
+    body.dimensions      — { skills, time, setup, mindset, market } each 0-100
+    body.steps           — ARRAY of HTML strings, 3 normally / 4 when hosting_blocked capped them
+    body.hosting_blocked — bool (informational; the step is already inside `steps`)
+
+  The steps list is built by the inline expression below — no extra node needed.
+  If your n8n version chokes on template literals in expressions, add a Code node
+  before the send with:
+
+    const steps = $json.body.steps || [];
+    return [{ json: { ...$json, steps_block: steps.map((s, i) =>
+      '<tr><td style="padding:0 0 10px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>' +
+      '<td width="28" valign="top" style="font-family:Syne,Arial,sans-serif;font-size:12px;font-weight:800;color:#c8f064;padding-top:2px;">0' + (i+1) + '</td>' +
+      '<td style="font-family:\'DM Sans\',Arial,sans-serif;font-size:14.5px;line-height:1.6;color:#cfc9d6;">' + s + '</td>' +
+      '</tr></table></td></tr>').join('') } }];
+
+  ...then swap the expression for {{ $json.steps_block }}.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+  <title>Your readiness scorecard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@700;800&display=swap');
+    :root { color-scheme: only dark; }
+    body { margin:0; padding:0; width:100% !important; background:#0a0a10; }
+    a { color:#c8f064; }
+    @media (max-width:600px) {
+      .card { width:100% !important; border-radius:0 !important; }
+      .px { padding-left:22px !important; padding-right:22px !important; }
+      h1 { font-size:23px !important; line-height:1.22 !important; }
+      .score-num { font-size:44px !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#0a0a10;">
+  <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">Your readiness score, the full breakdown, and your next step.</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0a0a10;">
+    <tr><td align="center" style="padding:28px 12px;">
+      <!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:0;"><![endif]-->
+      <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+        <tr><td style="height:4px;background:#c8f064;line-height:4px;font-size:0;">&nbsp;</td></tr>
+        <tr><td class="px" style="padding:28px 36px 4px;">
+          <span style="font-family:'Syne',Arial,sans-serif;font-size:20px;font-weight:800;color:#c8f064;letter-spacing:-0.01em;">TAAB</span>
+          <span style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#888096;"> by Repetigo</span>
+        </td></tr>
+
+        <tr><td class="px" style="padding:16px 36px 8px;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#f0ede8;">
+          <p style="margin:0 0 6px;font-family:'Syne',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#c8f064;">Readiness Scorecard</p>
+          <h1 style="margin:0 0 14px;font-family:'Syne',Arial,sans-serif;font-size:26px;font-weight:800;line-height:1.2;color:#ffffff;">Here's your scorecard, {{ $json.body.name || 'there' }}.</h1>
+
+          <!-- Score + verdict -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;background:#18181f;border:1px solid rgba(255,255,255,0.08);border-radius:12px;">
+            <tr><td align="center" style="padding:26px 20px;">
+              <p class="score-num" style="margin:0;font-family:'Syne',Arial,sans-serif;font-size:52px;font-weight:800;line-height:1;color:#c8f064;">{{ $json.body.score }}<span style="font-size:20px;color:#888096;">/100</span></p>
+              <p style="margin:12px 0 0;font-family:'Syne',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#f0ede8;">{{ $json.body.verdict_label }}</p>
+            </td></tr>
+          </table>
+
+          <h2 style="margin:0 0 10px;font-family:'Syne',Arial,sans-serif;font-size:20px;font-weight:800;line-height:1.25;color:#ffffff;">{{ $json.body.verdict_title }}</h2>
+          <p style="margin:0 0 24px;font-size:15px;line-height:1.7;color:#cfc9d6;">{{ $json.body.verdict_text }}</p>
+
+          <!-- Dimension breakdown -->
+          <p style="margin:0 0 12px;font-family:'Syne',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#888096;">Score by dimension</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px;">
+
+            <tr><td style="padding:0 0 12px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                <td width="88" style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#f0ede8;">Skills</td>
+                <td>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#2a2a35;border-radius:100px;"><tr>
+                    <td width="{{ $json.body.dimensions.skills }}%" style="height:6px;line-height:6px;font-size:0;background:#c8f064;border-radius:100px;">&nbsp;</td>
+                    <td style="height:6px;line-height:6px;font-size:0;">&nbsp;</td>
+                  </tr></table>
+                </td>
+                <td width="46" align="right" style="font-family:'Syne',Arial,sans-serif;font-size:12px;font-weight:700;color:#c8f064;">{{ $json.body.dimensions.skills }}%</td>
+              </tr></table>
+            </td></tr>
+
+            <tr><td style="padding:0 0 12px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                <td width="88" style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#f0ede8;">Time</td>
+                <td>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#2a2a35;border-radius:100px;"><tr>
+                    <td width="{{ $json.body.dimensions.time }}%" style="height:6px;line-height:6px;font-size:0;background:#60c8f0;border-radius:100px;">&nbsp;</td>
+                    <td style="height:6px;line-height:6px;font-size:0;">&nbsp;</td>
+                  </tr></table>
+                </td>
+                <td width="46" align="right" style="font-family:'Syne',Arial,sans-serif;font-size:12px;font-weight:700;color:#60c8f0;">{{ $json.body.dimensions.time }}%</td>
+              </tr></table>
+            </td></tr>
+
+            <tr><td style="padding:0 0 12px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                <td width="88" style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#f0ede8;">Setup</td>
+                <td>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#2a2a35;border-radius:100px;"><tr>
+                    <td width="{{ $json.body.dimensions.setup }}%" style="height:6px;line-height:6px;font-size:0;background:#f5a623;border-radius:100px;">&nbsp;</td>
+                    <td style="height:6px;line-height:6px;font-size:0;">&nbsp;</td>
+                  </tr></table>
+                </td>
+                <td width="46" align="right" style="font-family:'Syne',Arial,sans-serif;font-size:12px;font-weight:700;color:#f5a623;">{{ $json.body.dimensions.setup }}%</td>
+              </tr></table>
+            </td></tr>
+
+            <tr><td style="padding:0 0 12px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                <td width="88" style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#f0ede8;">Mindset</td>
+                <td>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#2a2a35;border-radius:100px;"><tr>
+                    <td width="{{ $json.body.dimensions.mindset }}%" style="height:6px;line-height:6px;font-size:0;background:#c87df0;border-radius:100px;">&nbsp;</td>
+                    <td style="height:6px;line-height:6px;font-size:0;">&nbsp;</td>
+                  </tr></table>
+                </td>
+                <td width="46" align="right" style="font-family:'Syne',Arial,sans-serif;font-size:12px;font-weight:700;color:#c87df0;">{{ $json.body.dimensions.mindset }}%</td>
+              </tr></table>
+            </td></tr>
+
+            <tr><td style="padding:0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+                <td width="88" style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#f0ede8;">Market</td>
+                <td>
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#2a2a35;border-radius:100px;"><tr>
+                    <td width="{{ $json.body.dimensions.market }}%" style="height:6px;line-height:6px;font-size:0;background:#f06488;border-radius:100px;">&nbsp;</td>
+                    <td style="height:6px;line-height:6px;font-size:0;">&nbsp;</td>
+                  </tr></table>
+                </td>
+                <td width="46" align="right" style="font-family:'Syne',Arial,sans-serif;font-size:12px;font-weight:700;color:#f06488;">{{ $json.body.dimensions.market }}%</td>
+              </tr></table>
+            </td></tr>
+
+          </table>
+
+          <!-- Next steps (loops the payload array: 3 normally, 4 when the hosting cap fired) -->
+          <p style="margin:0 0 12px;font-family:'Syne',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#888096;">Your next steps</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 6px;">
+            {{ $json.body.steps.map((s, i) => `<tr><td style="padding:0 0 10px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#18181f;border:1px solid rgba(255,255,255,0.08);border-radius:10px;"><tr><td width="34" valign="top" style="padding:13px 0 13px 16px;font-family:Syne,Arial,sans-serif;font-size:12px;font-weight:800;color:#c8f064;">0${i+1}</td><td style="padding:13px 16px 13px 0;font-family:'DM Sans',Arial,sans-serif;font-size:14.5px;line-height:1.6;color:#cfc9d6;">${s}</td></tr></table></td></tr>`).join('') }}
+          </table>
+
+          <!-- CTA — honest per tier: don't push the paid cohort at someone who isn't ready -->
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:22px 0 8px;">
+            <tr><td align="center" bgcolor="#c8f064" style="border-radius:10px;">
+              <a href="{{ $json.body.tier === 'not_yet' ? 'https://ajbuildai.com/taab' : 'https://ajbuildai.com/accelerator' }}" style="display:inline-block;padding:15px 34px;font-family:'Syne',Arial,sans-serif;font-size:14px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#0a0a10;text-decoration:none;border-radius:10px;">{{ $json.body.tier === 'not_yet' ? 'Start with the free masterclass →' : ($json.body.tier === 'almost' ? 'See what the Accelerator covers →' : 'Explore the Accelerator →') }}</a>
+            </td></tr>
+          </table>
+
+          <p style="margin:8px 0 0;font-size:14px;line-height:1.65;color:#888096;">Things change — you can <a href="https://ajbuildai.com/taab/scorecard" style="color:#888096;text-decoration:underline;">retake the scorecard</a> any time.</p>
+
+          <p style="margin:24px 0 0;font-size:15px;line-height:1.5;color:#f0ede8;">Questions? Just reply to this email.<br><br>— AJ Thompson<br><span style="color:#888096;font-size:13px;">Repetigo · AJBuilds AI</span></p>
+        </td></tr>
+
+        <tr><td class="px" style="padding:24px 36px 32px;border-top:1px solid rgba(255,255,255,0.07);">
+          <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.6;color:#666;">
+            TAAB by <a href="https://repetigo.co" style="color:#888096;text-decoration:none;">Repetigo</a> · You're receiving this because you completed the AI Automation Readiness Scorecard.<br>
+            Questions? Reply to this email or reach us at <a href="mailto:hello@repetigo.co" style="color:#888096;">hello@repetigo.co</a>.
+          </p>
+        </td></tr>
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td></tr>
+  </table>
+</body>
+</html>
