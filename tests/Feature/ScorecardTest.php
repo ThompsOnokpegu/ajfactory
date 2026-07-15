@@ -13,6 +13,10 @@ it('captures a scorecard result into a new student lead and notifies n8n', funct
         'tier' => 'ready',
         'dimensions' => ['skills' => 80, 'time' => 90, 'setup' => 60, 'mindset' => 75, 'market' => 55],
         'hosting_blocked' => false,
+        'verdict_label' => '🟢 Ready to start',
+        'verdict_title' => 'You are built for this.',
+        'verdict_text' => 'Your score puts you firmly in the "ready" tier.',
+        'steps' => ['<strong>Enrol in the Accelerator</strong> — you are exactly who it is built for.'],
     ])->assertOk()->assertJson(['ok' => true]);
 
     $lead = DB::table('students')->where('email', 'ada@example.com')->first();
@@ -21,7 +25,12 @@ it('captures a scorecard result into a new student lead and notifies n8n', funct
         ->and($lead->scorecard_tier)->toBe('ready')
         ->and((int) $lead->scorecard_score)->toBe(72);
 
-    Http::assertSent(fn ($req) => $req['type'] === 'scorecard_result' && $req['tier'] === 'ready');
+    // The email promises a tailored next step — the verdict + steps must ship.
+    Http::assertSent(fn ($req) => $req['type'] === 'scorecard_result'
+        && $req['tier'] === 'ready'
+        && $req['verdict_label'] === '🟢 Ready to start'
+        && count($req['steps']) === 1
+        && str_contains($req['steps'][0], 'Enrol in the Accelerator'));
 });
 
 it('enriches an existing lead without reclassifying their source', function () {

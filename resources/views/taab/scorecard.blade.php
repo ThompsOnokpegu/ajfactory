@@ -414,6 +414,12 @@ function submitEmail() {
       tier: result.tier,
       dimensions: result.dimPct,
       hosting_blocked: result.hostingBlocked,
+      // The rendered verdict + steps, exactly as shown on screen, so the email
+      // matches the page without duplicating this copy in n8n.
+      verdict_label: result.verdict.label,
+      verdict_title: result.verdict.title,
+      verdict_text: result.verdictText,
+      steps: result.steps.map(s => s.text),
     }),
   }).catch(() => {}).finally(() => { showResults(); });
 }

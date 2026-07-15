@@ -25,6 +25,11 @@ class ScorecardController extends Controller
             'tier' => 'required|in:ready,almost,not_yet',
             'dimensions' => 'nullable|array',
             'hosting_blocked' => 'boolean',
+            'verdict_label' => 'nullable|string|max:120',
+            'verdict_title' => 'nullable|string|max:200',
+            'verdict_text' => 'nullable|string|max:2000',
+            'steps' => 'nullable|array|max:10',
+            'steps.*' => 'string|max:600',
         ]);
 
         $email = strtolower(trim($data['email']));
@@ -73,6 +78,12 @@ class ScorecardController extends Controller
                 'tier' => $data['tier'],
                 'dimensions' => $data['dimensions'] ?? null,
                 'hosting_blocked' => $data['hosting_blocked'] ?? false,
+                // The verdict + next steps the user saw — ready to drop straight
+                // into the "tailored next step" email.
+                'verdict_label' => $data['verdict_label'] ?? null,
+                'verdict_title' => $data['verdict_title'] ?? null,
+                'verdict_text' => $data['verdict_text'] ?? null,
+                'steps' => $data['steps'] ?? [],
                 'timestamp' => now()->toIso8601String(),
             ]);
         } catch (\Throwable $e) {
