@@ -50,6 +50,14 @@
   .btn-primary:hover { background: #d4f474; border-color: #d4f474; color: var(--bg); }
   .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
+  .gate-sub { font-size: 14px; color: var(--muted); font-weight: 300; line-height: 1.6; margin: -1rem 0 1.5rem; }
+  .gate-fields { display: flex; flex-direction: column; gap: 10px; }
+  .gate-input { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface2); color: var(--text); font-family: inherit; font-size: 15px; transition: border-color 0.2s; }
+  .gate-input:focus { outline: none; border-color: var(--accent); }
+  .gate-input::placeholder { color: var(--muted); }
+  .gate-error { color: #ff6b6b; font-size: 12px; min-height: 15px; font-family: 'Syne', sans-serif; font-weight: 600; }
+
+  #email-gate { display: none; }
   #results { display: none; }
   .result-hero { text-align: center; padding: 3rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 2rem; animation: fadeUp 0.6s ease both; }
   .score-ring { width: 120px; height: 120px; margin: 0 auto 1.5rem; position: relative; }
@@ -119,6 +127,23 @@
     <div class="nav-row">
       <button class="btn" id="btn-back" onclick="navigate(-1)" disabled>Back</button>
       <button class="btn btn-primary" id="btn-next" onclick="navigate(1)" disabled>Next</button>
+    </div>
+  </div>
+
+  <div id="email-gate" style="display:none;">
+    <div class="question-card">
+      <div class="q-number">Done · Your results are ready</div>
+      <div class="q-text">Want your scorecard + a tailored next step in your inbox?</div>
+      <p class="gate-sub">Drop your email and we'll send your full breakdown and the exact next move for your readiness level.</p>
+      <div class="gate-fields">
+        <input type="text" id="gate-name" class="gate-input" placeholder="First name (optional)" autocomplete="given-name">
+        <input type="email" id="gate-email" class="gate-input" placeholder="you@email.com" autocomplete="email" required>
+        <div id="gate-error" class="gate-error"></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn" id="gate-back" onclick="backToQuiz()">Back</button>
+      <button class="btn btn-primary" id="gate-submit" onclick="submitEmail()">Show my results →</button>
     </div>
   </div>
 
@@ -258,6 +283,7 @@ const verdicts = {
 
 let current = 0;
 let answers = new Array(10).fill(null);
+let result = null;
 
 function render() {
   const q = questions[current];
@@ -299,13 +325,14 @@ function selectOption(i) {
 }
 
 function navigate(dir) {
-  if (dir === 1 && current === 9) { showResults(); return; }
+  if (dir === 1 && current === 9) { showEmailGate(); return; }
   current = Math.max(0, Math.min(9, current + dir));
   document.getElementById('question-card').style.animation = 'none';
   requestAnimationFrame(() => { document.getElementById('question-card').style.animation = ''; render(); });
 }
 
-function showResults() {
+// Score the answers into the full result object used by the gate POST + results.
+function computeResult() {
   let total = 0;
   const dimScores = [0, 0, 0, 0, 0];
   const dimMax = [0, 0, 0, 0, 0];
@@ -327,6 +354,7 @@ function showResults() {
   const capped = hostingBlocked && verdict === verdicts.high;
   if (capped) verdict = verdicts.mid;
 
+  const tier = verdict === verdicts.high ? 'ready' : verdict === verdicts.mid ? 'almost' : 'not_yet';
   const color = verdict === verdicts.high ? '#c8f064' : verdict === verdicts.mid ? '#f5a623' : '#ff6b6b';
 
   let verdictText = verdict.text;
@@ -336,7 +364,64 @@ function showResults() {
     steps = [{ text: "<strong>Sort your hosting path first</strong> — get access to a real international/USD card, or budget ~$30 for 3 months of paid hosting. Without it you can't complete the owned-stack half of the program." }, ...steps];
   }
 
+  const dimPct = {};
+  ['skills', 'time', 'setup', 'mindset', 'market'].forEach((k, i) => { dimPct[k] = Math.round(dimScores[i] / dimMax[i] * 100); });
+
+  return { total, pct, dimScores, dimMax, dimPct, verdict, color, verdictText, steps, tier, hostingBlocked };
+}
+
+// After the last question: capture the email before revealing results.
+function showEmailGate() {
+  result = computeResult();
   document.getElementById('quiz').style.display = 'none';
+  document.getElementById('email-gate').style.display = 'block';
+  document.getElementById('prog-fill').style.width = '100%';
+  document.getElementById('prog-pct').textContent = '100%';
+  document.getElementById('prog-label').textContent = 'Complete';
+  document.getElementById('gate-email').focus();
+}
+
+function backToQuiz() {
+  document.getElementById('email-gate').style.display = 'none';
+  document.getElementById('quiz').style.display = 'block';
+  render();
+}
+
+function submitEmail() {
+  const email = document.getElementById('gate-email').value.trim();
+  const name = document.getElementById('gate-name').value.trim();
+  const err = document.getElementById('gate-error');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    err.textContent = 'Please enter a valid email so we can send your results.';
+    return;
+  }
+  err.textContent = '';
+  const btn = document.getElementById('gate-submit');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  fetch('{{ route('taab.scorecard.store') }}', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+    },
+    body: JSON.stringify({
+      name: name || null,
+      email,
+      score: result.total,
+      tier: result.tier,
+      dimensions: result.dimPct,
+      hosting_blocked: result.hostingBlocked,
+    }),
+  }).catch(() => {}).finally(() => { showResults(); });
+}
+
+function showResults() {
+  const { pct, dimScores, dimMax, verdict, color, verdictText, steps } = result;
+
+  document.getElementById('email-gate').style.display = 'none';
   document.getElementById('results').style.display = 'block';
 
   const ring = document.getElementById('ring-fill');
@@ -376,18 +461,22 @@ function showResults() {
     el.innerHTML = `<div class="step-num">0${i+1}</div><div class="step-text">${step.text}</div>`;
     list.appendChild(el);
   });
-
-  document.getElementById('prog-fill').style.width = '100%';
-  document.getElementById('prog-pct').textContent = '100%';
-  document.getElementById('prog-label').textContent = 'Complete';
 }
 
 function restart() {
   current = 0;
   answers = new Array(10).fill(null);
+  result = null;
   document.getElementById('results').style.display = 'none';
+  document.getElementById('email-gate').style.display = 'none';
   document.getElementById('next-steps-list').innerHTML = '';
   document.querySelectorAll('#results .dim-bar').forEach(b => b.style.width = '0%');
+  document.getElementById('gate-email').value = '';
+  document.getElementById('gate-name').value = '';
+  document.getElementById('gate-error').textContent = '';
+  const btn = document.getElementById('gate-submit');
+  btn.disabled = false;
+  btn.textContent = 'Show my results →';
   document.getElementById('quiz').style.display = 'block';
   render();
 }

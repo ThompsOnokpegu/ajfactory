@@ -6,6 +6,7 @@ use App\Http\Middleware\CheckEnrollment;
 use App\Http\Controllers\VaultController;
 use App\Http\Controllers\TaabLeadController;
 use App\Http\Controllers\MasterclassController;
+use App\Http\Controllers\ScorecardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +74,7 @@ Route::view('/taab/scorecard', 'taab.scorecard')->name('taab.scorecard');
 Route::view('/taab/roi-calculator', 'taab.roi-calculator')->name('taab.roi');
 Route::view('/taab/tool-stack', 'taab.tool-stack-guide')->name('taab.tools');
 Route::post('/taab/lead', [TaabLeadController::class, 'store'])->name('taab.lead.store');
+Route::post('/taab/scorecard', [ScorecardController::class, 'store'])->name('taab.scorecard.store');
 
 // Installment balance — minimal signed pay page (link sent via n8n; no expiry)
 Volt::route('/installment/{enrollment}/pay', 'installment-pay')

@@ -267,7 +267,7 @@ new class extends Component {
                         <span class="text-xs text-zinc-400 leading-snug">
                             I've read the
                             <button type="button" @click.prevent="showReq = true" class="text-cyan-400 underline underline-offset-2 hover:text-cyan-300">Requirements &amp; Costs</button>
-                            and understand that beyond tuition I'll need ~one cheap domain (from ~$10/yr) plus a card that works for international/USD payments.
+                            and understand that beyond tuition I'll need ~one cheap domain (from ~$10/yr) plus a real international/USD card for free Google Cloud hosting (or a small paid host, ~$10/mo for ~3 months, if I don't have one).
                         </span>
                     </label>
 

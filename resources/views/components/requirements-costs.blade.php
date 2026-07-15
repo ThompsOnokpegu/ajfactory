@@ -61,7 +61,7 @@
         <p class="text-sm text-zinc-300 leading-relaxed">
             <span class="font-black text-amber-400 uppercase tracking-wide text-xs">Bottom line:</span>
             the only real cost is <strong class="text-white">one cheap domain (from ~$10/year).</strong>
-            Vapi even gives you a free $10 credit — enough to test through the whole course. No servers to rent, no monthly bills, no surprise charges.
+            Vapi even gives you a free $10 credit — enough to test through the whole course. The one exception: if you can't get an international card for free Google Cloud hosting, a small paid host runs ~$10/mo for about 3 months. Otherwise, no servers to rent and no surprise charges.
         </p>
     </div>
 
@@ -73,7 +73,7 @@
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A computer + stable internet.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A smartphone.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A Google account.</span></li>
-                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A card that works for international/USD payments — for free Google Cloud verification (and the optional Vapi credits).</span></li>
+                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A <strong class="text-zinc-300">real</strong> international/USD card (a virtual card won't pass) — for free Google Cloud verification and the optional Vapi credits. No card? A small paid host (~$10/mo for ~3 months) is the fallback.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>~5–8 hours/week for 6 weeks.</span></li>
                 </ul>
             </div>

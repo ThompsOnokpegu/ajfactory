@@ -82,6 +82,16 @@ new #[Layout('components.layouts.admin', ['title' => 'Leads & Waitlist'])] class
                         <div class="min-w-0 flex-1">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="text-sm font-bold text-white truncate">{{ $l->name }}</span>
+                                @if($l->scorecard_tier)
+                                    @php
+                                        [$scEmoji, $scLabel, $scClass] = [
+                                            'ready' => ['🟢', 'Ready', 'text-lime-400 bg-lime-400/10'],
+                                            'almost' => ['🟡', 'Almost', 'text-amber-400 bg-amber-400/10'],
+                                            'not_yet' => ['🔴', 'Not yet', 'text-red-400 bg-red-400/10'],
+                                        ][$l->scorecard_tier] ?? ['⚪', '—', 'text-zinc-400 bg-zinc-800'];
+                                    @endphp
+                                    <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded {{ $scClass }}" title="Readiness scorecard">{{ $scEmoji }} {{ $scLabel }} · {{ $l->scorecard_score }}</span>
+                                @endif
                                 <span class="md:hidden text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">{{ $l->source ?: $l->interest }}</span>
                             </div>
                             <div class="text-[11px] text-zinc-500 truncate">{{ $l->email }}</div>

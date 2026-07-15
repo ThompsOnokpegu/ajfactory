@@ -371,7 +371,7 @@
                         ['What will it cost beyond the ₦79,000?', 'About one cheap domain (from ~$10/yr). Vapi gives a free $10 credit for the optional voice module, and everything else runs on free tiers.'],
                         ['Do I need a registered business (CAC)?', 'No — not for any part of the program. The WhatsApp bot is built in test mode, so no business registration is required to build or complete it.'],
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
-                        ['Do I need an international card?', 'Only for free Google Cloud verification (and the optional Vapi credits) — you\'ll need a card that works for international/USD payments.'],
+                        ['Do I need an international card?', 'For free Google Cloud hosting, yes — a real international/USD card (a virtual card won\'t pass verification), also used for the optional Vapi credits. If you can\'t get one, the fallback is a small paid host at ~$10/mo for about 3 months.'],
                         ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
                         ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
                         ['Can I pay in installments?', 'Yes — ₦42,000 × 2.'],
