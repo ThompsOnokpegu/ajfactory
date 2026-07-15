@@ -107,7 +107,7 @@
     <div class="dim-tabs" id="dim-tabs">
       <div class="dim-tab active" data-dim="0">Skills</div>
       <div class="dim-tab" data-dim="1">Time</div>
-      <div class="dim-tab" data-dim="2">Capital</div>
+      <div class="dim-tab" data-dim="2">Setup</div>
       <div class="dim-tab" data-dim="3">Mindset</div>
       <div class="dim-tab" data-dim="4">Market</div>
     </div>
@@ -142,9 +142,9 @@
       <div class="breakdown-title">Score by dimension</div>
       <div class="dim-row"><div class="dim-name">Skills</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-0" style="background:var(--accent)"></div></div><div class="dim-pct" id="pct-0" style="color:var(--accent)">0%</div></div>
       <div class="dim-row"><div class="dim-name">Time</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-1" style="background:#60c8f0"></div></div><div class="dim-pct" id="pct-1" style="color:#60c8f0">0%</div></div>
-      <div class="dim-row"><div class="dim-name">Capital</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-2" style="background:#f5a623"></div></div><div class="dim-pct" id="pct-2" style="color:#f5a623">0%</div></div>
+      <div class="dim-row"><div class="dim-name">Setup &amp; budget</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-2" style="background:#f5a623"></div></div><div class="dim-pct" id="pct-2" style="color:#f5a623">0%</div></div>
       <div class="dim-row"><div class="dim-name">Mindset</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-3" style="background:#c87df0"></div></div><div class="dim-pct" id="pct-3" style="color:#c87df0">0%</div></div>
-      <div class="dim-row"><div class="dim-name">Market access</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-4" style="background:#f06488"></div></div><div class="dim-pct" id="pct-4" style="color:#f06488">0%</div></div>
+      <div class="dim-row"><div class="dim-name">Market</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-4" style="background:#f06488"></div></div><div class="dim-pct" id="pct-4" style="color:#f06488">0%</div></div>
     </div>
 
     <div class="next-steps">
@@ -163,41 +163,41 @@
 @push('scripts')
 <script>
 const questions = [
-  { dim: 0, dimName: 'Skills', text: 'How comfortable are you working with web-based tools and APIs (connecting apps, configuring integrations)?', options: [
-    { label: 'I have no idea what APIs are', score: 0 },
-    { label: 'I understand the concept but have never actually built one', score: 3 },
-    { label: 'I have connected a few tools using no-code platforms (Zapier, Make)', score: 7 },
-    { label: 'I can work with APIs confidently — REST calls, JSON, auth flows', score: 10 },
+  { dim: 0, dimName: 'Skills', text: "You're handed an unfamiliar software tool and a step-by-step guide. How does that usually go?", options: [
+    { label: 'I get overwhelmed and usually need someone to walk me through it', score: 2 },
+    { label: 'I can follow along, but slowly and unsure of myself', score: 5 },
+    { label: 'I can follow a good guide and figure most of it out on my own', score: 8 },
+    { label: 'I pick up new tools easily — I often go beyond the guide', score: 10 },
   ]},
-  { dim: 0, dimName: 'Skills', text: 'How would you describe your ability to think through and map out a business process before automating it?', options: [
+  { dim: 0, dimName: 'Skills', text: 'How well can you think through and map out a business process before automating it?', options: [
     { label: 'I tend to jump in without mapping things out', score: 2 },
     { label: 'I can follow a process map if someone else creates it', score: 4 },
     { label: 'I can map out a simple process on my own', score: 7 },
-    { label: 'I regularly document and optimise workflows professionally', score: 10 },
+    { label: 'I regularly document and optimise workflows', score: 10 },
   ]},
-  { dim: 1, dimName: 'Time', text: 'How many hours per week can you realistically dedicate to learning and building AI automation — consistently?', options: [
-    { label: 'Less than 3 hours — I have very little free time right now', score: 2 },
-    { label: '3–5 hours — possible but it would require discipline', score: 5 },
-    { label: '6–10 hours — I have carved out deliberate time for this', score: 8 },
-    { label: '10+ hours — this is a primary focus for me', score: 10 },
+  { dim: 1, dimName: 'Time', text: 'How many hours per week can you realistically protect for this — consistently, for 6 weeks?', options: [
+    { label: "Under 4 hours — I'm genuinely stretched right now", score: 3 },
+    { label: '4–6 hours — doable if I stay disciplined', score: 7 },
+    { label: "6–8 hours — I've deliberately carved out the recommended time", score: 9 },
+    { label: '8+ hours — this is a top priority for me', score: 10 },
   ]},
-  { dim: 1, dimName: 'Time', text: 'What is your expected timeline to land your first paid client or deliver your first automation project?', options: [
-    { label: 'Within 2 weeks — I need income immediately', score: 1 },
+  { dim: 1, dimName: 'Time', text: "What's your expected timeline to land your first paid automation client?", options: [
+    { label: 'Within 2 weeks — I need income almost immediately', score: 1 },
     { label: '1–2 months — I need it to move quickly', score: 5 },
-    { label: '3–6 months — I am thinking medium-term', score: 9 },
-    { label: 'I have no immediate financial pressure — I can build properly first', score: 10 },
+    { label: "3–6 months — I'm thinking medium-term", score: 9 },
+    { label: 'No urgent financial pressure — I can build properly first', score: 10 },
   ]},
-  { dim: 2, dimName: 'Capital', text: 'How much can you invest in tools and learning per month right now (excluding your time)?', options: [
-    { label: 'Under ₦10k ($6) — essentially zero budget', score: 1 },
-    { label: '₦10k–₦30k ($6–$18) — very tight but workable', score: 4 },
-    { label: '₦30k–₦80k ($18–$50) — I can manage the basics', score: 7 },
-    { label: 'Over ₦80k ($50+) — I am ready to invest properly', score: 10 },
+  { dim: 2, dimName: 'Setup', id: 'hosting', text: "The owned-stack modules host on Google Cloud's always-free tier, which needs a one-time verification with a real international/USD card — a virtual card won't pass. The fallback is paid hosting at ~$10/mo for at least 3 months. Where do you stand?", options: [
+    { label: 'I have a real international/USD card ready to use', score: 10 },
+    { label: 'No card, but I can budget ~$30 (≈₦45k) for 3 months of paid hosting', score: 6 },
+    { label: 'Neither yet, but I could sort one out within a few weeks', score: 3 },
+    { label: "No USD card, and I can't cover the paid fallback", score: 0, blocks: true },
   ]},
-  { dim: 2, dimName: 'Capital', text: 'Do you have financial runway — savings or income — to support yourself for at least 3 months while you build this?', options: [
-    { label: 'No — I need this to generate money within a few weeks', score: 0 },
-    { label: 'About 1 month of runway', score: 4 },
-    { label: '2–3 months of runway', score: 7 },
-    { label: '3+ months — I can build without financial panic', score: 10 },
+  { dim: 2, dimName: 'Setup', text: 'Beyond tuition, you\'ll need ~one domain (₦8–15k/yr) and, optionally, ~$5–10 of voice credits. Can you cover these?', options: [
+    { label: 'Yes, comfortably', score: 10 },
+    { label: "Yes, though it'd be a slight stretch", score: 7 },
+    { label: 'Only the domain — the optional voice credits would be hard', score: 5 },
+    { label: 'No — even a ₦10k domain is out of reach right now', score: 0 },
   ]},
   { dim: 3, dimName: 'Mindset', text: 'How do you typically respond when you hit a wall — a tool that does not work, a concept you cannot grasp?', options: [
     { label: 'I get frustrated and often give up or pause for a long time', score: 1 },
@@ -211,17 +211,17 @@ const questions = [
     { label: 'I usually follow through if I stay accountable to something', score: 7 },
     { label: 'I have a strong track record of completing what I start', score: 10 },
   ]},
-  { dim: 4, dimName: 'Market access', text: 'How well do you understand the types of businesses that need AI automation and what problems they want solved?', options: [
+  { dim: 4, dimName: 'Market', text: 'How well do you understand the types of businesses that need AI automation and what problems they want solved?', options: [
     { label: 'I have no idea who would buy this or why', score: 0 },
     { label: 'I have a vague sense — something like "businesses want to save time"', score: 3 },
     { label: 'I can name 2–3 specific business types and their pain points', score: 7 },
     { label: 'I have a clear niche, specific problems, and can speak their language', score: 10 },
   ]},
-  { dim: 4, dimName: 'Market access', text: 'How strong is your existing network for finding early clients or collaborators in this space?', options: [
-    { label: 'I know almost no one in business or tech circles', score: 0 },
-    { label: 'I have some contacts but nothing specifically relevant', score: 3 },
-    { label: 'I have a network with a few people who could be clients or referrers', score: 7 },
-    { label: 'I have direct access to business owners or decision-makers already', score: 10 },
+  { dim: 4, dimName: 'Market', text: 'The program hands you outreach scripts and an onboarding roadmap — but you have to actually pitch. How do you feel about proactively reaching out to businesses?', options: [
+    { label: "I dread it — I'd probably avoid it", score: 1 },
+    { label: "It scares me, but I'll push through with a script", score: 6 },
+    { label: "I'm fairly comfortable reaching out to people", score: 9 },
+    { label: 'I already pitch/sell regularly, or have warm contacts to start with', score: 10 },
   ]},
 ];
 
@@ -320,8 +320,23 @@ function showResults() {
   });
   const pct = Math.round(total / 100 * 100);
 
-  const verdict = pct >= 65 ? verdicts.high : pct >= 40 ? verdicts.mid : verdicts.low;
-  const color = pct >= 65 ? '#c8f064' : pct >= 40 ? '#f5a623' : '#ff6b6b';
+  let verdict = pct >= 70 ? verdicts.high : pct >= 45 ? verdicts.mid : verdicts.low;
+
+  // Hosting soft-cap: you can't be "ready to start" with no way to stand up the
+  // owned stack. If the GCP/USD-card hurdle can't be cleared at all, cap at 🟡.
+  const hostingBlocked = questions.some((q, i) =>
+    q.id === 'hosting' && answers[i] !== null && q.options[answers[i]].blocks);
+  const capped = hostingBlocked && verdict === verdicts.high;
+  if (capped) verdict = verdicts.mid;
+
+  const color = verdict === verdicts.high ? '#c8f064' : verdict === verdicts.mid ? '#f5a623' : '#ff6b6b';
+
+  let verdictText = verdict.text;
+  let steps = verdict.steps.slice();
+  if (capped) {
+    verdictText += " One thing gates you first: the owned-stack modules need Google Cloud verification, and right now you have neither a USD card nor the paid-hosting fallback — that holds you at “almost ready” until it's sorted.";
+    steps = [{ text: "<strong>Sort your hosting path first</strong> — get access to a real international/USD card, or budget ~$30 for 3 months of paid hosting. Without it you can't complete the owned-stack half of the program." }, ...steps];
+  }
 
   document.getElementById('quiz').style.display = 'none';
   document.getElementById('results').style.display = 'block';
@@ -345,7 +360,7 @@ function showResults() {
   document.getElementById('verdict-label').textContent = verdict.label;
   document.getElementById('verdict-label').style.color = color;
   document.getElementById('verdict-title').textContent = verdict.title;
-  document.getElementById('verdict-text').textContent = verdict.text;
+  document.getElementById('verdict-text').textContent = verdictText;
 
   setTimeout(() => {
     dimScores.forEach((s, i) => {
@@ -357,7 +372,7 @@ function showResults() {
 
   const list = document.getElementById('next-steps-list');
   list.innerHTML = '';
-  verdict.steps.forEach((step, i) => {
+  steps.forEach((step, i) => {
     const el = document.createElement('div');
     el.className = 'step-item';
     el.innerHTML = `<div class="step-num">0${i+1}</div><div class="step-text">${step.text}</div>`;
