@@ -42,8 +42,6 @@
   .option.selected .option-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--bg); }
   .option-label { font-size: 14px; color: var(--text); line-height: 1.5; font-weight: 300; }
   .option.selected .option-label { color: var(--text); font-weight: 400; }
-  .option-score { margin-left: auto; font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; color: var(--muted); min-width: 28px; text-align: right; padding-top: 2px; }
-  .option.selected .option-score { color: var(--accent); }
 
   .nav-row { display: flex; gap: 10px; margin-top: 1.5rem; justify-content: flex-end; animation: fadeUp 0.4s 0.1s ease both; }
   .btn { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; padding: 12px 24px; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; background: transparent; color: var(--muted); }
@@ -271,7 +269,7 @@ function render() {
   q.options.forEach((opt, i) => {
     const btn = document.createElement('button');
     btn.className = 'option' + (answers[current] === i ? ' selected' : '');
-    btn.innerHTML = `<div class="option-dot"></div><div class="option-label">${opt.label}</div><div class="option-score">${opt.score}</div>`;
+    btn.innerHTML = `<div class="option-dot"></div><div class="option-label">${opt.label}</div>`;
     btn.onclick = () => selectOption(i);
     list.appendChild(btn);
   });

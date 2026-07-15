@@ -81,7 +81,7 @@
                 <h4 class="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-4">You do NOT need</h4>
                 <ul class="space-y-3 text-sm text-zinc-500 leading-snug">
                     <li class="flex gap-2"><span class="text-zinc-700 mt-0.5 shrink-0">×</span><span>Coding experience.</span></li>
-                    <li class="flex gap-2"><span class="text-zinc-700 mt-0.5 shrink-0">×</span><span>A registered business to start or finish (only the <em>optional</em> WhatsApp module needs one — without it you complete via the Telegram path).</span></li>
+                    <li class="flex gap-2"><span class="text-zinc-700 mt-0.5 shrink-0">×</span><span>A registered business (CAC) — none of the modules need one. The WhatsApp bot is built in test mode.</span></li>
                     <li class="flex gap-2"><span class="text-zinc-700 mt-0.5 shrink-0">×</span><span>Expensive software.</span></li>
                     <li class="flex gap-2"><span class="text-zinc-700 mt-0.5 shrink-0">×</span><span>Prior AI knowledge.</span></li>
                 </ul>

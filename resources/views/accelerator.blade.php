@@ -369,7 +369,7 @@
                     @foreach([
                         ['Do I need to know how to code?', "No. It's drag-and-drop automation. If you can follow step-by-step instructions, you can do this."],
                         ['What will it cost beyond the ₦79,000?', 'About one cheap domain (from ~$10/yr). Vapi gives a free $10 credit for the optional voice module, and everything else runs on free tiers.'],
-                        ['Do I need a registered business (CAC)?', 'No — not to start or to finish. It\'s only needed for the optional WhatsApp module; without it you complete via the Telegram path.'],
+                        ['Do I need a registered business (CAC)?', 'No — not for any part of the program. The WhatsApp bot is built in test mode, so no business registration is required to build or complete it.'],
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
                         ['Do I need an international card?', 'Only for free Google Cloud verification (and the optional Vapi credits) — you\'ll need a card that works for international/USD payments.'],
                         ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
