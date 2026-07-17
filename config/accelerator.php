@@ -29,9 +29,9 @@ return [
     'cohort_number'     => 2,     // stamped on new enrollments; >= 2 enables ship-to-unlock
     'cohort_cap'        => 25,
     'earlybird_seats'   => 10,    // early-bird active while seats_sold < this
-    'earlybird_ends_at' => '2026-06-29 23:59:59', // Monday 29th June 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
-    'cohort_starts_at'  => '2026-07-06', // Monday 6th July 2026
-    'cart_closes_at'    => '2026-07-06 23:59:59', // Monday 6th July 2026
+    'earlybird_ends_at' => '2026-07-20 23:59:59', // Monday 20th July 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
+    'cohort_starts_at'  => '2026-07-31', // Friday 31st July 2026
+    'cart_closes_at'    => '2026-08-03 23:59:59', // Monday 3rd August 2026
 
     'payment_provider'  => 'paystack', // or 'flutterwave'
 
