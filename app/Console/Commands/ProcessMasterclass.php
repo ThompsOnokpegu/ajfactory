@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class ProcessMasterclass extends Command
 {
-    protected $signature = 'masterclass:remind';
+    protected $signature = 'masterclass:remind {--throttle= : Override send_throttle_ms (e.g. 2000) — raise it if n8n drops sends under burst}';
     protected $description = 'Fire the masterclass reminder, day-of nudge, and post-session follow-up to n8n (once each)';
 
     public function handle(): int
@@ -113,7 +113,12 @@ class ProcessMasterclass extends Command
 
         // Throttle sends so a burst (e.g. 30 day-of nudges at once) doesn't trip
         // SMTP / n8n rate limits and silently drop messages.
-        $throttleMs = (int) config('taab.masterclass.send_throttle_ms', 400);
+        //
+        // NOTE: a 2xx here only proves n8n ACCEPTED the POST. If the n8n Webhook
+        // node responds immediately, it can still drop the execution internally
+        // under burst — so we'd stamp a send that never happened. Set the webhook
+        // to "Respond: When Last Node Finishes" to make this status truthful.
+        $throttleMs = (int) ($this->option('throttle') ?? config('taab.masterclass.send_throttle_ms', 400));
         if ($throttleMs > 0 && ! app()->runningUnitTests()) {
             usleep($throttleMs * 1000);
         }
