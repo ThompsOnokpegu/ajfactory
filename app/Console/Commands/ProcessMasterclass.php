@@ -75,6 +75,18 @@ class ProcessMasterclass extends Command
 
         $this->info("Masterclass processed: {$reminders} reminder(s), {$dayofs} day-of nudge(s), {$followups} follow-up(s).");
 
+        // Anyone still unstamped inside an open window failed and will be retried
+        // on the next run — surfaced so a partial delivery is never silent.
+        $pending = $registrations->filter(function ($reg) use ($now, $reminderAt, $startsAt) {
+            return ! $reg->fresh()->reminder_sent_at && $now->gte($reminderAt) && $now->lt($startsAt);
+        })->count();
+
+        if ($pending > 0) {
+            $this->warn("{$pending} registrant(s) still awaiting the reminder — re-run to retry them.");
+        } elseif ($now->gte($reminderAt) && $now->lt($startsAt)) {
+            $this->info('All registrants have their reminder.');
+        }
+
         return self::SUCCESS;
     }
 
@@ -92,7 +104,11 @@ class ProcessMasterclass extends Command
         }
 
         try {
-            $response = Http::post($url, array_merge([
+            // Generous timeout: with the webhook set to "Respond: When Last Node
+            // Finishes" the response only comes back once n8n has actually sent,
+            // so this call is meant to block. A hang fails closed (no stamp) and
+            // is retried on the next run rather than wedging the whole command.
+            $response = Http::timeout(45)->post($url, array_merge([
                 'type' => $type,
                 'first_name' => $reg->first_name,
                 'last_name' => $reg->last_name,
@@ -106,8 +122,16 @@ class ProcessMasterclass extends Command
             ], $extra));
 
             $ok = $response->successful();
+
+            // A non-2xx used to be swallowed silently — no stamp AND no log — so
+            // failures were invisible at any scale. Now they're named.
+            if (! $ok) {
+                Log::error("Masterclass n8n rejected ({$type}) for {$reg->email}: HTTP {$response->status()} {$response->body()}");
+                $this->warn("  ! {$reg->email} — HTTP {$response->status()} (will retry next run)");
+            }
         } catch (\Throwable $e) {
             Log::error("Masterclass n8n trigger failed ({$type}) for {$reg->email}: " . $e->getMessage());
+            $this->warn("  ! {$reg->email} — {$e->getMessage()} (will retry next run)");
             $ok = false;
         }
 

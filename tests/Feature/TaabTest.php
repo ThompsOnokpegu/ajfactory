@@ -166,6 +166,33 @@ it('captures a waitlist lead into students and notifies n8n', function () {
         && $req['email'] === 'ada@example.com');
 });
 
+it('does not stamp a rejected send, and retries it on the next run', function () {
+    config([
+        'taab.masterclass.date' => '2026-06-27',
+        'taab.masterclass.timezone' => 'UTC',
+        'taab.masterclass.starts_at' => now()->addHours(23)->format('Y-m-d H:i'),
+        'taab.masterclass.ends_at' => now()->addHours(25)->format('Y-m-d H:i'),
+        'services.n8n.student_webhook_url' => 'https://example.test/hook',
+    ]);
+
+    $reg = MasterclassRegistration::create([
+        'first_name' => 'Ada', 'last_name' => 'O', 'email' => 'ada@example.com',
+        'session_date' => '2026-06-27', 'status' => 'registered',
+    ]);
+
+    // First attempt rejected, second accepted. (Http::fake() MERGES stubs rather
+    // than replacing them, so a sequence is the way to vary the response.)
+    Http::fakeSequence()->push('overloaded', 500)->push('ok', 200);
+
+    // n8n rejects (or drops) the send — must NOT be recorded as reminded.
+    $this->artisan('masterclass:remind')->assertExitCode(0);
+    expect($reg->fresh()->reminder_sent_at)->toBeNull();
+
+    // Next run picks them straight back up — no manual list, at any headcount.
+    $this->artisan('masterclass:remind')->assertExitCode(0);
+    expect($reg->fresh()->reminder_sent_at)->not->toBeNull();
+});
+
 it('fires the masterclass reminder once and is idempotent', function () {
     config([
         'taab.masterclass.date' => '2026-06-27',
