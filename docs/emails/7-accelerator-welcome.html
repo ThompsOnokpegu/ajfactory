@@ -1,0 +1,143 @@
+<!-- Event: enrollment confirmed  |  Subject: You're in — Cohort 02 starts Fri 31 July
+
+  Sent from the ENROLMENT workflow (not the student webhook), so the variable
+  scoping differs from the masterclass templates — it reads $json from the
+  preceding node and pulls login_url off the Webhook node. Preserved verbatim
+  from the previous version; do NOT "normalise" these to $json.body.*:
+
+    {{ $json.full_name }}
+    {{ $json.email }}
+    {{ $json.temp_password }}
+    {{ $('Webhook').item.json.body.login_url }}
+
+  Facts are sourced from config/accelerator.php — if the cohort dates change,
+  update BOTH (cohort_starts_at is currently 2026-07-31):
+    cohort_number    => 2
+    cohort_starts_at => 2026-07-31  (Friday 31st July 2026)
+
+  Telegram invite is hardcoded below; config/accelerator.php also holds
+  ACCELERATOR_TELEGRAM_URL for the app side. Keep them in sync.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+  <title>Access granted — AI Automation Accelerator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+    :root { color-scheme: only dark; }
+    body { margin:0; padding:0; width:100% !important; background:#09090b; }
+    a { color:#22d3ee; }
+    @media (max-width:600px) {
+      .card { width:100% !important; border-radius:0 !important; }
+      .px { padding-left:22px !important; padding-right:22px !important; }
+      h1 { font-size:23px !important; line-height:1.22 !important; }
+      .key-val { font-size:14px !important; word-break:break-all !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#09090b;">
+  <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">Your seat is confirmed. Here are your login details and what happens next.</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#09090b;">
+    <tr><td align="center" style="padding:28px 12px;">
+      <!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:0;"><![endif]-->
+      <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#111114;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+        <tr><td style="height:4px;background:#06b6d4;line-height:4px;font-size:0;">&nbsp;</td></tr>
+
+        <tr><td class="px" style="padding:28px 36px 4px;">
+          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:19px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">AI Automation <span style="color:#06b6d4;">Accelerator</span></span>
+          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;"> · Cohort 02</span>
+        </td></tr>
+
+        <tr><td class="px" style="padding:16px 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;color:#e4e4e7;">
+          <p style="margin:0 0 6px;font-family:'Space Grotesk',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#06b6d4;">Seat confirmed</p>
+          <h1 style="margin:0 0 14px;font-family:'Space Grotesk',Arial,sans-serif;font-size:26px;font-weight:700;line-height:1.2;color:#ffffff;">You're in, {{ $json.full_name }}.</h1>
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">Your enrolment is locked in for <strong style="color:#e4e4e7;">Cohort 02</strong>. Over the next 6 weeks you'll build 9 production automations end to end — and get the playbook to charge for them.</p>
+
+          <!-- Start date -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;background:#18181b;border:1px solid rgba(6,182,212,0.25);border-radius:12px;">
+            <tr><td style="padding:18px 20px;font-family:'Space Grotesk',Arial,sans-serif;">
+              <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;">Cohort starts</p>
+              <p style="margin:0;font-size:19px;font-weight:700;color:#ffffff;">Friday, 31st July 2026</p>
+              <p style="margin:6px 0 0;font-size:13.5px;line-height:1.6;color:#a1a1aa;">Your terminal is open now for pre-flight checks — log in, set up your profile, and confirm your access works. Module 01 unlocks on start day.</p>
+            </td></tr>
+          </table>
+
+          <!-- How the cohort runs -->
+          <p style="margin:0 0 12px;font-family:'Space Grotesk',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#71717a;">How the cohort runs</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 26px;">
+            <tr><td style="padding:0 0 9px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#18181b;border:1px solid rgba(255,255,255,0.07);border-radius:10px;"><tr>
+                <td width="34" valign="top" style="padding:13px 0 13px 16px;font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;font-weight:700;color:#06b6d4;">01</td>
+                <td style="padding:13px 16px 13px 0;font-family:'Space Grotesk',Arial,sans-serif;font-size:14px;line-height:1.6;color:#a1a1aa;"><strong style="color:#e4e4e7;">Ship to unlock.</strong> The next module opens when you submit proof your last build works — so you never silently fall behind.</td>
+              </tr></table>
+            </td></tr>
+            <tr><td style="padding:0 0 9px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#18181b;border:1px solid rgba(255,255,255,0.07);border-radius:10px;"><tr>
+                <td width="34" valign="top" style="padding:13px 0 13px 16px;font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;font-weight:700;color:#06b6d4;">02</td>
+                <td style="padding:13px 16px 13px 0;font-family:'Space Grotesk',Arial,sans-serif;font-size:14px;line-height:1.6;color:#a1a1aa;"><strong style="color:#e4e4e7;">Weekly live Build &amp; Debug clinics.</strong> Bring whatever is broken and get unblocked in real time.</td>
+              </tr></table>
+            </td></tr>
+            <tr><td style="padding:0 0 9px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#18181b;border:1px solid rgba(255,255,255,0.07);border-radius:10px;"><tr>
+                <td width="34" valign="top" style="padding:13px 0 13px 16px;font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;font-weight:700;color:#06b6d4;">03</td>
+                <td style="padding:13px 16px 13px 0;font-family:'Space Grotesk',Arial,sans-serif;font-size:14px;line-height:1.6;color:#a1a1aa;"><strong style="color:#e4e4e7;">Your accountability pod.</strong> 3–4 classmates building alongside you, plus the Telegram community where you post each proof checkpoint.</td>
+              </tr></table>
+            </td></tr>
+            <tr><td style="padding:0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#18181b;border:1px solid rgba(255,255,255,0.07);border-radius:10px;"><tr>
+                <td width="34" valign="top" style="padding:13px 0 13px 16px;font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;font-weight:700;color:#06b6d4;">04</td>
+                <td style="padding:13px 16px 13px 0;font-family:'Space Grotesk',Arial,sans-serif;font-size:14px;line-height:1.6;color:#a1a1aa;"><strong style="color:#e4e4e7;">Finish, or we finish with you.</strong> There's a catch-up buffer week — and if your stack isn't live by the end, you get 1-on-1 sessions until it is.</td>
+              </tr></table>
+            </td></tr>
+          </table>
+
+          <!-- Credentials -->
+          <p style="margin:0 0 12px;font-family:'Space Grotesk',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#71717a;">Your access</p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;background:#18181b;border:1px solid rgba(255,255,255,0.07);border-radius:12px;">
+            <tr><td style="padding:20px;font-family:'Space Grotesk',Arial,sans-serif;">
+              <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#71717a;">Member terminal</p>
+              <p class="key-val" style="margin:0 0 16px;font-size:15px;"><a href="{{ $('Webhook').item.json.body.login_url }}" style="color:#22d3ee;text-decoration:none;word-break:break-all;">{{ $('Webhook').item.json.body.login_url }}</a></p>
+
+              <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#71717a;">Email</p>
+              <p class="key-val" style="margin:0 0 16px;font-size:15px;color:#ffffff;word-break:break-all;">{{ $json.email }}</p>
+
+              <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#71717a;">Temporary password</p>
+              <p class="key-val" style="margin:0;font-size:17px;font-weight:700;color:#06b6d4;letter-spacing:0.04em;">{{ $json.temp_password }}</p>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 6px;font-size:13px;line-height:1.6;color:#71717a;">You'll be prompted to change this password after your first login.</p>
+
+          <!-- CTA -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 8px;">
+            <tr><td align="center" bgcolor="#06b6d4" style="border-radius:10px;">
+              <a href="{{ $('Webhook').item.json.body.login_url }}" style="display:block;padding:16px 28px;font-family:'Space Grotesk',Arial,sans-serif;font-size:14px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:#09090b;text-decoration:none;border-radius:10px;">Access your terminal →</a>
+            </td></tr>
+          </table>
+
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 8px;">
+            <tr><td align="center" style="padding:10px 0;">
+              <a href="https://t.me/+EH57E-1mkn02Mjg0" style="font-family:'Space Grotesk',Arial,sans-serif;font-size:14px;font-weight:700;color:#22d3ee;text-decoration:none;">Join the private Telegram community →</a>
+            </td></tr>
+          </table>
+
+          <p style="margin:20px 0 0;font-size:15px;line-height:1.5;color:#e4e4e7;">Do the pre-flight check today — it's the only thing standing between you and a clean start day.<br><br>— AJ Thompson</p>
+        </td></tr>
+
+        <tr><td class="px" style="padding:24px 36px 32px;border-top:1px solid rgba(255,255,255,0.07);">
+          <p style="margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;line-height:1.6;color:#52525b;">
+            AI Automation Accelerator · Cohort 02 · You're receiving this because you enrolled.<br>
+            Questions? Reply to this email or reach us at <a href="mailto:hello@ajbuildai.com" style="color:#71717a;">hello@ajbuildai.com</a>.<br>
+            &copy; 2026 Deepr Web Services.
+          </p>
+        </td></tr>
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td></tr>
+  </table>
+</body>
+</html>
