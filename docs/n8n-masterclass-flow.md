@@ -24,6 +24,56 @@ Webhook (POST, =N8N_STUDENT_WEBHOOK_URL)
 
 ---
 
+## ⚠️ Exact event names — copy/paste these
+
+A Switch branch that doesn't match **any** `type` fails the whole item. Every
+registrant fails identically, so it looks like an outage rather than a typo. This
+has bitten us once already: the follow-up branch was checking
+`masterclass_follow_up` (extra underscore) instead of `masterclass_followup`, and
+all 53 post-session emails failed with HTTP 500.
+
+Copy these verbatim — **note `followup` and `signup` have no underscore, while
+`starting_soon` does**:
+
+```
+masterclass_registration
+masterclass_reminder
+masterclass_starting_soon
+masterclass_followup
+masterclass_waitlist
+scorecard_result
+taab_lead
+student_signup
+```
+
+These strings are the contract between the app and n8n. They're emitted from
+`app/Console/Commands/ProcessMasterclass.php`,
+`app/Http/Controllers/MasterclassController.php`, and
+`app/Http/Controllers/ScorecardController.php` — grep there if you ever need to
+confirm one.
+
+**Add a fallback branch** on the Switch that logs anything unmatched. Then a
+future rename surfaces as one obviously-wrong item instead of a silent mass
+failure. Note that with the webhook set to **"Respond: When Last Node Finishes"**
+(required — see below), an unmatched type returns a non-2xx, so Laravel won't
+stamp it as sent and will retry on the next run.
+
+---
+
+## ⚠️ Webhook response mode — must be "When Last Node Finishes"
+
+The Webhook node **must** be set to *Respond: When Last Node Finishes*, not
+*Immediately*. With *Immediately*, n8n returns `200` before the workflow runs, so
+Laravel stamps the touch as sent even when n8n later drops or errors the
+execution — producing rows marked "reminded" with no email behind them (this cost
+us ~20 of 30 sends one edition, and hid the `follow_up` typo above entirely).
+
+Respond-when-done makes the `2xx` truthful: Laravel blocks until n8n has actually
+finished, real failures return non-2xx, nothing gets stamped, and the next run
+retries them automatically.
+
+---
+
 ## Common payload fields
 
 Every masterclass event carries these (use as n8n expressions, e.g. `{{ $json.body.email }}`):
