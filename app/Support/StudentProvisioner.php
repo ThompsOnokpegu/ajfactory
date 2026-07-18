@@ -58,16 +58,53 @@ class StudentProvisioner
         return ['enrollment' => $enrollment, 'temp_password' => $created ? $tempPassword : null, 'created' => $created];
     }
 
-    private function fireWelcome(Enrollment $enrollment, ?string $tempPassword): void
+    /**
+     * Re-fire the welcome automation for one student — for when n8n failed or
+     * dropped the original (the student never got their credentials).
+     *
+     * The original temp password is Hash::make()'d at provision time, so the
+     * plaintext is NOT recoverable and cannot be replayed. Re-sending therefore
+     * issues a NEW temporary password by default; pass false to re-send the
+     * welcome without touching the account (the email's password block will then
+     * be empty, so only do that for someone who can already log in).
+     *
+     * @return array{ok:bool,temp_password:?string}
+     */
+    public function resendWelcome(Enrollment $enrollment, bool $issueNewPassword = true): array
+    {
+        $tempPassword = null;
+
+        if ($issueNewPassword) {
+            $user = User::where('email', $enrollment->email)->first();
+            if ($user) {
+                $tempPassword = Str::random(14);
+                $user->update(['password' => Hash::make($tempPassword)]);
+            }
+        }
+
+        $ok = $this->fireWelcome($enrollment, $tempPassword, ['resent' => true]);
+
+        return ['ok' => $ok, 'temp_password' => $tempPassword];
+    }
+
+    /**
+     * Returns true only when n8n accepted the POST. A non-2xx used to be
+     * swallowed silently, which would make an admin "resend" button report
+     * success for a send that never happened.
+     */
+    private function fireWelcome(Enrollment $enrollment, ?string $tempPassword, array $extra = []): bool
     {
         $url = config('services.n8n.enrollment_webhook');
         if (! $url) {
-            return;
+            Log::warning('Enrolment webhook skipped — no n8n URL configured. ' . $enrollment->email);
+            return false;
         }
 
         try {
-            Http::post($url, [
+            $response = Http::timeout(45)->post($url, array_merge([
                 'event'                 => 'enrollment_finalized',
+                // Admin-initiated either way — keep the value n8n already routes
+                // on rather than inventing a new one it might not match.
                 'gateway'               => 'manual',
                 'full_name'             => $enrollment->full_name,
                 'email'                 => $enrollment->email,
@@ -82,9 +119,17 @@ class StudentProvisioner
                 'second_payment_status' => $enrollment->second_payment_status,
                 'reference'             => $enrollment->payment_reference,
                 'paid_at'               => optional($enrollment->paid_at)->toIso8601String(),
-            ]);
+            ], $extra));
+
+            if (! $response->successful()) {
+                Log::error("Enrolment webhook rejected for {$enrollment->email}: HTTP {$response->status()} {$response->body()}");
+                return false;
+            }
+
+            return true;
         } catch (\Throwable $e) {
-            Log::error('Manual enrolment webhook failed for ' . $enrollment->email . ': ' . $e->getMessage());
+            Log::error('Enrolment webhook failed for ' . $enrollment->email . ': ' . $e->getMessage());
+            return false;
         }
     }
 }

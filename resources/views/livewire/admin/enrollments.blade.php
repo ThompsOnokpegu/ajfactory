@@ -75,6 +75,23 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
         $this->message = "{$e->email} moved to Cohort {$cohort}.";
     }
 
+    /**
+     * Re-fire the welcome automation when n8n failed or dropped the original.
+     * Issues a NEW temp password — the original is hashed and unrecoverable —
+     * and surfaces it here in case the email fails again.
+     */
+    public function resendWelcome(int $id, StudentProvisioner $provisioner): void
+    {
+        $e = $this->find($id);
+        if (! $e) return;
+
+        $result = $provisioner->resendWelcome($e);
+
+        $this->message = $result['ok']
+            ? "Welcome re-sent to {$e->email}. New temp password: {$result['temp_password']}"
+            : "n8n did NOT accept the welcome for {$e->email} — check the workflow, then retry. New temp password: {$result['temp_password']}";
+    }
+
     public function resendInstallmentLink(int $id): void
     {
         $e = $this->find($id);
@@ -240,6 +257,9 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
                                 class="w-full text-left px-4 py-2 text-xs font-bold {{ $e->access_suspended ? 'text-green-400' : 'text-red-400' }} hover:bg-zinc-800 transition">
                                 {{ $e->access_suspended ? 'Reinstate access' : 'Suspend access' }}
                             </button>
+                            <button wire:click="resendWelcome({{ $e->id }})"
+                                wire:confirm="Re-send the welcome email to {{ $e->email }}?&#10;&#10;This issues a NEW temporary password (the original can't be recovered), so any password they already set will stop working."
+                                @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-bold text-cyan-400 hover:bg-zinc-800 transition">Re-send welcome</button>
                             @if($hasBalance)
                                 <button wire:click="resendInstallmentLink({{ $e->id }})" @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-bold text-cyan-400 hover:bg-zinc-800 transition">Re-send pay link</button>
                                 <button wire:click="markBalancePaid({{ $e->id }})" wire:confirm="Mark this balance as paid in full?" @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-bold text-amber-400 hover:bg-zinc-800 transition">Mark balance paid</button>
