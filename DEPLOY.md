@@ -3,7 +3,9 @@
 The app lives in `~/domains/ajbuildai.com/public_html/laravel` and the web root is
 `~/domains/ajbuildai.com/public_html`.
 Deploys are automated by **GitHub Actions** (`.github/workflows/deploy.yml`):
-every push to `main` SSHes into Hostinger, runs `git pull`, then `deploy.sh`
+every push to `main` SSHes into Hostinger, resets the working tree to `origin/main`
+(`git fetch origin main && git reset --hard origin/main` — a plain `git pull` used to fail
+whenever the server tree had drifted), then runs `deploy.sh`
 (copies the build assets into the web root, then clears + rebuilds the
 config/route/view caches). No more manual copying or cache commands.
 
@@ -49,10 +51,27 @@ cd ~/domains/ajbuildai.com/public_html/laravel && git fetch origin main && git r
 
 ## Notes
 - Built assets (`public/build`) are committed to the repo, so the server does **not**
-  run `npm run build` — `git pull` brings the bundle and `deploy.sh` copies it to the
-  web root.
-- `deploy.sh` does **not** run migrations by default. If a deploy includes new
-  migrations, review them, then uncomment the `php artisan migrate --force` line.
+  run `npm run build` — the reset brings the bundle and `deploy.sh` copies it to the
+  web root. **Run `npm run build` and commit `public/build` before pushing UI changes**,
+  or production keeps serving the old CSS/JS.
+- `deploy.sh` **does** run `php artisan migrate --force` on every deploy, then rebuilds
+  the config/route/view caches. Review pending migrations before pushing.
 - The `cd` path in `deploy.yml` is set to this account's app root
   (`~/domains/ajbuildai.com/public_html/laravel`). `deploy.sh` copies to its parent
   dir, so the web-root path adapts automatically.
+
+## The second workflow: `scheduler.yml`
+
+The same SSH secrets also power `.github/workflows/scheduler.yml`, which exists because
+**Hostinger's hPanel cron does not execute for this account** — so the Laravel scheduler
+never ticks. Every 15 minutes it SSHes in and runs `php artisan masterclass:remind`
+**directly** (not `schedule:run`, which needs exact-minute alignment a delayed cron can't
+give). The command is window-based and idempotent, so extra or late runs are harmless.
+
+**GitHub's scheduled triggers are best-effort and drop most runs** — measured at ~75% on
+this repo. Anything with a short send window must be run manually. Read
+[docs/operations.md](docs/operations.md#️-scheduling-reality--read-this-first) before
+relying on it. Replacing this with a reliable trigger is an open task.
+
+You can fire it any time from **Actions → Masterclass reminders → Run workflow**
+(`workflow_dispatch`), which is not throttled.
