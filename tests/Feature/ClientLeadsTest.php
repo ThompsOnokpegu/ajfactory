@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Http;
 use Livewire\Volt\Volt;
 
 it('renders the earn capture page', function () {
-    $this->get('/earn')->assertOk()->assertSee('AI automations', false);
+    $this->get('/earn')->assertOk()->assertSee('proven', false);
 });
 
 it('captures a lead tagged interest=earn / source=clients and fires n8n', function () {

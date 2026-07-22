@@ -3,13 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Get Paid to Build AI Automations | AJBuilds AI</title>
-        <meta name="description" content="The skill is learnable and businesses are already paying for it. Get the exact path from zero to your first paying AI automation client — starting with a free masterclass.">
+        <title>Watch Me Land AI Automation Clients | AJBuilds AI</title>
+        <meta name="description" content="I don't teach what I haven't proven. For ~60 days I'm documenting exactly how I land AI automation clients from scratch — real messages, real numbers, wins and flops. Get on the list.">
 
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ config('app.url') }}/earn">
-        <meta property="og:title" content="Get Paid to Build AI Automations">
-        <meta property="og:description" content="No coding, no big following. The exact path from zero to your first paying AI automation client.">
+        <meta property="og:title" content="Watch Me Land AI Automation Clients (Real Numbers)">
+        <meta property="og:description" content="No course pitch. ~60 days documenting exactly how I land AI automation clients — the messages, the numbers, the ones that flop.">
         <meta property="og:image" content="{{ asset('img/og-preview.jpg') }}">
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:image" content="{{ asset('img/og-preview.jpg') }}">
@@ -33,7 +33,7 @@
                 <a href="/accelerator" class="text-xl font-black tracking-tighter italic text-zinc-500 hover:text-white transition">
                     AJBUILDS<span class="text-cyan-500"> AI</span>
                 </a>
-                <a href="/taab" class="text-[10px] font-mono uppercase tracking-widest text-zinc-600 hover:text-cyan-400 transition">Free masterclass →</a>
+                <a href="https://tiktok.com/@ajthompson.ai" target="_blank" rel="noopener" class="text-[10px] font-mono uppercase tracking-widest text-zinc-600 hover:text-cyan-400 transition">Building in public →</a>
             </nav>
 
             <main class="flex-1 flex items-center justify-center py-8">

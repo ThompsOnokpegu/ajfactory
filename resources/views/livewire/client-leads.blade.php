@@ -72,23 +72,23 @@ new class extends Component {
             </div>
             <h2 class="text-3xl md:text-4xl font-black text-white uppercase italic tracking-tighter">You're on the list.</h2>
             <p class="text-zinc-400 mt-4 max-w-md mx-auto leading-relaxed">
-                Check your email and WhatsApp — the first thing I'll send is the free masterclass, so you can see the real path before committing to anything.
+                Every week I'll send the real numbers — the messages that landed clients and the ones that flopped. No hype, no course pitch. Want to watch it unfold day by day? I'm posting the whole thing on TikTok.
             </p>
-            <a href="/taab" class="inline-block mt-8 px-6 py-3 rounded-xl bg-cyan-500 text-black font-black uppercase tracking-widest text-xs hover:bg-white transition">
-                Watch the free masterclass →
+            <a href="https://tiktok.com/@ajthompson.ai" target="_blank" rel="noopener" class="inline-block mt-8 px-6 py-3 rounded-xl bg-cyan-500 text-black font-black uppercase tracking-widest text-xs hover:bg-white transition">
+                Follow the build on TikTok →
             </a>
         </div>
     @else
         <!-- SECTION HEADER -->
         <div class="text-center mb-8">
             <span class="inline-block py-1 px-3 rounded-full bg-cyan-900/30 border border-cyan-500/30 text-cyan-400 text-[10px] font-mono uppercase tracking-widest mb-4">
-                AI Automation · Get Paid
+                Building in public · Real numbers
             </span>
             <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter leading-[0.95]">
-                Get <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">paid</span> to build<br>AI automations.
+                I don't teach what<br>I haven't <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">proven.</span>
             </h2>
             <p class="text-zinc-400 mt-5 max-w-md mx-auto leading-relaxed">
-                The skill is learnable and businesses are already paying for it — no coding, no big following. Drop your details and I'll show you the exact path from zero to your first paying client.
+                So I'm proving it in the open. For the next ~60 days I'm documenting exactly how I land AI automation clients from scratch — the messages, the numbers, the wins and the ones that flop. Get on the list and you'll see all of it first.
             </p>
         </div>
 
@@ -111,11 +111,11 @@ new class extends Component {
             </div>
             <button type="submit" wire:loading.attr="disabled"
                     class="w-full px-6 py-3.5 rounded-xl bg-cyan-500 text-black font-black uppercase tracking-widest text-xs hover:bg-white transition disabled:opacity-60">
-                <span wire:loading.remove wire:target="join">Show me the path →</span>
-                <span wire:loading wire:target="join">Sending…</span>
+                <span wire:loading.remove wire:target="join">Send me the real numbers →</span>
+                <span wire:loading wire:target="join">Adding you…</span>
             </button>
             <p class="text-[11px] text-zinc-600 text-center leading-relaxed pt-1">
-                No hype, no shortcuts. It's a real skill — I'll show you how to learn it and get paid for it.
+                No course to sell you — yet. Just the receipts: what's working, what isn't, as it happens.
             </p>
         </form>
     @endif
