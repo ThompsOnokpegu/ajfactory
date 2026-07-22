@@ -43,6 +43,10 @@ Route::get('/terms', function () {
 Route::get('/builders', function () {
     return view('builders');
 })->name('builders');
+// Client-acquisition lead capture ("how do I earn / get clients with AI automation")
+Route::get('/clients', function () {
+    return view('clients');
+})->name('clients');
 
 // Accelerator Sales Page
 Route::get('/accelerator', function () {
