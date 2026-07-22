@@ -44,9 +44,9 @@ Route::get('/builders', function () {
     return view('builders');
 })->name('builders');
 // Client-acquisition lead capture ("how do I earn / get clients with AI automation")
-Route::get('/clients', function () {
+Route::get('/earn', function () {
     return view('clients');
-})->name('clients');
+})->name('earn');
 
 // Accelerator Sales Page
 Route::get('/accelerator', function () {

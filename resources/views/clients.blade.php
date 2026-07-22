@@ -7,7 +7,7 @@
         <meta name="description" content="The skill is learnable and businesses are already paying for it. Get the exact path from zero to your first paying AI automation client — starting with a free masterclass.">
 
         <meta property="og:type" content="website">
-        <meta property="og:url" content="{{ config('app.url') }}/clients">
+        <meta property="og:url" content="{{ config('app.url') }}/earn">
         <meta property="og:title" content="Get Paid to Build AI Automations">
         <meta property="og:description" content="No coding, no big following. The exact path from zero to your first paying AI automation client.">
         <meta property="og:image" content="{{ asset('img/og-preview.jpg') }}">
