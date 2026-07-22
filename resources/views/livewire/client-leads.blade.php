@@ -88,7 +88,7 @@ new class extends Component {
                 I don't teach what<br>I haven't <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">proven.</span>
             </h2>
             <p class="text-zinc-400 mt-5 max-w-md mx-auto leading-relaxed">
-                So I'm proving it in the open. For the next ~60 days I'm documenting exactly how I land AI automation clients from scratch — the messages, the numbers, the wins and the ones that flop. Get on the list and you'll see all of it first.
+                My own first clients came from a network I'd already built as a web dev — that's position, not a strategy you could copy. So I'm proving the real thing from scratch, in the open: ~60 days documenting exactly how I land AI automation clients — the messages, the numbers, the wins and the ones that flop. Get on the list and you'll see all of it first.
             </p>
         </div>
 
