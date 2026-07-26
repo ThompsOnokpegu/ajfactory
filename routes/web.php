@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Middleware\CheckEnrollment;
 use App\Http\Controllers\VaultController;
+use App\Http\Controllers\TaabController;
 use App\Http\Controllers\TaabLeadController;
 use App\Http\Controllers\MasterclassController;
 use App\Http\Controllers\ScorecardController;
@@ -69,7 +70,8 @@ Route::get('/r/{resource}', function (\App\Models\Resource $resource) {
 })->name('resources.go');
 
 // TAAB — The AI Automation Bootcamp (hub + masterclass registration)
-Route::view('/taab', 'taab.index')->name('taab.index');
+// Controller (not Route::view) so a re-invite link /taab?i=<token> can pre-fill.
+Route::get('/taab', [TaabController::class, 'hub'])->name('taab.index');
 Route::post('/taab/register', [MasterclassController::class, 'register'])->name('taab.register');
 Route::post('/taab/waitlist', [MasterclassController::class, 'waitlist'])->name('taab.waitlist');
 

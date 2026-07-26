@@ -23,6 +23,19 @@ new #[Layout('components.layouts.admin', ['title' => 'Masterclass'])] class exte
         if (in_array($name, ['session', 'search'])) $this->resetPage();
     }
 
+    /** Mark/unmark a registrant as having attended — feeds the re-invite targeting. */
+    public function toggleAttended(int $id): void
+    {
+        abort_unless(auth()->user()?->is_admin, 403);
+
+        $reg = MasterclassRegistration::findOrFail($id);
+        $attended = ! $reg->attended;
+        $reg->update([
+            'attended' => $attended,
+            'attended_at' => $attended ? now() : null,
+        ]);
+    }
+
     public function with(): array
     {
         $regs = MasterclassRegistration::query()
@@ -72,8 +85,9 @@ new #[Layout('components.layouts.admin', ['title' => 'Masterclass'])] class exte
         <div class="hidden md:grid grid-cols-12 gap-3 px-5 py-3 bg-zinc-900/60 border-b border-zinc-800 text-[9px] font-black uppercase tracking-widest text-zinc-600">
             <div class="col-span-4">Registrant</div>
             <div class="col-span-3">Background</div>
-            <div class="col-span-3">Goal</div>
+            <div class="col-span-2">Goal</div>
             <div class="col-span-2">Session</div>
+            <div class="col-span-1 text-right">Attended</div>
         </div>
         <div class="divide-y divide-zinc-900">
             @forelse($regs as $r)
@@ -83,17 +97,25 @@ new #[Layout('components.layouts.admin', ['title' => 'Masterclass'])] class exte
                         <div class="min-w-0">
                             <div class="text-sm font-bold text-white truncate">{{ $r->first_name }} {{ $r->last_name }}</div>
                             <div class="text-[11px] text-zinc-500 truncate">{{ $r->email }}</div>
-                            @if($r->reminder_sent_at || $r->followup_sent_at)
+                            @if($r->reminder_sent_at || $r->followup_sent_at || $r->attended)
                                 <div class="flex flex-wrap items-center gap-1.5 mt-1">
                                     @if($r->reminder_sent_at)<span class="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-400">Reminded</span>@endif
                                     @if($r->followup_sent_at)<span class="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-zinc-700/40 text-zinc-400">Followed up</span>@endif
+                                    @if($r->attended)<span class="text-[8px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded bg-green-500/10 text-green-400">Attended</span>@endif
                                 </div>
                             @endif
                         </div>
                     </div>
                     <div class="md:col-span-3 text-xs text-zinc-400 md:truncate mt-2 md:mt-0"><span class="md:hidden text-zinc-600 font-mono text-[10px] uppercase tracking-widest mr-1">Background</span>{{ $r->background ?: '—' }}</div>
-                    <div class="md:col-span-3 text-xs text-zinc-400 md:truncate mt-1 md:mt-0"><span class="md:hidden text-zinc-600 font-mono text-[10px] uppercase tracking-widest mr-1">Goal</span>{{ $r->goal ?: '—' }}</div>
+                    <div class="md:col-span-2 text-xs text-zinc-400 md:truncate mt-1 md:mt-0"><span class="md:hidden text-zinc-600 font-mono text-[10px] uppercase tracking-widest mr-1">Goal</span>{{ $r->goal ?: '—' }}</div>
                     <div class="md:col-span-2 text-[10px] font-mono text-zinc-500 mt-2 md:mt-0">{{ $r->session_date }}</div>
+                    <div class="md:col-span-1 md:text-right mt-2 md:mt-0">
+                        <button type="button" wire:click="toggleAttended({{ $r->id }})"
+                            title="{{ $r->attended ? 'Mark as no-show' : 'Mark as attended' }}"
+                            class="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-widest px-2 py-1 rounded-lg border transition {{ $r->attended ? 'bg-green-500/10 border-green-500/30 text-green-400 hover:bg-green-500/20' : 'bg-zinc-900 border-zinc-800 text-zinc-500 hover:border-zinc-600 hover:text-zinc-300' }}">
+                            {{ $r->attended ? 'Attended' : 'No-show' }}
+                        </button>
+                    </div>
                 </div>
             @empty
                 <div class="px-5 py-14 text-center bg-zinc-900/30 text-sm text-zinc-500">No registrations for this filter.</div>

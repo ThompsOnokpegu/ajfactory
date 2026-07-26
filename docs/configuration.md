@@ -121,11 +121,11 @@ Empty renders a graceful empty state. **Never fabricate entries.**
 
 ### Session
 ```php
-'date'                => '2026-07-18',   // selects registrations; null = "date to be announced"
+'date'                => '2026-08-01',   // selects registrations; null = "date to be announced"
 'time'                => '9:00 AM – 11:00 AM WAT',   // display string only
-'registration_closes' => '2026-07-17',
-'starts_at'           => '2026-07-18 09:00',   // real datetimes — these drive reminders
-'ends_at'             => '2026-07-18 11:00',
+'registration_closes' => '2026-07-31',
+'starts_at'           => '2026-08-01 09:00',   // real datetimes — these drive reminders
+'ends_at'             => '2026-08-01 11:00',
 'timezone'            => 'Africa/Lagos',
 ```
 

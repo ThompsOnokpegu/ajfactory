@@ -1,0 +1,41 @@
+name: Masterclass re-invite (registration-open announcement)
+
+# Nudges waitlisters + recent past registrants to REGISTER for the current
+# session (not a silent auto-enrol). The command is idempotent — one invite per
+# person per session, gated on registrationOpen — so a daily tick sends each
+# lead exactly once and no-ops the rest of the time. Trigger it manually from the
+# Actions tab the moment a new date opens, or let the daily cron pick it up.
+#
+# Hostinger's hPanel cron isn't executing for this account, so the Laravel
+# scheduler never ticks; this runs the command directly on the server, mirroring
+# the reminders workflow.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Preview the audience without sending'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 9 * * *'   # 09:00 UTC (~10:00 WAT); command decides if there's anyone to invite
+
+concurrency:
+  group: masterclass-announce
+  cancel-in-progress: false
+
+jobs:
+  announce:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH in and run masterclass:announce
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          script: |
+            set -e
+            cd ~/domains/ajbuildai.com/public_html/laravel
+            php artisan masterclass:announce ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}

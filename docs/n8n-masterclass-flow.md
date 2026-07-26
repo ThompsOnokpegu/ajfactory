@@ -15,7 +15,8 @@ Webhook (POST, =N8N_STUDENT_WEBHOOK_URL)
        ├─ masterclass_reminder        → Email + WhatsApp   (T-24h: Meet link + group)
        ├─ masterclass_starting_soon   → Email + WhatsApp   (T-2h nudge)
        ├─ masterclass_followup        → Email + WhatsApp   (post-session → Accelerator)
-       └─ masterclass_waitlist        → Email + WhatsApp   (registration closed)
+       ├─ masterclass_waitlist        → Email + WhatsApp   (registration closed)
+       └─ masterclass_reinvite        → Email + WhatsApp   ("registration open" → register)
 ```
 
 > The same webhook also receives `taab_lead` (lead-magnet tools) and
@@ -41,6 +42,7 @@ masterclass_reminder
 masterclass_starting_soon
 masterclass_followup
 masterclass_waitlist
+masterclass_reinvite
 scorecard_result
 taab_lead
 student_signup
@@ -48,6 +50,7 @@ student_signup
 
 These strings are the contract between the app and n8n. They're emitted from
 `app/Console/Commands/ProcessMasterclass.php`,
+`app/Console/Commands/AnnounceMasterclass.php`,
 `app/Http/Controllers/MasterclassController.php`, and
 `app/Http/Controllers/ScorecardController.php` — grep there if you ever need to
 confirm one.
@@ -278,6 +281,60 @@ Talk soon.
 ```
 Hi {{ $json.body.name }} 👋 Registration for this TAAB session has closed, but you're on the waitlist — I'll message you when the next date is set. Meanwhile, try the free Readiness Scorecard: https://ajbuildai.com/taab/scorecard — AJ
 ```
+
+---
+
+## 6. `masterclass_reinvite` — registration is open (→ register for this session)
+
+Fired by `masterclass:announce` to nudge two audiences to **register** for the
+current session: waitlisters who never registered, and registrants from the last
+couple of sessions (most only ever attend once). It deliberately drives them to
+the registration form — not a silent auto-enrol — so we re-capture their goal and
+a fresh intent signal.
+
+Extra fields: `register_url` (the `/taab` hub with a per-invite token —
+`/taab?i=<token>` — **relative**, prepend `https://ajbuildai.com`; the token makes
+the form pre-fill the lead's known name/email/WhatsApp/background, so **link to
+`register_url` verbatim, don't hardcode a bare `/taab`**), `audience`
+(`waitlist` | `past_registrant`, for optional copy tweaks / segmentation).
+`name` + `first_name` are always present.
+
+**Email**
+- **Subject:** `New TAAB date: {{SESSION}} — save your spot`
+- **Body:**
+```
+Hi {{ $json.body.first_name }},
+
+The next The AI Automation Bootcamp (TAAB) is set:
+
+🗓  {{SESSION}} (WAT)
+📍  Live on Google Meet
+
+It's a focused, free 2-hour session to get real clarity on AI automation before
+you commit to anything. Seats on the call are limited, so register to lock yours:
+
+👉  https://ajbuildai.com{{ $json.body.register_url }}
+
+Registering also lets us tailor the session to what you're trying to achieve —
+you'll tell us your main goal on the form.
+
+See you there.
+
+— AJ Thompson
+Repetigo · TAAB
+```
+
+**WhatsApp**
+```
+Hi {{ $json.body.first_name }} 👋 New TAAB Bootcamp date: {{SESSION}} (WAT), live on Google Meet. It's a free 2-hour clarity session — register to save your spot (and tell us your goal): https://ajbuildai.com{{ $json.body.register_url }} — AJ
+```
+
+> **Use `register_url` verbatim** (prefixed with the domain) — it carries the
+> `?i=<token>` that pre-fills the form. A bare `https://ajbuildai.com/taab` still
+> works but throws away the pre-fill. `register_url` already starts with `/taab`.
+>
+> Idempotency is handled app-side: Laravel stamps the `masterclass_invites` ledger
+> so no one is invited to the same session twice. n8n just sends what it receives.
 
 ---
 

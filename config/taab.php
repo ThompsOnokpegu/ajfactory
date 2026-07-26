@@ -24,16 +24,16 @@ return [
     | announced". {{TODO: confirm the next session date/time}}
     */
     'masterclass' => [
-        'date' => '2026-07-18',                 // a Saturday
+        'date' => '2026-08-01',                 // a Saturday
         'time' => '9:00 AM – 11:00 AM WAT',
         'location' => 'Live · Google Meet',
-        'registration_closes' => '2026-07-17',  // the Friday before
+        'registration_closes' => '2026-07-31',  // the Friday before
         'host' => 'AJ Thompson',
 
         // Real datetimes the reminder scheduler uses (display strings above are
         // for the page). Interpreted in `timezone`, since app default is UTC.
-        'starts_at' => '2026-07-18 09:00',
-        'ends_at' => '2026-07-18 11:00',
+        'starts_at' => '2026-08-01 09:00',
+        'ends_at' => '2026-08-01 11:00',
         'timezone' => 'Africa/Lagos',
 
         // Links sent in the reminders. {{TODO: owner supplies the real links}}

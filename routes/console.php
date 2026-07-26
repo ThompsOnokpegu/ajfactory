@@ -20,3 +20,11 @@ Schedule::command('installments:process')
 Schedule::command('masterclass:remind')
     ->everyFifteenMinutes()
     ->timezone('Africa/Lagos');
+
+// Masterclass: re-invite waitlisters + recent past registrants to register for
+// the current session. Idempotent (one invite per person per session) and gated
+// on registrationOpen, so a daily tick sends each lead exactly once per session
+// and no-ops otherwise. Runs once registration is open for a new date.
+Schedule::command('masterclass:announce')
+    ->dailyAt('10:00')
+    ->timezone('Africa/Lagos');

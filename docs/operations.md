@@ -69,10 +69,10 @@ sends indefinitely.
 Edit `config/taab.php`:
 
 ```php
-'date'                => '2026-07-18',        // the session day
-'registration_closes' => '2026-07-17',
-'starts_at'           => '2026-07-18 09:00',  // real datetimes drive the reminders
-'ends_at'             => '2026-07-18 11:00',
+'date'                => '2026-08-01',        // the session day
+'registration_closes' => '2026-07-31',
+'starts_at'           => '2026-08-01 09:00',  // real datetimes drive the reminders
+'ends_at'             => '2026-08-01 11:00',
 ```
 
 Then set the join links **in the server `.env`** (not just config):
@@ -92,18 +92,31 @@ php artisan tinker --execute="echo config('taab.masterclass.meet_url').PHP_EOL;"
 
 If that prints an empty line, the reminder will send a blank link. Fix it before proceeding.
 
-### 2. Bring the waitlist in
+### 2. Re-invite the funnel to register
 
 People who signed up while registration was closed sit in `students` with
-`source=waitlist` — they are **not** registrations and will receive nothing. Move them:
+`source=waitlist`, and past registrants mostly attend only once (~30–35% show rate). The
+preferred play is to **invite both pools to register** for this session — not silently
+enrol them — so we re-capture each person's goal and a fresh intent signal:
 
 ```bash
-php artisan masterclass:enroll-waitlist --dry-run   # preview
-php artisan masterclass:enroll-waitlist             # enrol + send confirmations
+php artisan masterclass:announce --dry-run   # preview exactly who'd be invited
+php artisan masterclass:announce             # send the "registration is open" invite
 ```
 
-Idempotent: anyone already registered for the session is skipped, so re-run freely as more
-sign up.
+It targets current waitlisters **plus** registrants from the last 2 sessions
+(`--past-sessions=N` to change the reach), and suppresses anyone already registered for this
+session, anyone who already enrolled in the Accelerator, and anyone already invited (the
+`masterclass_invites` ledger makes it idempotent — safe to re-run and it runs daily via
+`.github/workflows/masterclass-announce.yml`). It fires the `masterclass_reinvite` n8n event,
+so that Switch branch must exist (see [n8n-masterclass-flow.md](n8n-masterclass-flow.md)).
+
+> `masterclass:enroll-waitlist` (the older command that auto-moves waitlisters straight into
+> registrations) still exists but is **deprecated** — it creates registrations with no goal
+> and stale intent. Prefer `announce`.
+
+**Marking attendance.** After a session, mark who actually showed in Admin → Masterclass
+(the **Attended / No-show** toggle per row). This feeds smarter re-invite targeting over time.
 
 ### 3. Session morning
 
@@ -259,7 +272,7 @@ before committing it.
 | **Overview** | KPIs + the registration Open/Paused switch |
 | **Enrollments** | All paid students. Suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol |
 | **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module |
-| **Masterclass** | Registrations for the current session + send status pills; CSV export |
+| **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |
 | **Leads & Waitlist** | Every lead with source + scorecard tier/score; CSV export |
 | **Free Resources** | CRUD for `/free` — add a link, publish/unpublish, see click counts |
 
@@ -276,7 +289,7 @@ The user must already exist.
 | Rows say "reminded" but nobody got email | n8n webhook on "Respond: Immediately" |
 | All sends fail with HTTP 500 | n8n Switch matches no branch — check the exact `type` string |
 | A touch never fired at all | GitHub Actions cron gap — just run the command manually |
-| Waitlisters got nothing | They're `students`, not registrations — run `masterclass:enroll-waitlist` |
+| Waitlisters got nothing | They're `students`, not registrations — invite them with `masterclass:announce` (they register themselves) |
 | Follow-up can't reach last edition | `taab.masterclass.date` already moved on |
 | Student can't log in after paying | Re-send welcome from admin (issues a new temp password) |
 | Site serving old CSS/JS | `npm run build` not run / `public/build` not committed |

@@ -78,9 +78,24 @@ Carries the three idempotency stamps that make reminders safe to re-run:
 
 `reminder_sent_at` · `dayof_sent_at` · `followup_sent_at`
 
+Plus `attended` / `attended_at` — set from the admin Masterclass screen. Only ~30–35% of
+registrants show, so attendance is what lets the re-invite flow eventually target no-shows.
+
 `masterclass:remind` selects rows by `session_date = config('taab.masterclass.date')`.
 **Changing that config value makes the previous edition's registrants unreachable** by the
 command — send their follow-up before rolling over to the next session.
+
+### `masterclass_invites` — re-invite ledger
+Idempotency for `masterclass:announce`: one row per (`email`, `session_date`) recording that
+someone was nudged to register for a session. Because the target hasn't registered yet, the
+stamp can't live on `MasterclassRegistration` — this table is where "already invited" lives,
+so a re-run (or the daily tick) never double-invites.
+
+Each row also carries a random `token` embedded in the re-invite link (`/taab?i=<token>`).
+On arrival, `TaabController@hub` resolves it to pre-fill the registration form with what we
+already hold for that person — identity + `background` from their latest registration, or
+name/WhatsApp from their waitlist row. `goal` is intentionally never pre-filled, so re-invites
+still capture a *fresh* goal (the reason they're sent to register rather than auto-enrolled).
 
 ---
 
@@ -123,7 +138,7 @@ re-send issues a new one and resets the account to it.
 |---|---|
 | `/` | agency landing (business clients) |
 | `/accelerator` → `/checkout` | the paid offer and its checkout |
-| `/taab` | masterclass hub + registration/waitlist form |
+| `/taab` | masterclass hub + registration/waitlist form (`TaabController@hub`; `?i=<token>` pre-fills for re-invited leads) |
 | `/taab/scorecard`, `/taab/roi-calculator`, `/taab/tool-stack` | lead-magnet tools |
 | `/free`, `/r/{resource}` | free resource hub + click-tracking redirect |
 | `/links`, `/builders` | link-in-bio, TikTok waitlist |
@@ -169,9 +184,15 @@ masterclass:remind  (every 15 min; each touch once, stamped)
 
 registration closed?  → waitlist card → masterclass_waitlist
                                               │
-                        masterclass:enroll-waitlist moves them into
-                        the next session and confirms them
+                        masterclass:announce invites them (+ the last 2 sessions'
+                        registrants) to register for the next session →
+                        n8n: masterclass_reinvite  (stamped in masterclass_invites)
 ```
+
+`masterclass:announce` is the preferred way to fill a session — it drives waitlisters and
+recent past registrants back to `/taab` to register themselves (re-capturing their goal),
+rather than silently enrolling them. The older `masterclass:enroll-waitlist` (auto-move
+`waitlist` → `registration`) still exists but is deprecated.
 
 Offsets are config, not code: `reminder_lead_hours`, `dayof_lead_hours`,
 `followup_after_hours`, and `send_throttle_ms` in `config/taab.php`.

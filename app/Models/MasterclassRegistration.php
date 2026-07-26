@@ -18,11 +18,15 @@ class MasterclassRegistration extends Model
         'reminder_sent_at',
         'dayof_sent_at',
         'followup_sent_at',
+        'attended',
+        'attended_at',
     ];
 
     protected $casts = [
         'reminder_sent_at' => 'datetime',
         'dayof_sent_at' => 'datetime',
         'followup_sent_at' => 'datetime',
+        'attended' => 'boolean',
+        'attended_at' => 'datetime',
     ];
 }

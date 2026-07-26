@@ -1,4 +1,5 @@
 @php
+    $prefill = $prefill ?? [];
     $mc = config('taab.masterclass');
     $mcDate = !empty($mc['date']) ? \Illuminate\Support\Carbon::parse($mc['date']) : null;
     $dateLong = $mcDate ? $mcDate->translatedFormat('l j F') : 'Date to be announced';
@@ -229,34 +230,39 @@ footer a:hover { color: var(--lime); }
           <div class="form-row">
             <div class="form-group">
               <label class="form-label" for="fname">First name</label>
-              <input class="form-input" type="text" id="fname" name="first_name" placeholder="Adebayo" required>
+              <input class="form-input" type="text" id="fname" name="first_name" placeholder="Adebayo" value="{{ $prefill['first_name'] ?? '' }}" required>
             </div>
             <div class="form-group">
               <label class="form-label" for="lname">Last name</label>
-              <input class="form-input" type="text" id="lname" name="last_name" placeholder="Okafor" required>
+              <input class="form-input" type="text" id="lname" name="last_name" placeholder="Okafor" value="{{ $prefill['last_name'] ?? '' }}" required>
             </div>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="email">Email address</label>
-            <input class="form-input" type="email" id="email" name="email" placeholder="you@email.com" required>
+            <input class="form-input" type="email" id="email" name="email" placeholder="you@email.com" value="{{ $prefill['email'] ?? '' }}" required>
           </div>
 
           <div class="form-group">
             <label class="form-label" for="whatsapp">WhatsApp number</label>
-            <input class="form-input" type="tel" id="whatsapp" name="whatsapp" placeholder="+234 800 000 0000">
+            <input class="form-input" type="tel" id="whatsapp" name="whatsapp" placeholder="+234 800 000 0000" value="{{ $prefill['whatsapp'] ?? '' }}">
           </div>
 
           <div class="form-group">
             <label class="form-label" for="background">Your current background</label>
+            @php $bg = $prefill['background'] ?? ''; @endphp
             <select class="form-select" id="background" name="background" required>
-              <option value="" disabled selected>Select one</option>
-              <option>Complete beginner — no tech background</option>
-              <option>Developer / technical background</option>
-              <option>Business owner / entrepreneur</option>
-              <option>Freelancer / consultant</option>
-              <option>Student</option>
-              <option>Other</option>
+              <option value="" disabled @selected($bg === '')>Select one</option>
+              @foreach([
+                'Complete beginner — no tech background',
+                'Developer / technical background',
+                'Business owner / entrepreneur',
+                'Freelancer / consultant',
+                'Student',
+                'Other',
+              ] as $opt)
+              <option @selected($bg === $opt)>{{ $opt }}</option>
+              @endforeach
             </select>
           </div>
 
