@@ -23,6 +23,14 @@ links to the architecture, configuration, and operations docs.
    `{{TODO}}` placeholder instead. An empty state is always better than invented proof.
 5. **Verify before asserting.** Config and copy have drifted from each other repeatedly —
    check the live file rather than trusting memory or an older doc.
+6. **Document every major change or decision in the right doc, in the same PR/commit as the
+   change** — code without the doc update is incomplete. Match the change to its home:
+   `docs/architecture.md` (domain model, tables, data flow), `docs/configuration.md` (env
+   vars / config keys), `docs/operations.md` (runbooks — how to operate a feature),
+   `docs/n8n-masterclass-flow.md` (any new/renamed n8n event `type` — it's the app↔n8n
+   contract), `DEPLOY.md` (deploy/server), or this file (durable conventions). A one-off fix
+   doesn't need a doc; a new command, table, event type, config key, route, or a reversed
+   design decision does.
 
 ---
 
