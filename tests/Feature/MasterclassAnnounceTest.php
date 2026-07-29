@@ -62,7 +62,9 @@ it('stamps a token and carries it in the register link', function () {
 
     $token = DB::table('masterclass_invites')->where('email', 'ada@example.com')->value('token');
     expect($token)->not->toBeNull();
-    Http::assertSent(fn ($req) => str_contains($req['register_url'], 'i=' . $token));
+    // Must be a RELATIVE path — the email prepends https://ajbuildai.com, so an
+    // absolute URL here would produce https://ajbuildai.comhttp://localhost/taab...
+    Http::assertSent(fn ($req) => $req['register_url'] === "/taab?i={$token}");
 });
 
 it('suppresses people already registered for this session and Accelerator buyers', function () {
@@ -112,6 +114,24 @@ it('only reaches back --past-sessions sessions', function () {
     expect($invited)->toContain('s1@example.com', 's2@example.com')
         ->and($invited)->not->toContain('s3@example.com');
     Http::assertSentCount(2);
+});
+
+it('caps a run to --limit and sends the rest on the next run', function () {
+    Http::fake();
+
+    seedAnnounceWaitlister('a@example.com');
+    seedAnnounceWaitlister('b@example.com');
+    seedAnnounceWaitlister('c@example.com');
+
+    // First run: only 2 go out and get stamped.
+    $this->artisan('masterclass:announce --limit=2')->assertSuccessful();
+    expect(DB::table('masterclass_invites')->count())->toBe(2);
+    Http::assertSentCount(2);
+
+    // Second run (simulating the next day): the held-back one goes.
+    $this->artisan('masterclass:announce --limit=2')->assertSuccessful();
+    expect(DB::table('masterclass_invites')->count())->toBe(3);
+    Http::assertSentCount(3);
 });
 
 it('writes nothing and sends nothing on a dry run', function () {

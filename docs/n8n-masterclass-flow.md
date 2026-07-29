@@ -292,6 +292,14 @@ couple of sessions (most only ever attend once). It deliberately drives them to
 the registration form — not a silent auto-enrol — so we re-capture their goal and
 a fresh intent signal.
 
+Branded HTML: [`emails/8-reinvite.html`](emails/8-reinvite.html). The importable branch
+(built into `n8n/aj-buildai-waitlist-masterclass.json`) round-robins across **three Hostinger
+senders** — `hello@`, `aj@`, `taab@` — because each mailbox is capped at **100 emails/day**.
+A Code node (`Pick Sender`) sets `smtpIndex = n % 3` and a Switch (`Rotate SMTP`) routes to
+one of three email nodes. **Before use:** create SMTP credentials for `aj@` and `taab@` in
+n8n and select them on their email nodes (`hello@` is already wired). Daily volume is capped
+app-side with `masterclass:announce --limit` — see the operations runbook.
+
 Extra fields: `register_url` (the `/taab` hub with a per-invite token —
 `/taab?i=<token>` — **relative**, prepend `https://ajbuildai.com`; the token makes
 the form pre-fill the lead's known name/email/WhatsApp/background, so **link to

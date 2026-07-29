@@ -111,6 +111,23 @@ session, anyone who already enrolled in the Accelerator, and anyone already invi
 `.github/workflows/masterclass-announce.yml`). It fires the `masterclass_reinvite` n8n event,
 so that Switch branch must exist (see [n8n-masterclass-flow.md](n8n-masterclass-flow.md)).
 
+**Mind the email cap.** Hostinger allows **100 emails/day per mailbox**. The n8n
+`masterclass_reinvite` branch round-robins across three senders — `hello@`, `aj@`, `taab@`
+(you must create SMTP credentials for the latter two and select them on their email nodes) —
+for ~300/day of headroom. But `hello@` also sends transactional mail (registration
+confirmations etc.), so keep runs conservative and cap each day; idempotency carries the rest
+to the next day automatically:
+
+```bash
+php artisan masterclass:announce --dry-run          # how many are eligible?
+php artisan masterclass:announce --limit=270        # send up to 270 today (~90 per sender)
+# next day, after the cap resets — already-invited people are skipped:
+php artisan masterclass:announce --limit=270
+```
+
+Repeat daily until `--dry-run` reports nobody left. Without `--limit` the command tries to
+send to everyone at once, which would blow past the per-mailbox cap and bounce.
+
 > `masterclass:enroll-waitlist` (the older command that auto-moves waitlisters straight into
 > registrations) still exists but is **deprecated** — it creates registrations with no goal
 > and stale intent. Prefer `announce`.

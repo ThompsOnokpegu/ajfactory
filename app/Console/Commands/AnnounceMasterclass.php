@@ -31,6 +31,7 @@ class AnnounceMasterclass extends Command
     protected $signature = 'masterclass:announce
         {--dry-run : List who would be invited without writing or sending}
         {--past-sessions=2 : How many prior sessions of registrants to re-invite}
+        {--limit= : Cap invites sent this run, to stay under daily SMTP limits (default: all). Re-run after the cap resets to send the rest.}
         {--throttle= : Override send_throttle_ms (e.g. 2000) if n8n drops sends under burst}';
 
     protected $description = 'Invite waitlisters + recent past registrants to register for the current masterclass session';
@@ -121,7 +122,16 @@ class AnnounceMasterclass extends Command
             return self::SUCCESS;
         }
 
-        $label = ($dryRun ? '[dry-run] ' : '') . "Inviting {$recipients->count()} lead(s) to register for {$session}:";
+        // Cap this run to stay under daily SMTP limits. The rest keep their place:
+        // they're not stamped, so the next run (after the cap resets) picks them up.
+        $limit = $this->option('limit') !== null ? max(0, (int) $this->option('limit')) : null;
+        $eligibleCount = $recipients->count();
+        if ($limit !== null) {
+            $recipients = $recipients->take($limit);
+        }
+
+        $label = ($dryRun ? '[dry-run] ' : '') . "Inviting {$recipients->count()} lead(s) to register for {$session}"
+            . ($limit !== null && $eligibleCount > $recipients->count() ? " (of {$eligibleCount} eligible; --limit={$limit})" : '') . ':';
         $this->info($label);
         foreach ($recipients as $email => $r) {
             $this->line("  · {$email}" . ($r['name'] ? " ({$r['name']})" : '') . " [{$r['audience']}]");
@@ -163,6 +173,11 @@ class AnnounceMasterclass extends Command
             $this->warn("{$failed} invite(s) failed and stayed unstamped — re-run to retry them.");
         }
 
+        $deferred = $eligibleCount - $recipients->count();
+        if ($deferred > 0) {
+            $this->warn("{$deferred} eligible lead(s) held back by --limit — re-run after the daily cap resets to send them.");
+        }
+
         return self::SUCCESS;
     }
 
@@ -193,8 +208,10 @@ class AnnounceMasterclass extends Command
                 'session_date' => $session,
                 'session_label' => Masterclass::sessionLabel(),
                 'starts_at' => optional(Masterclass::startsAt())->toIso8601String(),
-                // Token lets /taab pre-fill what they already gave us.
-                'register_url' => route('taab.index', ['i' => $token]),
+                // Relative path (not absolute) so it doesn't depend on APP_URL and the
+                // email owns the domain: `https://ajbuildai.com` + `/taab?i=<token>`.
+                // The token lets /taab pre-fill what they already gave us.
+                'register_url' => route('taab.index', ['i' => $token], false),
                 'timestamp' => now()->toIso8601String(),
             ]);
 
