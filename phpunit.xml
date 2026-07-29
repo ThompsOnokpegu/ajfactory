@@ -26,6 +26,14 @@
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
         <env name="MAIL_MAILER" value="array"/>
+        <!-- Pin the n8n webhooks so tests that assert a send don't depend on a
+             developer's local .env. Without these, CI copies .env.example (no
+             N8N_* keys) and every Http::assertSent-style test fails because the
+             code skips the send when the URL is unconfigured. -->
+        <env name="N8N_STUDENT_WEBHOOK_URL" value="https://n8n.test/webhook/student"/>
+        <env name="N8N_WEBHOOK_URL" value="https://n8n.test/webhook/general"/>
+        <env name="N8N_ENROLLMENT_WEBHOOK" value="https://n8n.test/webhook/enrollment"/>
+        <env name="N8N_INSTALLMENT_WEBHOOK" value="https://n8n.test/webhook/installment"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
