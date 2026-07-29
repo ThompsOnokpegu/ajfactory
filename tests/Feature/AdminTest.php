@@ -53,6 +53,19 @@ it('overview reports collected revenue', function () {
     $this->get('/admin')->assertOk()->assertSee('79,000');
 });
 
+it('overview outstanding balance excludes abandoned (unpaid) installment attempts', function () {
+    // A real student mid-installment: first payment verified, still owes 42k.
+    anEnrollment(['plan_type' => 'installment', 'balance_due' => 42000, 'status' => 'paid']);
+    // An abandoned checkout: row pre-created with a balance but never paid.
+    anEnrollment(['plan_type' => 'installment', 'balance_due' => 42000, 'status' => 'pending']);
+
+    $this->actingAs(adminUser());
+    $c = Volt::test('admin.overview');
+
+    expect($c->viewData('outstandingTotal'))->toBe(42000.0)  // only the paid one, not 84,000
+        ->and($c->viewData('outstandingCount'))->toBe(1);
+});
+
 it('toggles a student suspension', function () {
     $e = anEnrollment();
     $this->actingAs(adminUser());

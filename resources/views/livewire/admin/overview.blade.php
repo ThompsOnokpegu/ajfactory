@@ -28,7 +28,13 @@ new #[Layout('components.layouts.admin', ['title' => 'Overview'])] class extends
             ->groupBy('currency')
             ->pluck('total', 'currency');
 
-        $outstanding = Enrollment::where('plan_type', 'installment')->where('balance_due', '>', 0);
+        // Only students whose first payment actually verified (status=paid) truly owe
+        // a balance. Without this, abandoned checkout rows — pre-created with a balance
+        // but never paid — inflate the outstanding total (Collected + installments:process
+        // already scope to status=paid; this stat was the odd one out).
+        $outstanding = Enrollment::where('status', 'paid')
+            ->where('plan_type', 'installment')
+            ->where('balance_due', '>', 0);
         $cap = (int) config('accelerator.cohort_cap');
         $sold = Accelerator::seatsSold();
 
