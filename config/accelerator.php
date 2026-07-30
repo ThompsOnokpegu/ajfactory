@@ -36,7 +36,9 @@ return [
     'payment_provider'  => 'paystack', // or 'flutterwave'
 
     // Telegram community group invite link (fallback for any thread below).
-    'telegram_community_url' => env('ACCELERATOR_TELEGRAM_URL'), // {{TODO: Telegram group invite link}}
+    // Hardcoded default — like the #wins/thread URLs — so it renders in production
+    // without depending on the server .env being set + config-cached. Env overrides.
+    'telegram_community_url' => env('ACCELERATOR_TELEGRAM_URL') ?: 'https://t.me/+EH57E-1mkn02Mjg0',
 
     // #wins thread — where students post build proof for their checkpoints.
     // The "Ship it to unlock" panel links here; falls back to the group url.
