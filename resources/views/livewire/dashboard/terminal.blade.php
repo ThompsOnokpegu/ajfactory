@@ -25,7 +25,8 @@ state([
     'lockMap' => [],               // "sIndex-mIndex" => ['locked','reason','label']
     'proofUrl' => '',              // bound to the submit form for the active module
     'telegramUrl' => '',           // group-level fallback link
-    'telegramThreads' => [],       // module_id => per-module thread deep link
+    'telegramThreads' => [],       // module_id => per-module #help thread (questions)
+    'telegramWinsUrl' => '',       // #wins thread — where build proof / checkpoints go
     'balanceNotice' => null,       // installment balance reminder shown from 3 days before due
 ]);
 
@@ -152,6 +153,7 @@ $applyActiveLock = function () {
 mount(function () use ($normalizeModule) {
     $this->telegramUrl = config('accelerator.telegram_community_url') ?? '';
     $this->telegramThreads = config('accelerator.telegram_threads', []);
+    $this->telegramWinsUrl = config('accelerator.telegram_wins_url') ?? '';
 
     // 1. Load + normalize curriculum into sections of modules
     $rawConfig = config('curriculum') ?? [];
@@ -270,7 +272,7 @@ $submitCheckpoint = function () {
     >
         <div class="h-16 flex items-center justify-between px-6 border-b border-zinc-800 bg-zinc-950/50">
             <div class="text-sm font-black tracking-tighter italic text-white uppercase">
-                AUTO<span class="text-cyan-500">MATION</span>.ACC
+                AJBUILD<span class="text-cyan-500">AI</span>
             </div>
             <button @click="mobileMenuOpen = false" class="lg:hidden text-zinc-500 hover:text-white">
                 <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
@@ -360,16 +362,29 @@ $submitCheckpoint = function () {
             @endforeach
         </nav>
 
-        <div class="p-4 border-t border-zinc-800 bg-zinc-950/50 mt-auto">
+        <div class="p-4 border-t border-zinc-800 bg-zinc-950/50 mt-auto space-y-3">
             <div class="flex items-center gap-3">
-                <div class="h-8 w-8 rounded bg-cyan-600 flex items-center justify-center text-xs font-black text-white uppercase">
+                <div class="h-8 w-8 rounded bg-cyan-600 flex items-center justify-center text-xs font-black text-white uppercase shrink-0">
                     {{ substr(auth()->user()->name ?? 'U', 0, 1) }}
                 </div>
                 <div class="flex-1 min-w-0">
                     <p class="text-[10px] font-bold text-white truncate uppercase tracking-wider">{{ auth()->user()->name ?? 'Builder' }}</p>
                     <p class="text-[8px] text-zinc-500 font-mono uppercase tracking-widest leading-none mt-1">Status: Online</p>
                 </div>
+                <form method="POST" action="{{ route('logout') }}" class="shrink-0">
+                    @csrf
+                    <button type="submit" class="text-[9px] font-black text-zinc-600 hover:text-red-500 transition uppercase tracking-widest">
+                        Log out
+                    </button>
+                </form>
             </div>
+            @if(!empty($telegramUrl))
+                <a href="{{ $telegramUrl }}" target="_blank"
+                   class="flex items-center justify-center gap-2 w-full py-2 rounded-lg border border-zinc-800 bg-zinc-950/40 text-[10px] font-black text-cyan-500 hover:border-cyan-500/40 hover:bg-cyan-500/5 transition uppercase tracking-widest">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                    Telegram Community
+                </a>
+            @endif
         </div>
     </aside>
 
@@ -388,17 +403,7 @@ $submitCheckpoint = function () {
                 </div>
             </div>
 
-            <div class="flex items-center gap-4 lg:gap-6">
-                <a href="https://t.me/yourlink" target="_blank" class="hidden md:flex text-[10px] font-black text-zinc-500 hover:text-cyan-500 transition uppercase tracking-widest items-center gap-2">
-                    Telegram Community
-                </a>
-                <form method="POST" action="{{ route('logout') }}">
-                    @csrf
-                    <button type="submit" class="text-[10px] font-black text-zinc-700 hover:text-red-500 transition uppercase tracking-widest">
-                        Exit
-                    </button>
-                </form>
-            </div>
+            <!-- Telegram + logout now live in the sidebar footer (visible on mobile via the menu). -->
         </header>
 
         <div class="flex-1 overflow-y-auto p-4 lg:p-12 custom-scrollbar">
@@ -589,12 +594,20 @@ $submitCheckpoint = function () {
                         @else
                             <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Ship it to unlock the next module</h3>
                             <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
-                                Post a short screen-record (Loom) or screenshot proving your build works in the Telegram thread, then paste the link below.
+                                Post a short screen-record (Loom) or screenshot proving your build works in <strong class="text-zinc-300">#wins</strong>, then paste the link below.
                             </p>
-                            @php $threadUrl = $telegramThreads[$curModule['id']] ?? $telegramUrl; @endphp
-                            @if(!empty($threadUrl))
-                                <a href="{{ $threadUrl }}" target="_blank" class="inline-flex items-center gap-2 mt-3 text-[11px] font-bold text-cyan-500 hover:underline">Open the {{ $curModule['title'] ?? 'module' }} thread →</a>
-                            @endif
+                            @php
+                                $winsUrl = $telegramWinsUrl ?: $telegramUrl;
+                                $helpUrl = $telegramThreads[$curModule['id']] ?? $telegramUrl;
+                            @endphp
+                            <div class="flex flex-wrap items-center gap-x-5 gap-y-2 mt-3">
+                                @if(!empty($winsUrl))
+                                    <a href="{{ $winsUrl }}" target="_blank" class="inline-flex items-center gap-2 text-[11px] font-bold text-cyan-500 hover:underline">Post your proof in #wins →</a>
+                                @endif
+                                @if(!empty($helpUrl))
+                                    <a href="{{ $helpUrl }}" target="_blank" class="inline-flex items-center gap-2 text-[11px] font-bold text-zinc-400 hover:text-cyan-500 hover:underline">Stuck? Ask in the {{ $curModule['title'] ?? 'module' }} thread →</a>
+                                @endif
+                            </div>
                             @include('livewire.dashboard.partials.checkpoint-form', ['label' => 'Submit proof'])
                         @endif
                     </div>

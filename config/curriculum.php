@@ -37,7 +37,7 @@ return [
             'title' => 'Module 01: Welcome to the Factory',
             'release_at' => '2026-07-06 00:00:00',
             'has_blueprint' => false,
-            'description' => "Welcome to the Founding Batch. In this briefing, I cover how the next 4-5 weeks will run, how to access the private community, and what you need to install before we lift off on Jan 26th.",
+            'description' => "Welcome to the AI Automation Accelerator. This briefing covers how the cohort runs across the 9 modules, how to join the private Telegram community, and the accounts to set up before we build — n8n, a Google account, Telegram, and a Gemini key (plus Meta Business, Vapi, and Pinecone later on). Goal for setup week: every tool ready and your environment working, so nothing surprises you once the builds begin.",
             'videos' => [
                 ['id' => 'module-01-v1', 'title' => 'Welcome Briefing', 'video_id' => 'welcome_video_id', 'duration' => '02:00'],
                 // Add further onboarding videos here →

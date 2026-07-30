@@ -50,7 +50,7 @@ success callback.
 ### Accelerator
 | Var | Notes |
 |---|---|
-| `ACCELERATOR_TELEGRAM_URL` | Community invite — where students post proof checkpoints |
+| `ACCELERATOR_TELEGRAM_URL` | Community group invite (fallback for the #wins / per-module threads) |
 
 ### Video delivery
 | Var | Notes |
@@ -106,8 +106,13 @@ the rate moves materially.
 ```
 
 ### Community
-`telegram_community_url` plus per-module `telegram_threads` (forum topic deep links). Any
-module left `null` falls back to the main group.
+Three keys, one per role in the checkpoint flow:
+- `telegram_wins_url` — the `#wins` thread. **Build proof / checkpoints go here** — the
+  dashboard "Ship it to unlock" panel links students to it.
+- `telegram_threads` — per-module `#module-n-help` threads (questions), surfaced as the
+  "Stuck? Ask in the module thread" link. **Not** where proof goes.
+- `telegram_community_url` (`ACCELERATOR_TELEGRAM_URL`) — the group invite; fallback for
+  either of the above when unset.
 
 ### Testimonials
 ```php
