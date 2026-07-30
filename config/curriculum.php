@@ -39,7 +39,16 @@ return [
             'has_blueprint' => false,
             'description' => "Welcome to the AI Automation Accelerator. This briefing covers how the cohort runs across the 9 modules, how to join the private Telegram community, and the accounts to set up before we build — n8n, a Google account, Telegram, and a Gemini key (plus Meta Business, Vapi, and Pinecone later on). Goal for setup week: every tool ready and your environment working, so nothing surprises you once the builds begin.",
             'videos' => [
-                ['id' => 'module-01-v1', 'title' => 'Welcome Briefing', 'video_id' => 'welcome_video_id', 'duration' => '02:00'],
+                ['id' => 'module-01-v1', 'title' => 'Welcome Briefing', 'video_id' => '0da06b43-61a4-4dd1-b9fa-cb6dd9672f64', 'duration' => '02:00'],
+                ['id' => 'module-01-v2', 'title' => 'n8n Trial Setup', 'video_id' => '3883304a-77ed-4ef9-b836-cf81bf444a8d', 'duration' => '02:47'],
+                ['id' => 'module-01-v3', 'title' => 'LLM API Key Setup', 'video_id' => 'ac58ea28-d9b5-43af-9b55-bbb4f08e4514', 'duration' => '01:07'],
+                ['id' => 'module-01-v4', 'title' => 'GCP Account Setup', 'video_id' => '544f005c-4653-403b-98fc-6d9c2b609aea', 'duration' => '02:00'],
+                ['id' => 'module-01-v5', 'title' => 'Pinecone Account Setup', 'video_id' => 'c4160678-72af-4cca-8820-b256ee40346a', 'duration' => '02:26'],
+                ['id' => 'module-01-v6', 'title' => 'Slack & App Setup', 'video_id' => 'a2b10aaf-ed66-4140-b0c5-38149e33363d', 'duration' => '06:11'],
+                ['id' => 'module-01-v7', 'title' => 'OAuth Credentials Setup', 'video_id' => 'f4423e5d-6fc8-433f-a30b-cbf86c2897ea', 'duration' => '09:59'],
+                ['id' => 'module-01-v8', 'title' => 'Telegram Bot Setup', 'video_id' => 'd155cb39-de71-4eb4-927b-4f672302444e', 'duration' => '01:53'],
+                ['id' => 'module-01-v9', 'title' => 'Vapi Orchestrator Setup', 'video_id' => '1e7d1ebe-8980-4b75-ad23-24b9b6b3499f', 'duration' => '02:15'],
+                ['id' => 'module-01-v10', 'title' => 'Hello World - Telegram Automation', 'video_id' => '721a09c1-61b4-4ad7-b3b8-75eeb4f190ef', 'duration' => '07:51'],
                 // Add further onboarding videos here →
             ],
         ],
