@@ -56,17 +56,27 @@ cd ~/domains/ajbuildai.com/public_html/laravel && git fetch origin main && git r
   or production keeps serving the old CSS/JS.
 - `deploy.sh` **does** run `php artisan migrate --force` on every deploy, then rebuilds
   the config/route/view caches. Review pending migrations before pushing.
+- **A failed deploy can leave prod with new code but un-run migrations.** Hostinger SSH
+  sometimes times out (`dial tcp … i/o timeout`); the reset may land new code before the
+  run dies, so `migrate` never happens → `Base table or view not found` after a push.
+  **Always check the Deploy run is green**, and if it's red just re-run it (Actions →
+  *Deploy to Hostinger* → Re-run jobs, or *Run workflow* — it has `workflow_dispatch`).
+  `deploy.sh` is idempotent, so re-running is safe.
 - The `cd` path in `deploy.yml` is set to this account's app root
   (`~/domains/ajbuildai.com/public_html/laravel`). `deploy.sh` copies to its parent
   dir, so the web-root path adapts automatically.
 
-## The second workflow: `scheduler.yml`
+## Scheduler-fallback workflows
 
-The same SSH secrets also power `.github/workflows/scheduler.yml`, which exists because
 **Hostinger's hPanel cron does not execute for this account** — so the Laravel scheduler
-never ticks. Every 15 minutes it SSHes in and runs `php artisan masterclass:remind`
-**directly** (not `schedule:run`, which needs exact-minute alignment a delayed cron can't
-give). The command is window-based and idempotent, so extra or late runs are harmless.
+never ticks. Each scheduled command therefore has its own GitHub Actions workflow that reuses
+the same SSH secrets and runs the command **directly** (not `schedule:run`, which needs
+exact-minute alignment a delayed cron can't give). All are idempotent, so extra/late runs are
+harmless:
+
+- `scheduler.yml` — `masterclass:remind`, every 15 min.
+- `installments.yml` — `installments:process`, 3×/day (09/15/21 WAT).
+- `masterclass-announce.yml` — `masterclass:announce` (re-invite), daily + manual.
 
 **GitHub's scheduled triggers are best-effort and drop most runs** — measured at ~75% on
 this repo. Anything with a short send window must be run manually. Read

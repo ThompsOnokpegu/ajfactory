@@ -115,3 +115,10 @@ false positives.
 
 Cover the behaviour that matters operationally: that a failed send isn't recorded as sent,
 that gating actually gates, and that idempotent commands stay idempotent.
+
+`phpunit.xml` **pins the `N8N_*` webhook URLs** (alongside `DB_CONNECTION=sqlite` etc.) so
+the suite is self-contained. Don't remove them: the code skips a send when the webhook URL is
+unconfigured, so any `Http::assertSent`-style test would pass locally (dev `.env` has the URL)
+but fail on CI (which copies `.env.example`, where they're unset). Real incident — that's why
+they're pinned. Similarly, tests that assert a send must ensure the relevant webhook config is
+set (it is, via `phpunit.xml`), not rely on ambient `.env`.

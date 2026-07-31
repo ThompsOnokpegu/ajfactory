@@ -306,6 +306,14 @@ every session so a leaked one can't be reused later.
 Push to `main`. GitHub Actions SSHes in, resets the working tree to `origin/main`, and runs
 `deploy.sh` (migrate → publish build assets → rebuild caches). See [../DEPLOY.md](../DEPLOY.md).
 
+**If a deploy fails, re-run it — don't assume prod is fine.** Hostinger's SSH occasionally
+times out (`dial tcp … i/o timeout`). The reset can bring new code live while `migrate` never
+runs, leaving prod with **new code but a missing table/column** — you'll see
+`Base table or view not found` right after a push. Fix: re-run the deploy (Actions → *Deploy
+to Hostinger* → **Re-run jobs**, or trigger it via *Run workflow* — it supports
+`workflow_dispatch`). `deploy.sh` is idempotent (`migrate --force` + cache rebuilds), so a
+re-run is always safe. Last-resort manual fix over SSH: `php artisan migrate --force`.
+
 **Before pushing UI changes:** run `npm run build` and commit `public/build`. Hostinger has
 no Node; production serves the committed assets.
 
@@ -321,7 +329,7 @@ before committing it.
 | Screen | What it's for |
 |---|---|
 | **Overview** | KPIs + the registration Open/Paused switch |
-| **Enrollments** | All paid students. Suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol; per-student live-attendance count |
+| **Enrollments** | All students. Approve a pending offline payment, suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol; per-student live-attendance count |
 | **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module |
 | **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |
 | **Leads & Waitlist** | Every lead with source + scorecard tier/score; CSV export |
@@ -345,3 +353,6 @@ The user must already exist.
 | Student can't log in after paying | Re-send welcome from admin (issues a new temp password) |
 | Site serving old CSS/JS | `npm run build` not run / `public/build` not committed |
 | Prices wrong on one page only | Something hardcoded in Blade instead of using `Accelerator` |
+| `Base table or view not found` after a push | Deploy failed (SSH timeout) so `migrate` didn't run — re-run the deploy |
+| Live Attendance / Telegram link missing in prod | Deploy failed, or config not re-cached — re-run the deploy |
+| Student paid offline but has no access | If they started checkout, Admin → Enrollments → **Approve payment** on their pending row; if not, **Manual enrol** |

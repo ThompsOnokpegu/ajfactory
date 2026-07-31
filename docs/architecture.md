@@ -46,10 +46,14 @@ Setting                  key/value runtime flags (e.g. registration on/off)
 ```
 
 ### `Enrollment`
-The record of a paid seat, keyed by email. Carries the plan (`full` / `installment`),
-`balance_due`, `second_payment_status`, `cohort`, and `access_suspended`.
+The record of a seat, keyed by email. Carries `status` (`pending` → `paid`), the plan
+(`full` / `installment`), `balance_due`, `second_payment_status`, `cohort`, and
+`access_suspended`. Checkout pre-creates the row as `pending`; the payment webhook flips it to
+`paid` and provisions access. An **offline** payer is finalized without a new row — the webhook
+path for online, `StudentProvisioner::approve()` (Admin → Enrollments → *Approve payment*) for
+a `pending` row paid by transfer, or `manualEnrol()` for someone who never checked out.
 
-`shipToUnlockEnabled()` returns `cohort >= 2` — Cohort 1 stays fully open so existing
+`usesShipToUnlock()` returns `cohort >= 2` — Cohort 1 stays fully open so existing
 students are never retroactively locked out of modules they already had.
 
 ### `Checkpoint`
