@@ -1,0 +1,37 @@
+name: Installments (scheduler fallback)
+
+# Hostinger's hPanel cron isn't executing for this account, so the Laravel
+# scheduler never ticks and `installments:process` (routes/console.php, dailyAt
+# 09:00 WAT) never runs. This SSHes in and runs it directly, like the masterclass
+# reminders workflow.
+#
+# The command is idempotent — it sends each 2nd-payment link once (via the
+# second_payment_status transition) and suspends overdue access once — and its
+# windows are open all day, so running it several times is safe and just makes it
+# resilient to GitHub's best-effort cron dropping runs. Times chosen to land in
+# WAT daytime so payment-link emails don't arrive overnight.
+
+on:
+  schedule:
+    - cron: '0 8,14,20 * * *'   # 08/14/20 UTC = 09/15/21 WAT
+  workflow_dispatch: {}          # manual "run now" from the Actions tab
+
+concurrency:
+  group: installments-scheduler
+  cancel-in-progress: false
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH in and run installments:process
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          script: |
+            set -e
+            cd ~/domains/ajbuildai.com/public_html/laravel
+            php artisan installments:process

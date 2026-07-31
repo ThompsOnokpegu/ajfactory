@@ -17,9 +17,14 @@ cd ~/domains/ajbuildai.com/public_html/laravel
 that never produced output; `crontab -l` reports no crontab. The Laravel scheduler therefore
 never ticks on its own.
 
-The workaround is `.github/workflows/scheduler.yml`: every 15 minutes GitHub Actions SSHes
-in and runs `php artisan masterclass:remind` **directly** — not `schedule:run`, which needs
-exact-minute alignment that a delayed cron can't provide.
+The workaround is a set of GitHub Actions workflows that SSH in and run each command
+**directly** (not `schedule:run`, which needs exact-minute alignment a delayed cron can't
+provide):
+- `.github/workflows/scheduler.yml` — `masterclass:remind`, every 15 min.
+- `.github/workflows/installments.yml` — `installments:process`, 3×/day (09/15/21 WAT).
+- `.github/workflows/masterclass-announce.yml` — `masterclass:announce`, daily + manual.
+
+Each command is idempotent, so extra/duplicate ticks are safe.
 
 **But GitHub's cron is best-effort and drops most runs.** Observed on this repo: 42 runs in
 ~2 days against an expected ~190 — roughly **75% dropped**, with gaps averaging ~1.7 hours
@@ -32,7 +37,7 @@ Consequences you must plan around:
 | Masterclass reminder (T-24h) | ~23 hours | Yes |
 | **Day-of nudge (T-2h)** | **2 hours** | **No — run it manually** |
 | Post-session follow-up | never closes | Yes, eventually |
-| `installments:process` (daily) | all day | Yes |
+| `installments:process` | all day | Yes — runs 3×/day via `installments.yml` |
 
 > The day-of nudge has silently failed twice. On session morning, run it by hand between
 > **07:00 and 08:30 WAT**. The commands are idempotent — a manual run and a scheduled run
