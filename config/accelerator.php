@@ -25,10 +25,10 @@ return [
     'installment_due_days'   => 21,  // 2nd payment is due this many days after the 1st
     'installment_grace_hours' => 24, // suspend access this long after the due date if still unpaid
 
-    // Completion guarantee: minimum weekly live sessions a student must attend
-    // (in addition to finishing all module checkpoints) to qualify. Surfaced on
-    // the dashboard progress card. {{TODO: confirm the policy number}}
-    'guarantee_min_live_sessions' => 4,
+    // Completion guarantee: weekly live sessions a student must attend (in
+    // addition to finishing all module checkpoints) to qualify. Set to all 6
+    // Friday sessions. Surfaced on the dashboard progress card.
+    'guarantee_min_live_sessions' => 6,
 
     // --- Scarcity / cohort ---
     'cohort_number'     => 2,     // stamped on new enrollments; >= 2 enables ship-to-unlock
