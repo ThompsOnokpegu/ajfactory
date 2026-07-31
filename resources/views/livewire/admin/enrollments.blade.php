@@ -59,6 +59,22 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
         $this->message = $e->access_suspended ? "Access suspended for {$e->email}." : "Access restored for {$e->email}.";
     }
 
+    /**
+     * Approve a PENDING enrollment paid offline (bank transfer): finalize the row
+     * the student created at checkout + provision access, without minting a new one.
+     */
+    public function approvePayment(int $id, StudentProvisioner $provisioner): void
+    {
+        $e = $this->find($id);
+        if (! $e || $e->status === 'paid') return;
+
+        $result = $provisioner->approve($e);
+
+        $this->message = $result['temp_password']
+            ? "Approved {$e->email} — access granted. Temp password: {$result['temp_password']}"
+            : "Approved {$e->email} — access granted (existing account kept).";
+    }
+
     public function markBalancePaid(int $id): void
     {
         $e = $this->find($id);
@@ -255,6 +271,12 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
                         </button>
                         <div x-show="menu" x-cloak @click.outside="menu = false" x-transition
                              class="absolute right-0 top-10 z-20 w-52 rounded-xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/50 py-1.5">
+                            @if($e->status !== 'paid')
+                                <button wire:click="approvePayment({{ $e->id }})"
+                                    wire:confirm="Approve offline payment for {{ $e->email }}?&#10;&#10;Marks it paid, grants LMS access, and sends the welcome email{{ $e->plan_type === 'installment' ? ' — the 2nd installment will be scheduled' : '' }}."
+                                    @click="menu=false" class="w-full text-left px-4 py-2 text-xs font-black text-green-400 hover:bg-zinc-800 transition">Approve payment</button>
+                                <div class="border-t border-zinc-800 my-1.5"></div>
+                            @endif
                             <button wire:click="toggleSuspend({{ $e->id }})" wire:confirm="{{ $e->access_suspended ? 'Restore access?' : 'Suspend access for this student?' }}" @click="menu=false"
                                 class="w-full text-left px-4 py-2 text-xs font-bold {{ $e->access_suspended ? 'text-green-400' : 'text-red-400' }} hover:bg-zinc-800 transition">
                                 {{ $e->access_suspended ? 'Reinstate access' : 'Suspend access' }}

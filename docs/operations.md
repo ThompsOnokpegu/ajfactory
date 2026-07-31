@@ -251,6 +251,15 @@ php artisan enroll:user ada@example.com "Ada Builder" 42000 NGN --cohort=2
 Both route through `StudentProvisioner`, so the student gets the identical welcome flow and
 LMS access as a card payment.
 
+**Two offline cases — pick the right one:**
+- **They never started checkout** → use **Manual enrol** above (mints a fresh paid row).
+- **They started checkout then paid offline** (a `pending` enrollment already exists — common,
+  ~3–4 per cohort) → Admin → Enrollments → row menu (⋯) → **Approve payment**. This finalizes
+  the *existing* row, keeping its plan/amount/balance, grants access, sends the welcome, and —
+  for installments — schedules the 2nd payment. Don't Manual-enrol these; that would create a
+  duplicate and reset the balance to zero. The Approve action only appears on non-`paid` rows
+  (filter by Status → pending to find them).
+
 ### A student didn't get their welcome email
 
 Admin → Enrollments → row menu (⋯) → **Re-send welcome**.

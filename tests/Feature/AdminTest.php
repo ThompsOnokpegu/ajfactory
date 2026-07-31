@@ -122,6 +122,37 @@ it('manually enrols a student, provisions the account, and fires the welcome', f
     Http::assertSent(fn ($r) => $r['event'] === 'enrollment_finalized' && $r['gateway'] === 'manual');
 });
 
+it('approves a pending offline installment payment: finalizes, schedules 2nd, provisions', function () {
+    config(['services.n8n.enrollment_webhook' => 'https://example.test/enr']);
+    Http::fake();
+    $e = anEnrollment([
+        'email' => 'offline@example.com', 'status' => 'pending',
+        'plan_type' => 'installment', 'amount' => 42000, 'amount_total' => 84000,
+        'balance_due' => 42000, 'second_payment_status' => 'pending',
+    ]);
+    $this->actingAs(adminUser());
+
+    Volt::test('admin.enrollments')->call('approvePayment', $e->id);
+
+    $e->refresh();
+    expect($e->status)->toBe('paid')
+        ->and($e->paid_at)->not->toBeNull()
+        ->and((float) $e->balance_due)->toBe(42000.0)          // balance preserved
+        ->and($e->second_payment_due_at)->not->toBeNull();      // 2nd payment scheduled
+    expect(User::where('email', 'offline@example.com')->exists())->toBeTrue();
+    Http::assertSent(fn ($r) => $r['event'] === 'enrollment_finalized' && $r['email'] === 'offline@example.com');
+});
+
+it('does not reschedule or double-provision an already-paid enrollment', function () {
+    Http::fake();
+    $e = anEnrollment(['status' => 'paid']);
+    $this->actingAs(adminUser());
+
+    Volt::test('admin.enrollments')->call('approvePayment', $e->id);
+
+    Http::assertNothingSent(); // no-op on an already-paid row
+});
+
 it('exports masterclass registrations as csv', function () {
     MasterclassRegistration::create(['first_name' => 'Ada', 'last_name' => 'Okafor', 'email' => 'ada@example.com', 'session_date' => '2026-06-27']);
     $this->actingAs(adminUser());

@@ -59,6 +59,49 @@ class StudentProvisioner
     }
 
     /**
+     * Approve an existing PENDING enrollment that was paid offline (bank transfer).
+     * Unlike manualEnrol (which mints a fresh paid-in-full row), this finalizes the
+     * row the student already created at checkout — keeping its plan, amount, and
+     * balance — then provisions the account + welcome, mirroring the webhook's
+     * first-payment path.
+     *
+     * @return array{enrollment:Enrollment,temp_password:?string,created:bool}
+     */
+    public function approve(Enrollment $enrollment): array
+    {
+        $email = strtolower(trim($enrollment->email));
+        $tempPassword = Str::random(14);
+
+        $user = User::firstOrCreate(
+            ['email' => $email],
+            ['name' => $enrollment->full_name, 'password' => Hash::make($tempPassword)],
+        );
+        $created = $user->wasRecentlyCreated;
+
+        $updates = [
+            'status'           => 'paid',
+            'paid_at'          => now(),
+            'access_suspended' => false,
+        ];
+
+        // Installment paid offline: schedule the 2nd payment if it isn't already,
+        // so installments:process picks it up on the due date. Keep balance_due.
+        if ($enrollment->plan_type === 'installment'
+            && (float) $enrollment->balance_due > 0
+            && ! $enrollment->second_payment_due_at) {
+            $updates['second_payment_due_at'] = now()->addDays((int) config('accelerator.installment_due_days', 21));
+            $updates['second_payment_status'] = 'pending';
+        }
+
+        $enrollment->update($updates);
+        $enrollment = $enrollment->fresh();
+
+        $this->fireWelcome($enrollment, $created ? $tempPassword : null);
+
+        return ['enrollment' => $enrollment, 'temp_password' => $created ? $tempPassword : null, 'created' => $created];
+    }
+
+    /**
      * Re-fire the welcome automation for one student — for when n8n failed or
      * dropped the original (the student never got their credentials).
      *
