@@ -22,7 +22,7 @@ return [
     'currency'          => 'NGN',
 
     // Installment scheduling
-    'installment_due_days'   => 14,  // 2nd payment is due this many days after the 1st
+    'installment_due_days'   => 21,  // 2nd payment is due this many days after the 1st
     'installment_grace_hours' => 24, // suspend access this long after the due date if still unpaid
 
     // --- Scarcity / cohort ---
