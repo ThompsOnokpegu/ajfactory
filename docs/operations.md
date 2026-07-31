@@ -270,6 +270,26 @@ reporting a false success.
 Admin → Enrollments exposes **Re-send pay link** and **Mark balance paid** per student.
 Suspended students are bounced to `/checkout` by `CheckEnrollment` until the balance clears.
 
+### Running a live session (attendance)
+
+To drive live attendance (higher-value than the recordings), each live session has an
+attendance code students enter to get credit + unlock that session's playbook, and it counts
+toward the completion guarantee.
+
+1. **Before the session**, add the week's live session to `config/curriculum.php` under `live`
+   with a fresh `attendance_code` (and optional `playbook_url`), and deploy. **Never put the
+   code in chat** — it's read server-side and never sent to the browser, so announcing it live
+   is what proves attendance.
+2. **At the end of the call**, say the code aloud (e.g. "today's code is MANGO").
+3. Students open the session in their dashboard → **Live Attendance** panel → enter the code →
+   recorded, and the playbook link appears.
+4. **Verify** in Admin → Enrollments: each student shows a `Live N` count. Attendance +
+   approved checkpoints feed the "Completion Guarantee" card on their dashboard
+   (threshold = `accelerator.guarantee_min_live_sessions`).
+
+Codes are case-insensitive and each student can only mark a session once. Rotate the code
+every session so a leaked one can't be reused later.
+
 ---
 
 ## Deploying
@@ -292,7 +312,7 @@ before committing it.
 | Screen | What it's for |
 |---|---|
 | **Overview** | KPIs + the registration Open/Paused switch |
-| **Enrollments** | All paid students. Suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol |
+| **Enrollments** | All paid students. Suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol; per-student live-attendance count |
 | **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module |
 | **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |
 | **Leads & Waitlist** | Every lead with source + scorecard tier/score; CSV export |

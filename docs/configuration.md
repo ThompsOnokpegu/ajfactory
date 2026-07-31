@@ -105,6 +105,15 @@ the rate moves materially.
 'installment_grace_hours' => 24,  // suspend access this long after the due date
 ```
 
+### Live-session attendance & completion guarantee
+- `accelerator.php` → `guarantee_min_live_sessions` — how many weekly live sessions a student
+  must attend (on top of finishing all module checkpoints) to satisfy the completion
+  guarantee. Shown on the dashboard progress card; the guarantee itself is honoured by a human.
+- Per **live** session in `curriculum.php`: `attendance_code` (the code AJ announces at the
+  **end** of the call — set a fresh one each session, never type it in chat; it's read
+  server-side and never sent to the browser) and optional `playbook_url` (unlocked once the
+  student marks attendance). Leave `attendance_code` unset to keep attendance closed.
+
 ### Community
 Three keys, one per role in the checkpoint flow:
 - `telegram_wins_url` — the `#wins` thread. **Build proof / checkpoints go here** — the

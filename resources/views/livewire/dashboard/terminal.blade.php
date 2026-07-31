@@ -3,6 +3,7 @@
 use function Livewire\Volt\{state, layout, mount};
 use App\Models\Enrollment;
 use App\Models\Checkpoint;
+use App\Models\LiveAttendance;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 
@@ -27,6 +28,8 @@ state([
     'telegramUrl' => '',           // group-level fallback link
     'telegramThreads' => [],       // module_id => per-module #help thread (questions)
     'telegramWinsUrl' => '',       // #wins thread — where build proof / checkpoints go
+    'liveAttendance' => [],        // session_key[] the student has marked attendance for
+    'attendanceCode' => '',        // bound to the live-attendance form
     'balanceNotice' => null,       // installment balance reminder shown from 3 days before due
 ]);
 
@@ -53,6 +56,11 @@ $normalizeModule = function ($module) {
             'library_id' => $module['library_id'] ?? null,
         ]];
     }
+    // Never expose the live-session attendance code (or the gated playbook) to the
+    // browser — Livewire serializes public state to the client. Both are read
+    // server-side from config('curriculum') when needed.
+    unset($module['attendance_code'], $module['playbook_url']);
+
     return $module;
 };
 
@@ -68,6 +76,8 @@ $loadProgress = function () {
         $c->module_id => ['status' => $c->status, 'proof_url' => $c->proof_url, 'note' => $c->note],
     ])->all();
     $this->approvedModuleIds = $cps->where('status', 'approved')->pluck('module_id')->all();
+
+    $this->liveAttendance = $enrollment ? $enrollment->liveAttendances()->pluck('session_key')->all() : [];
 
     // Installment balance reminder — surfaces from 3 days before the due date,
     // while the student still has access (suspended students never reach here).
@@ -245,6 +255,38 @@ $submitCheckpoint = function () {
     $this->applyActiveLock();
 };
 
+// Live sessions: mark attendance by entering the code AJ announces at the end of
+// the call. The code is validated server-side against config (never sent to the
+// client), so knowing it ≈ having been there.
+$markAttendance = function () {
+    $module = $this->curriculum[$this->activeSection]['modules'][$this->activeModule] ?? null;
+    if (!$module) return;
+    if (($this->curriculum[$this->activeSection]['title'] ?? '') !== 'Live Archive') return;
+
+    $sessionKey = $module['id'] ?? null;
+    $cfg = collect(config('curriculum.live', []))->firstWhere('id', $sessionKey);
+    $code = $cfg['attendance_code'] ?? null;
+    if (!$code) return; // attendance not open for this session
+
+    $this->validate(['attendanceCode' => 'required|string|max:100']);
+
+    if (strcasecmp(trim($this->attendanceCode), trim($code)) !== 0) {
+        $this->addError('attendanceCode', "That code isn't right — listen for it at the end of the live session.");
+        return;
+    }
+
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    if (!$enrollment) return;
+
+    LiveAttendance::firstOrCreate(
+        ['enrollment_id' => $enrollment->id, 'session_key' => $sessionKey],
+        ['attended_at' => now()],
+    );
+
+    $this->attendanceCode = '';
+    $this->loadProgress();
+};
+
 ?>
 
 <div class="flex h-screen w-full bg-zinc-950 overflow-hidden" x-data="{ mobileMenuOpen: false }">
@@ -263,6 +305,24 @@ $submitCheckpoint = function () {
         $totalItems   = count($coreVideoIds);
         $completedCount = count(array_intersect($coreVideoIds, $completedLessons));
         $percent = ($totalItems > 0) ? ($completedCount / $totalItems) * 100 : 0;
+
+        // Live-session attendance for the active session (code + playbook read
+        // server-side from config, never from client state).
+        $isLiveSection  = ($curriculum[$activeSection]['title'] ?? '') === 'Live Archive';
+        $liveSessionKey = $curModule['id'] ?? null;
+        $liveCfg        = $isLiveSection ? collect(config('curriculum.live', []))->firstWhere('id', $liveSessionKey) : null;
+        $hasAttendanceCode = ! empty($liveCfg['attendance_code']);
+        $alreadyAttended   = in_array($liveSessionKey, $liveAttendance, true);
+        $playbookUrl       = $liveCfg['playbook_url'] ?? null;
+
+        // Completion-guarantee progress: all core checkpoints approved + enough
+        // live sessions attended. Display-only; the guarantee is honoured by a human.
+        $coreModuleIds     = collect($coreModules)->pluck('id')->all();
+        $coreTotal         = count($coreModuleIds);
+        $approvedCount     = count(array_intersect($coreModuleIds, $approvedModuleIds));
+        $liveAttendedCount = count($liveAttendance);
+        $guaranteeMinLive  = (int) config('accelerator.guarantee_min_live_sessions', 0);
+        $guaranteeMet      = $shipToUnlock && $coreTotal > 0 && $approvedCount === $coreTotal && $liveAttendedCount >= $guaranteeMinLive;
     @endphp
 
     <!-- SIDEBAR -->
@@ -557,6 +617,27 @@ $submitCheckpoint = function () {
                                 <div class="h-full bg-cyan-500 transition-all duration-700 shadow-[0_0_10px_#06b6d4]" style="width: {{ $percent }}%"></div>
                             </div>
                         </div>
+
+                        {{-- Completion guarantee: checkpoints + live attendance (Cohort 2) --}}
+                        @if($shipToUnlock)
+                            <div class="p-6 border rounded-2xl {{ $guaranteeMet ? 'border-green-500/30 bg-green-500/5' : 'border-zinc-900 bg-zinc-950/50' }}">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-[9px] font-black uppercase text-zinc-500 tracking-widest">Completion Guarantee</span>
+                                    @if($guaranteeMet)<span class="text-[9px] font-black uppercase text-green-500 tracking-widest">On track &check;</span>@endif
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex items-center justify-between text-[11px]">
+                                        <span class="text-zinc-400">Checkpoints approved</span>
+                                        <span class="font-mono {{ ($coreTotal > 0 && $approvedCount === $coreTotal) ? 'text-green-500' : 'text-zinc-300' }}">{{ $approvedCount }}/{{ $coreTotal }}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between text-[11px]">
+                                        <span class="text-zinc-400">Live sessions attended</span>
+                                        <span class="font-mono {{ $liveAttendedCount >= $guaranteeMinLive ? 'text-green-500' : 'text-zinc-300' }}">{{ $liveAttendedCount }}/{{ $guaranteeMinLive }}</span>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-zinc-600 mt-3 leading-relaxed">Finish every checkpoint and attend {{ $guaranteeMinLive }} live sessions to lock in your completion guarantee.</p>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
@@ -609,6 +690,46 @@ $submitCheckpoint = function () {
                                 @endif
                             </div>
                             @include('livewire.dashboard.partials.checkpoint-form', ['label' => 'Submit proof'])
+                        @endif
+                    </div>
+                @endif
+
+                {{-- LIVE ATTENDANCE: mark with the code AJ announces at the end of the session --}}
+                @if($isLiveSection && !$isLocked && $curModule)
+                    <div class="border rounded-2xl p-6 lg:p-8 {{ $alreadyAttended ? 'border-green-500/30 bg-green-500/5' : 'border-cyan-900/40 bg-zinc-900/40' }}">
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="h-1.5 w-1.5 rounded-full {{ $alreadyAttended ? 'bg-green-500' : 'bg-cyan-500' }} animate-pulse"></span>
+                            <span class="text-[10px] font-black uppercase tracking-[0.2em] {{ $alreadyAttended ? 'text-green-500' : 'text-cyan-500' }}">Live Attendance</span>
+                        </div>
+
+                        @if($alreadyAttended)
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Attendance recorded &check;</h3>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">Thanks for showing up live — this one counts toward your completion guarantee.</p>
+                            @if(!empty($playbookUrl))
+                                <a href="{{ $playbookUrl }}" target="_blank"
+                                   class="inline-flex items-center gap-2 mt-4 px-6 py-3 rounded-xl bg-white text-black hover:bg-cyan-500 transition-all text-[11px] font-black uppercase tracking-widest">
+                                    Get the session playbook →
+                                </a>
+                            @endif
+
+                        @elseif($hasAttendanceCode)
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Mark your attendance</h3>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">
+                                Enter the code AJ shares at the end of the live session{{ !empty($playbookUrl) ? ' to record it and unlock this session’s playbook' : ' to record it' }}.
+                            </p>
+                            <form wire:submit.prevent="markAttendance" class="mt-3 flex flex-col sm:flex-row gap-2 max-w-md">
+                                <input type="text" wire:model="attendanceCode" placeholder="Session code"
+                                       class="flex-1 bg-zinc-900 border border-zinc-800 text-white px-3 py-2.5 rounded-lg text-sm focus:border-cyan-500 focus:ring-0 placeholder:text-zinc-600 uppercase tracking-widest">
+                                <button type="submit"
+                                        class="shrink-0 px-6 py-2.5 rounded-lg bg-white text-black hover:bg-cyan-500 transition-all text-[11px] font-black uppercase tracking-widest">
+                                    Mark attendance
+                                </button>
+                            </form>
+                            @error('attendanceCode') <p class="text-[11px] text-amber-400 mt-2">{{ $message }}</p> @enderror
+
+                        @else
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Attendance closed</h3>
+                            <p class="text-xs text-zinc-400 mt-2 leading-relaxed">Attendance for this session isn’t open. Catch the next live session to earn your attendance toward the guarantee.</p>
                         @endif
                     </div>
                 @endif

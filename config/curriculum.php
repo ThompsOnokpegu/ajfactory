@@ -11,6 +11,13 @@
 |   'has_blueprint' => bool — shows the Snapshot Vault panel
 |   'blueprint_url' => (optional) override the vault download link
 |   'description'   => module overview (shown under the player)
+|   'attendance_code' => (LIVE sessions only) the code AJ announces at the END of
+|                        the live call; students enter it to mark attendance. Set
+|                        a FRESH one per session and never type it in chat — it's
+|                        server-side only (never sent to the browser). Leave unset
+|                        to keep attendance closed for that session.
+|   'playbook_url'    => (LIVE sessions only, optional) resource unlocked once the
+|                        student marks attendance for that session.
 |   'videos'        => [
 |        ['id' => 'm02-v1', 'title' => '...', 'video_id' => '<bunny-id>', 'duration' => '08:00', 'library_id' => '<optional>'],
 |        ... 3–5 per module ...
@@ -184,6 +191,88 @@ return [
             'description' => "Our fourth group build. We covered:\n\n• The Mindset Shift: Selling results, not \"AI\". \n• The \"Loom Audit\" outreach method. \n• The 7-day free trials.\n• How to price your setup fees and monthly retainers.",
             'videos' => [
                 ['id' => 'live-04-v1', 'title' => 'Customer Acquisition Playbook', 'video_id' => '05429538-2ef9-48cc-b452-034d0127c8d9', 'duration' => '32:41 Mins'],
+            ],
+        ],
+
+        /*
+        |----------------------------------------------------------------------
+        | Upcoming live sessions — every FRIDAY from 7 Aug 2026 (6 total).
+        |----------------------------------------------------------------------
+        | Announce the attendance_code at the END of each call. Set a FRESH code
+        | per session: uncomment its line and fill it just before you go live
+        | (it's server-side only, never sent to the browser). Paste each video_id
+        | after the session is recorded.
+        */
+        [
+            'id' => 'live-05',
+            'title' => 'Live Session #5: Build & Q&A',
+            'release_at' => '2026-08-07 00:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            'attendance_code' => 'PLAYBOOK', // ← the code you announce live on Fri 7 Aug — swap before the call
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-05-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-06',
+            'title' => 'Live Session #6: Build & Q&A',
+            'release_at' => '2026-08-14 00:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set before Fri 14 Aug
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-06-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-07',
+            'title' => 'Live Session #7: Build & Q&A',
+            'release_at' => '2026-08-21 00:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set before Fri 21 Aug
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-07-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-08',
+            'title' => 'Live Session #8: Build & Q&A',
+            'release_at' => '2026-08-28 00:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set before Fri 28 Aug
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-08-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-09',
+            'title' => 'Live Session #9: Build & Q&A',
+            'release_at' => '2026-09-04 00:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set before Fri 4 Sep
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-09-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-10',
+            'title' => 'Live Session #10: Build & Q&A',
+            'release_at' => '2026-09-11 00:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set before Fri 11 Sep
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-10-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
             ],
         ],
     ],

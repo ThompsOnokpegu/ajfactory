@@ -146,6 +146,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
     public function with(): array
     {
         $rows = Enrollment::query()
+            ->withCount('liveAttendances')
             ->when($this->search, fn ($q) => $q->where(fn ($w) =>
                 $w->where('full_name', 'like', "%{$this->search}%")->orWhere('email', 'like', "%{$this->search}%")))
             ->when($this->plan, fn ($q) => $q->where('plan_type', $this->plan))
@@ -240,6 +241,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
                             <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-500">C{{ $e->cohort }}</span>
                             <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded {{ $e->status === 'paid' ? 'bg-green-500/10 text-green-500' : 'bg-amber-500/10 text-amber-400' }}">{{ $e->status }}</span>
                             @if($e->access_suspended)<span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-red-500/10 text-red-400">Suspended</span>@endif
+                            <span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-400" title="Live sessions attended">Live {{ $e->live_attendances_count }}</span>
                         </div>
                         <div class="text-[11px] text-zinc-500 truncate mt-0.5">{{ $e->email }}</div>
                         @if($hasBalance)<div class="text-[11px] font-mono text-amber-400 mt-1">Balance due {{ $sym }}{{ number_format($e->balance_due) }}</div>@endif

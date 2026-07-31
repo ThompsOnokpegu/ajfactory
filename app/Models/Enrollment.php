@@ -61,6 +61,11 @@ class Enrollment extends Model
         return $this->hasMany(Checkpoint::class);
     }
 
+    public function liveAttendances(): HasMany
+    {
+        return $this->hasMany(LiveAttendance::class);
+    }
+
     /**
      * Cohort 2+ uses ship-to-unlock (proof-gated modules). Cohort 1 is legacy /
      * fully open — no checkpoint gating — so existing students are never locked

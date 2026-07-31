@@ -85,6 +85,15 @@ registrants show, so attendance is what lets the re-invite flow eventually targe
 **Changing that config value makes the previous edition's registrants unreachable** by the
 command — send their follow-up before rolling over to the next session.
 
+### `live_attendances` — weekly live-session attendance
+One row per (`enrollment_id`, `session_key`) — a student earns it by entering the code AJ
+announces at the **end** of each live session. Drives two things: unlocking that session's
+`playbook_url`, and the **completion-guarantee** progress on the dashboard (all core
+checkpoints approved **plus** ≥ `accelerator.guarantee_min_live_sessions` attended). The code
+lives only in `config/curriculum.php` and is validated server-side — it's stripped from the
+Livewire state so it never reaches the browser (otherwise students could read it and skip the
+session). Admin sees each student's count in Enrollments.
+
 ### `masterclass_invites` — re-invite ledger
 Idempotency for `masterclass:announce`: one row per (`email`, `session_date`) recording that
 someone was nudged to register for a session. Because the target hasn't registered yet, the
