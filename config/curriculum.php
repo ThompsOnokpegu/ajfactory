@@ -44,7 +44,7 @@ return [
             'title' => 'Module 01: Welcome to the Factory',
             'release_at' => '2026-07-06 00:00:00',
             'has_blueprint' => false,
-            'description' => "Welcome to the AI Automation Accelerator. This briefing covers how the cohort runs across the 9 modules, how to join the private Telegram community, and the accounts to set up before we build — n8n, a Google account, Telegram, and a Gemini key (plus Meta Business, Vapi, and Pinecone later on). Goal for setup week: every tool ready and your environment working, so nothing surprises you once the builds begin.",
+            'description' => "Welcome to the Accelerator — setup week, then your first builds. We cover:\n\n• Account setup for every tool you'll use: n8n trial, Gemini API key, Google Cloud, Pinecone, Slack, Google OAuth credentials, a Telegram bot, and Vapi.\n• The foundations behind every workflow — APIs, JSON, and webhooks.\n• A guided tour of the n8n canvas.\n• 'Hello World': your first live automation, sending a message through Telegram.\n• Project 1 — The Intake Funnel: capture a lead and fire an automated response, end to end.",
             'videos' => [
                 ['id' => 'module-01-v1', 'title' => 'Welcome Briefing', 'video_id' => '0da06b43-61a4-4dd1-b9fa-cb6dd9672f64', 'duration' => '02:00'],
                 ['id' => 'module-01-v2', 'title' => 'n8n Trial Setup', 'video_id' => '3883304a-77ed-4ef9-b836-cf81bf444a8d', 'duration' => '02:47'],
@@ -56,6 +56,9 @@ return [
                 ['id' => 'module-01-v8', 'title' => 'Telegram Bot Setup', 'video_id' => 'd155cb39-de71-4eb4-927b-4f672302444e', 'duration' => '01:53'],
                 ['id' => 'module-01-v9', 'title' => 'Vapi Orchestrator Setup', 'video_id' => '1e7d1ebe-8980-4b75-ad23-24b9b6b3499f', 'duration' => '02:15'],
                 ['id' => 'module-01-v10', 'title' => 'Hello World - Telegram Automation', 'video_id' => '721a09c1-61b4-4ad7-b3b8-75eeb4f190ef', 'duration' => '07:51'],
+                ['id' => 'module-01-v11', 'title' => 'Concepts: API, JSON, Webhook', 'video_id' => '6ba1c683-311f-42e1-ba72-d112e06c52e3', 'duration' => '03:18'],
+                ['id' => 'module-01-v12', 'title' => 'The n8n Canvas (quick tour)', 'video_id' => '1f406040-4018-4391-bd69-1f1c995cc458', 'duration' => '13:40'],
+                ['id' => 'module-01-v13', 'title' => 'Project 1: Intake Funnel', 'video_id' => 'e86158df-989d-465b-902d-45b545dbd5e4', 'duration' => '18:30'],
                 // Add further onboarding videos here →
             ],
         ],
@@ -64,9 +67,12 @@ return [
             'title' => 'Module 02: Basics of n8n',
             'release_at' => '2026-07-13 00:00:00',
             'has_blueprint' => true,
-            'description' => "A complete introduction to the n8n environment. In this module, we cover:\n\n• What is n8n? Cloud vs Desktop Setup.\n• A complete tour of the Interface (Canvas, Nodes, Executions).\n• Building your first 'Hello World' workflow.\n• Understanding JSON Data Flow and Conditional Logic (If/Switch nodes).",
+            'description' => "Learn to shape data in n8n, then put it to work. We cover:\n\n• Shaping data — restructuring and transforming items so each node gets exactly the input it needs.\n• Project 2: The Automated Archivist (basic) — sort incoming files and file them away automatically.\n• Project 2: The Automated Archivist (AI) — add an AI step so it classifies and handles messier, real-world input.\n\nThe original full-length 'Basics of n8n' walkthrough is included as a legacy reference.",
             'videos' => [
-                ['id' => 'module-02-v1', 'title' => 'Basics of n8n', 'video_id' => '03bff2b2-1135-4089-b8dc-c095903c87e0', 'duration' => '26:17 Mins'],
+                ['id' => 'module-02-v1', 'title' => 'Concept:Shaping Data in n8n', 'video_id' => '9630a7ee-2b0f-4d9b-9479-d8e4dfdc975f', 'duration' => '03:40 Mins'],
+                ['id' => 'module-02-v2', 'title' => 'Project 2: Automated Archivist - Basic', 'video_id' => 'd2df4aa2-844a-41ff-a36f-82679f119600', 'duration' => '16:49 Mins'],
+                ['id' => 'module-02-v3', 'title' => 'Project 2: Automated Archivist - AI', 'video_id' => '69b3d1b4-9c7e-40cc-b54e-52309ba42d90', 'duration' => '15:27 Mins'],
+                ['id' => 'module-02-v4', 'title' => 'LEGACY: Basics of n8n', 'video_id' => '03bff2b2-1135-4089-b8dc-c095903c87e0', 'duration' => '26:17 Mins'],
                 // Split the topics above into individual videos here →
                 // ['id' => 'module-02-v2', 'title' => 'The Interface Tour', 'video_id' => '<bunny-id>', 'duration' => '08:00'],
             ],
