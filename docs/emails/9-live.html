@@ -1,0 +1,60 @@
+<!-- Event: masterclass_live  |  Subject: 🔴 We're live — join TAAB now
+     Fired manually by `masterclass:go-live`. Extra field: meet_url. -->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+  <title>We're live — join TAAB now</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Syne:wght@700;800&display=swap');
+    :root { color-scheme: only dark; }
+    body { margin:0; padding:0; width:100% !important; background:#0a0a10; }
+    a { color:#c8f064; }
+    @media (max-width:600px) {
+      .card { width:100% !important; border-radius:0 !important; }
+      .px { padding-left:22px !important; padding-right:22px !important; }
+      h1 { font-size:26px !important; line-height:1.15 !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#0a0a10;">
+  <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">The TAAB masterclass has started — your join link is inside.</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#0a0a10;">
+    <tr><td align="center" style="padding:28px 12px;">
+      <!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:0;"><![endif]-->
+      <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#111118;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+        <tr><td style="height:4px;background:#c8f064;line-height:4px;font-size:0;">&nbsp;</td></tr>
+        <tr><td class="px" style="padding:28px 36px 4px;">
+          <span style="font-family:'Syne',Arial,sans-serif;font-size:20px;font-weight:800;color:#c8f064;letter-spacing:-0.01em;">TAAB</span>
+          <span style="font-family:'DM Sans',Arial,sans-serif;font-size:13px;color:#888096;"> by Repetigo</span>
+        </td></tr>
+        <tr><td class="px" style="padding:16px 36px 8px;font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#f0ede8;">
+          <p style="margin:0 0 6px;font-family:'Syne',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#c8f064;">🔴 We're live now</p>
+          <h1 style="margin:0 0 14px;font-family:'Syne',Arial,sans-serif;font-size:30px;font-weight:800;line-height:1.1;color:#ffffff;">We've started, {{ $json.body.first_name }} — join us.</h1>
+          <p style="margin:0 0 8px;font-size:15px;line-height:1.65;color:#cfc9d6;">The TAAB masterclass is live right now. Come straight in — we're just getting into it.</p>
+
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:24px 0 6px;">
+            <tr><td align="center" bgcolor="#c8f064" style="border-radius:10px;">
+              <a href="{{ $json.body.meet_url }}" style="display:inline-block;padding:16px 40px;font-family:'Syne',Arial,sans-serif;font-size:16px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:#0a0a10;text-decoration:none;border-radius:10px;">▶&nbsp; Join the session now</a>
+            </td></tr>
+          </table>
+          <p style="margin:0 0 8px;font-size:12px;line-height:1.5;color:#888096;">Or paste this into your browser: <a href="{{ $json.body.meet_url }}" style="color:#c8f064;">{{ $json.body.meet_url }}</a></p>
+
+          <p style="margin:24px 0 0;font-size:15px;line-height:1.5;color:#f0ede8;">See you inside.<br>— AJ</p>
+        </td></tr>
+        <tr><td class="px" style="padding:24px 36px 32px;border-top:1px solid rgba(255,255,255,0.07);">
+          <p style="margin:0;font-family:'DM Sans',Arial,sans-serif;font-size:12px;line-height:1.6;color:#666;">
+            TAAB by <a href="https://repetigo.co" style="color:#888096;text-decoration:none;">Repetigo</a> · You're receiving this because you registered for the AI Automation Bootcamp.<br>
+            Questions? Reply to this email or reach us at <a href="mailto:hello@repetigo.co" style="color:#888096;">hello@repetigo.co</a>.
+          </p>
+        </td></tr>
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td></tr>
+  </table>
+</body>
+</html>

@@ -217,25 +217,19 @@ See you there! — AJ
 ## 3b. `masterclass_live` — "we're live now" (fired manually by `masterclass:go-live`)
 
 Extra fields: `meet_url`. Sent by hand the moment the session goes live (the
-scheduled cron can't hit a tight window), stamped via `live_sent_at`.
+scheduled cron can't hit a tight window), stamped via `live_sent_at`. The branch
+does **email + WhatsApp**: the Switch's `Live` output fans out to both a
+3-account round-robin email path (Pick Sender → Rotate SMTP → hello@/aj@/taab@,
+same as re-invite) and a Twilio WhatsApp node.
 
-**Email** — Subject: `🔴 We're live — join TAAB now`
-```
-Hi {{ $json.body.first_name }},
+**Email** — branded HTML in [`emails/9-live.html`](emails/9-live.html), Subject:
+`🔴 We're live — join TAAB now` (CTA button → `{{ $json.body.meet_url }}`).
 
-We've started — {{SESSION}} is live now.
-
-▶  Join here: {{ $json.body.meet_url }}
-
-Come as you are, we're just getting into it. See you inside.
-
-— AJ
-```
-
-**WhatsApp**
-```
-🔴 We're LIVE — TAAB has started! Join now: {{ $json.body.meet_url }} — AJ
-```
+**WhatsApp** — Twilio approved template (its ContentSid is set on the `WA - Live`
+node in the workflow). ContentVariables mirror `starting_soon`:
+`{{1}}` = first name, `{{2}}` = the Meet **code** (`meet_url` split on `/`, last
+segment). ⚠️ If your approved template expects the **full** Meet URL in `{{2}}`,
+drop the `.split('/').pop()` from the node's ContentVariables.
 
 ---
 
