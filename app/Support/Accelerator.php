@@ -120,6 +120,14 @@ class Accelerator
         return $value ? Carbon::parse($value) : null;
     }
 
+    /** When registration/enrolment closes (cart close). Drives the deadline copy. */
+    public static function cartClosesAt(): ?Carbon
+    {
+        $value = config('accelerator.cart_closes_at');
+
+        return $value ? Carbon::parse($value, 'Africa/Lagos') : null;
+    }
+
     /** Published testimonials only — never fabricated, empty by default. */
     public static function publishedTestimonials(): Collection
     {

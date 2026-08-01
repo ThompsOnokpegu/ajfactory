@@ -42,6 +42,10 @@
         $instCount   = Accelerator::installmentCount();
         $startsAt    = Accelerator::cohortStartsAt();
         $startLabel  = $startsAt ? $startsAt->format('l jS F') : '{{TODO: cohort start date}}';
+        $closesAt    = Accelerator::cartClosesAt();
+        $closesLabel = $closesAt ? $closesAt->format('l jS F') : null;
+        // Registration still open? (cohort has started but the cart hasn't closed)
+        $regOpen     = $closesAt ? \Illuminate\Support\Carbon::now('Africa/Lagos')->lt($closesAt) : true;
         $primaryCta  = $soldOut ? '/builders' : '/checkout?plan=full';
         $primaryText = $soldOut ? 'Join The Waitlist' : 'Join Cohort 2 - ₦'.number_format($fullPrice);
     @endphp
@@ -92,16 +96,24 @@
 
                 <!-- Trust line -->
                 <div class="mt-8 text-xs font-mono text-zinc-500 uppercase tracking-widest flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
-                    <span>{{ $startLabel }}</span>
-                    <span class="text-zinc-700">·</span>
                     @if($soldOut)
                         <span class="text-amber-400">Cohort full - join the waitlist</span>
                     @else
+                        @if($regOpen && $closesLabel)
+                            <span class="text-amber-400 font-bold">⏳ Enrolment closes {{ $closesLabel }}</span>
+                            <span class="text-zinc-700">·</span>
+                        @endif
                         <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
+                        <span class="text-zinc-700">·</span>
+                        <span>Installments available</span>
                     @endif
-                    <span class="text-zinc-700">·</span>
-                    <span>Installments available</span>
                 </div>
+
+                @if(!$soldOut && $regOpen)
+                    <p class="mt-4 text-sm text-zinc-400 max-w-xl mx-auto">
+                        Cohort 2 has already started — but it's <span class="text-white font-semibold">self-paced</span>, so you can still join and catch up. Doors close <span class="text-amber-400 font-semibold">{{ $closesLabel }}</span>.
+                    </p>
+                @endif
 
                 <div class="mt-16 flex flex-wrap justify-center items-center gap-5 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
                     <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">N8N</span>
@@ -295,6 +307,9 @@
                         <p class="text-amber-400 font-bold">This cohort is full. Join the waitlist for the next one.</p>
                     @else
                         <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.@if($earlybird) <span class="text-cyan-400">Early-bird pricing is live.</span>@endif</p>
+                        @if($regOpen && $closesLabel)
+                            <p class="mt-2 text-sm font-bold text-amber-400">⏳ Enrolment closes {{ $closesLabel }} — cohort is already live and self-paced, so you can still catch up.</p>
+                        @endif
                     @endif
                 </div>
 
@@ -397,11 +412,13 @@
                     Build nine real automations, own your stack, and finish — backed by the completion guarantee. Finish, or we finish with you.
                 </p>
                 <div class="mb-10 text-xs font-mono text-zinc-500 uppercase tracking-widest flex flex-wrap justify-center items-center gap-x-3 gap-y-1">
-                    <span>{{ $startLabel }}</span>
-                    <span class="text-zinc-700">·</span>
                     @if($soldOut)
                         <span class="text-amber-400">Waitlist open</span>
                     @else
+                        @if($regOpen && $closesLabel)
+                            <span class="text-amber-400 font-bold">⏳ Closes {{ $closesLabel }}</span>
+                            <span class="text-zinc-700">·</span>
+                        @endif
                         <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
                     @endif
                 </div>
