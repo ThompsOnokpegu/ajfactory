@@ -1,6 +1,13 @@
 <?php
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+
+// Pin the clock inside the registration window so /taab shows the registration
+// form (not the waitlist card) regardless of when the suite runs. Without this,
+// these tests break the moment the calendar passes registration_closes.
+beforeEach(fn () => Carbon::setTestNow('2026-07-20 10:00:00'));
+afterEach(fn () => Carbon::setTestNow());
 
 function seedInvite(string $email, string $token, ?string $name = null): void
 {
