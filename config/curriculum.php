@@ -202,7 +202,7 @@ return [
 
         /*
         |----------------------------------------------------------------------
-        | Upcoming live sessions — every FRIDAY from 7 Aug 2026 (6 total).
+        | Upcoming live sessions — every SATURDAY 9AM WAT from 8 Aug 2026 (6 total).
         |----------------------------------------------------------------------
         | Announce the attendance_code at the END of each call. Set a FRESH code
         | per session: uncomment its line and fill it just before you go live
@@ -212,10 +212,10 @@ return [
         [
             'id' => 'live-05',
             'title' => 'Live Session #5: Build & Q&A',
-            'release_at' => '2026-08-07 00:00:00',
+            'release_at' => '2026-08-08 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            'attendance_code' => 'PLAYBOOK', // ← the code you announce live on Fri 7 Aug — swap before the call
+            'attendance_code' => 'PLAYBOOK', // ← the code you announce live on Sat 8 Aug — swap before the call
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-05-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
@@ -224,10 +224,10 @@ return [
         [
             'id' => 'live-06',
             'title' => 'Live Session #6: Build & Q&A',
-            'release_at' => '2026-08-14 00:00:00',
+            'release_at' => '2026-08-15 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Fri 14 Aug
+            // 'attendance_code' => '', // ← set before Sat 15 Aug
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-06-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
@@ -236,10 +236,10 @@ return [
         [
             'id' => 'live-07',
             'title' => 'Live Session #7: Build & Q&A',
-            'release_at' => '2026-08-21 00:00:00',
+            'release_at' => '2026-08-22 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Fri 21 Aug
+            // 'attendance_code' => '', // ← set before Sat 22 Aug
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-07-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
@@ -248,10 +248,10 @@ return [
         [
             'id' => 'live-08',
             'title' => 'Live Session #8: Build & Q&A',
-            'release_at' => '2026-08-28 00:00:00',
+            'release_at' => '2026-08-29 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Fri 28 Aug
+            // 'attendance_code' => '', // ← set before Sat 29 Aug
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-08-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
@@ -260,10 +260,10 @@ return [
         [
             'id' => 'live-09',
             'title' => 'Live Session #9: Build & Q&A',
-            'release_at' => '2026-09-04 00:00:00',
+            'release_at' => '2026-09-05 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Fri 4 Sep
+            // 'attendance_code' => '', // ← set before Sat 5 Sep
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-09-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
@@ -272,10 +272,10 @@ return [
         [
             'id' => 'live-10',
             'title' => 'Live Session #10: Build & Q&A',
-            'release_at' => '2026-09-11 00:00:00',
+            'release_at' => '2026-09-12 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Fri 11 Sep
+            // 'attendance_code' => '', // ← set before Sat 12 Sep
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-10-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
