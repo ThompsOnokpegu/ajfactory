@@ -17,6 +17,7 @@ class MasterclassRegistration extends Model
         'status',
         'reminder_sent_at',
         'dayof_sent_at',
+        'live_sent_at',
         'followup_sent_at',
         'attended',
         'attended_at',
@@ -25,6 +26,7 @@ class MasterclassRegistration extends Model
     protected $casts = [
         'reminder_sent_at' => 'datetime',
         'dayof_sent_at' => 'datetime',
+        'live_sent_at' => 'datetime',
         'followup_sent_at' => 'datetime',
         'attended' => 'boolean',
         'attended_at' => 'datetime',

@@ -40,6 +40,7 @@ Copy these verbatim — **note `followup` and `signup` have no underscore, while
 masterclass_registration
 masterclass_reminder
 masterclass_starting_soon
+masterclass_live
 masterclass_followup
 masterclass_waitlist
 masterclass_reinvite
@@ -209,6 +210,31 @@ Grab water, open a laptop, and come ready with your questions. See you shortly.
 We're live soon ({{SESSION}}, WAT) ⏰
 ▶ Join: {{ $json.body.meet_url }}
 See you there! — AJ
+```
+
+---
+
+## 3b. `masterclass_live` — "we're live now" (fired manually by `masterclass:go-live`)
+
+Extra fields: `meet_url`. Sent by hand the moment the session goes live (the
+scheduled cron can't hit a tight window), stamped via `live_sent_at`.
+
+**Email** — Subject: `🔴 We're live — join TAAB now`
+```
+Hi {{ $json.body.first_name }},
+
+We've started — {{SESSION}} is live now.
+
+▶  Join here: {{ $json.body.meet_url }}
+
+Come as you are, we're just getting into it. See you inside.
+
+— AJ
+```
+
+**WhatsApp**
+```
+🔴 We're LIVE — TAAB has started! Join now: {{ $json.body.meet_url }} — AJ
 ```
 
 ---
