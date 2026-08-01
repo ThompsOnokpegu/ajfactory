@@ -22,6 +22,12 @@ new class extends Component {
     public float $amountTotal = 0;     // total cost of the chosen plan
     public float $balanceDue = 0;      // outstanding after today's charge
 
+    // Coupon (validated server-side against config — never trusted from the client)
+    public string $couponCode = '';    // bound to the coupon input
+    public ?array $coupon = null;      // the applied coupon config, or null
+    public float $discount = 0;        // discount applied to the total
+    public string $couponMessage = '';
+
     // Cohort state
     public bool $soldOut = false;
     public bool $registrationOpen = true;
@@ -63,11 +69,48 @@ new class extends Component {
 
     public function updatedPlan()
     {
+        // Drop a coupon that doesn't apply to the newly-selected plan.
+        if ($this->coupon && ! Accelerator::couponAppliesToPlan($this->coupon, $this->plan)) {
+            $this->couponMessage = ($this->coupon['label'] ?? 'That coupon') . " isn't valid on this plan.";
+            $this->coupon = null;
+            $this->couponCode = '';
+        }
         $this->recalculate();
     }
 
     public function updatedCurrency()
     {
+        $this->recalculate();
+    }
+
+    public function applyCoupon(): void
+    {
+        $coupon = Accelerator::coupon($this->couponCode);
+
+        if (! $coupon) {
+            $this->coupon = null;
+            $this->couponMessage = "That code isn't valid or has expired.";
+            $this->recalculate();
+            return;
+        }
+
+        if (! Accelerator::couponAppliesToPlan($coupon, $this->plan)) {
+            $this->coupon = null;
+            $this->couponMessage = 'This code applies to a different plan — switch plans to use it.';
+            $this->recalculate();
+            return;
+        }
+
+        $this->coupon = $coupon;
+        $this->couponMessage = ($coupon['label'] ?? 'Coupon') . ' applied.';
+        $this->recalculate();
+    }
+
+    public function removeCoupon(): void
+    {
+        $this->coupon = null;
+        $this->couponCode = '';
+        $this->couponMessage = '';
         $this->recalculate();
     }
 
@@ -91,14 +134,27 @@ new class extends Component {
         // Always recompute cohort state so prices never go stale mid-session
         $this->refreshCohortState();
 
+        $count = Accelerator::installmentCount();
+        $baseTotal = $this->plan === 'installment'
+            ? Accelerator::installmentEach($this->currency) * $count
+            : Accelerator::fullPrice($this->currency);
+
+        // Coupon discount — revalidated on every recompute (including the final
+        // price-lock before charging), so the client can never inject a price.
+        $this->discount = 0;
+        if ($this->coupon && Accelerator::couponAppliesToPlan($this->coupon, $this->plan)) {
+            $this->discount = Accelerator::couponDiscount($this->coupon, $baseTotal, $this->currency);
+        }
+        $total = max(0, round($baseTotal - $this->discount, 2));
+
         if ($this->plan === 'installment') {
-            $each = Accelerator::installmentEach($this->currency);
+            $each = round($total / $count, 2);
             $this->amountToday = $each;
-            $this->amountTotal = $each * Accelerator::installmentCount();
-            $this->balanceDue  = $this->amountTotal - $each;
+            $this->amountTotal = $total;
+            $this->balanceDue  = round($total - $each, 2);
         } else {
-            $this->amountToday = Accelerator::fullPrice($this->currency);
-            $this->amountTotal = $this->amountToday;
+            $this->amountToday = $total;
+            $this->amountTotal = $total;
             $this->balanceDue  = 0;
         }
     }
@@ -141,6 +197,8 @@ new class extends Component {
                 'balance_due'           => $this->balanceDue,
                 'second_payment_status' => $this->plan === 'installment' ? 'pending' : 'none',
                 'currency'              => $this->currency,
+                'coupon_code'           => $this->coupon['code'] ?? null,
+                'discount_amount'       => $this->discount ?: null,
                 'status'                => 'pending',
             ]);
 
@@ -331,6 +389,25 @@ new class extends Component {
                                 <span class="text-zinc-500">Total</span>
                                 <span class="text-white font-bold">{{ $symbol }}{{ number_format($amountTotal) }}</span>
                             </div>
+                        @endif
+                    </div>
+
+                    <!-- Coupon -->
+                    <div class="pt-6 border-t border-zinc-900">
+                        @if($coupon)
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-green-400 font-bold">{{ $coupon['code'] }} applied <span class="text-zinc-500 font-normal">(−{{ $symbol }}{{ number_format($discount) }})</span></span>
+                                <button type="button" wire:click="removeCoupon" class="text-[11px] font-bold text-zinc-500 hover:text-red-400 uppercase tracking-widest">Remove</button>
+                            </div>
+                        @else
+                            <div class="flex gap-2">
+                                <input type="text" wire:model="couponCode" wire:keydown.enter.prevent="applyCoupon" placeholder="Coupon code"
+                                    class="flex-1 bg-zinc-900 border border-zinc-800 text-white px-3 py-2.5 rounded-lg text-sm focus:border-cyan-500 focus:ring-0 placeholder:text-zinc-600 uppercase tracking-widest">
+                                <button type="button" wire:click="applyCoupon" class="shrink-0 px-4 py-2.5 rounded-lg border border-zinc-700 text-zinc-300 text-[11px] font-black uppercase tracking-widest hover:border-cyan-500 hover:text-cyan-400 transition">Apply</button>
+                            </div>
+                        @endif
+                        @if($couponMessage)
+                            <p class="mt-2 text-[11px] {{ $coupon ? 'text-green-400' : 'text-amber-400' }}">{{ $couponMessage }}</p>
                         @endif
                     </div>
 

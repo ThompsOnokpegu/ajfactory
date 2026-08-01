@@ -31,6 +31,8 @@ class Enrollment extends Model
         'installment_reminder_sent_at',
         'access_suspended',
         'currency',
+        'coupon_code',
+        'discount_amount',
         'status',
         'paystack_payload',
         'paid_at',

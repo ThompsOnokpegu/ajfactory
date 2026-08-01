@@ -105,6 +105,23 @@ the rate moves materially.
 'installment_grace_hours' => 24,  // suspend access this long after the due date
 ```
 
+### Checkout coupons
+`accelerator.php` → `coupons`, keyed by the code the buyer types (case-insensitive). The
+discount is computed **server-side** from this config and re-validated at the final
+price-lock, so a discounted price can never be injected from the client. Each entry:
+```php
+'TAAB25' => [
+    'type'       => 'percent',              // 'percent' | 'fixed'
+    'value'      => 25,                       // percent: a number; fixed: ['NGN'=>10000,'USD'=>8]
+    'plans'      => ['full', 'installment'],  // plans it applies to
+    'expires_at' => '2026-08-03 23:59:59',    // optional (Africa/Lagos)
+    'label'      => 'TAAB masterclass — 25% off',
+],
+```
+The discount applies to the plan **total** at the current price (early-bird included). The
+applied code + discount are recorded on the enrollment (`coupon_code`, `discount_amount`); the
+charged `amount` is already the discounted figure the webhook verifies.
+
 ### Live-session attendance & completion guarantee
 - `accelerator.php` → `guarantee_min_live_sessions` — how many weekly live sessions a student
   must attend (on top of finishing all module checkpoints) to satisfy the completion

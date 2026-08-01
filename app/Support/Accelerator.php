@@ -128,6 +128,58 @@ class Accelerator
         return $value ? Carbon::parse($value, 'Africa/Lagos') : null;
     }
 
+    /**
+     * Look up a valid coupon by code (case-insensitive), or null. Enforces expiry
+     * here so the checkout never has to. Returns the config entry + its 'code'.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function coupon(?string $code): ?array
+    {
+        $code = strtoupper(trim((string) $code));
+        if ($code === '') {
+            return null;
+        }
+
+        $coupons = array_change_key_case(config('accelerator.coupons', []), CASE_UPPER);
+        $c = $coupons[$code] ?? null;
+        if (! $c) {
+            return null;
+        }
+
+        if (! empty($c['expires_at']) && Carbon::now('Africa/Lagos')->greaterThan(Carbon::parse($c['expires_at'], 'Africa/Lagos'))) {
+            return null;
+        }
+
+        return $c + ['code' => $code];
+    }
+
+    /** Whether a coupon applies to the given plan (defaults to all plans). */
+    public static function couponAppliesToPlan(array $coupon, string $plan): bool
+    {
+        return in_array($plan, $coupon['plans'] ?? ['full', 'installment'], true);
+    }
+
+    /**
+     * Naira/USD discount a coupon gives on a base amount. Never exceeds the amount
+     * (no negative prices). Fixed coupons are per-currency; a currency with no
+     * fixed value gets no discount.
+     */
+    public static function couponDiscount(array $coupon, float $amount, string $currency = 'NGN'): float
+    {
+        if (($coupon['type'] ?? '') === 'percent') {
+            $pct = max(0.0, min(100.0, (float) ($coupon['value'] ?? 0)));
+
+            return round($amount * $pct / 100, 2);
+        }
+
+        // fixed: value is a per-currency map
+        $value = $coupon['value'] ?? [];
+        $fixed = is_array($value) ? (float) ($value[$currency] ?? 0) : (float) $value;
+
+        return min(max(0.0, $fixed), $amount);
+    }
+
     /** Published testimonials only — never fabricated, empty by default. */
     public static function publishedTestimonials(): Collection
     {

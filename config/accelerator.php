@@ -30,6 +30,29 @@ return [
     // Friday sessions. Surfaced on the dashboard progress card.
     'guarantee_min_live_sessions' => 6,
 
+    /*
+    | Checkout coupons (server-side only — the discount is computed from here,
+    | never trusted from the client). Keyed by the code the buyer types
+    | (case-insensitive). Each:
+    |   'type'       => 'percent' | 'fixed'
+    |   'value'      => percent: a number (e.g. 25 = 25% off)
+    |                   fixed:   ['NGN' => 10000, 'USD' => 8]  (per-currency)
+    |   'plans'      => which plans it applies to: ['full','installment']
+    |   'expires_at' => optional Africa/Lagos cutoff; omit for no expiry
+    |   'label'      => shown on the checkout when applied
+    | Discount applies to the plan TOTAL at the current price (early-bird included).
+    | {{TODO: set the TAAB masterclass code + discount, then uncomment}}
+    */
+    'coupons' => [
+        'TAAB59' => [
+            'type' => 'fixed',
+            'value' => ['NGN' => 20000, 'USD' => 14], // ₦20,000 ≈ $14 at ~₦1,400/$
+            'plans' => ['full', 'installment'],
+            'expires_at' => '2026-08-03 23:59:59',     // cart close (Mon 3 Aug, Africa/Lagos)
+            'label' => 'TAAB masterclass discount',
+        ],
+    ],
+
     // --- Scarcity / cohort ---
     'cohort_number'     => 2,     // stamped on new enrollments; >= 2 enables ship-to-unlock
     'cohort_cap'        => 25,
