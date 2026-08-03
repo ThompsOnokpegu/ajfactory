@@ -77,6 +77,13 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
         $r?->update(['is_published' => ! $r->is_published]);
     }
 
+    public function togglePin(int $id): void
+    {
+        abort_unless(auth()->user()?->is_admin, 403);
+        $r = Resource::find($id);
+        $r?->update(['is_pinned' => ! $r->is_pinned]);
+    }
+
     public function delete(int $id): void
     {
         abort_unless(auth()->user()?->is_admin, 403);
@@ -96,7 +103,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
 
     public function with(): array
     {
-        return ['resources' => Resource::orderBy('sort_order')->orderByDesc('id')->get()];
+        return ['resources' => Resource::orderByDesc('is_pinned')->orderBy('sort_order')->orderByDesc('id')->get()];
     }
 }; ?>
 
@@ -169,6 +176,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
                 <div class="min-w-0 flex-1">
                     <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-sm font-bold text-white truncate">{{ $r->title }}</span>
+                        @if($r->is_pinned)<span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400">📌 Pinned</span>@endif
                         @if($r->category)<span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-400">{{ $r->category }}</span>@endif
                         @unless($r->is_published)<span class="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded bg-amber-500/10 text-amber-400">Hidden</span>@endunless
                     </div>
@@ -179,6 +187,9 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
                     <div class="text-[9px] uppercase tracking-widest text-zinc-600">clicks</div>
                 </div>
                 <div class="flex items-center gap-1 shrink-0">
+                    <button wire:click="togglePin({{ $r->id }})" class="p-2 rounded-md transition {{ $r->is_pinned ? 'text-cyan-400 bg-cyan-500/10' : 'text-zinc-500 hover:text-cyan-400 hover:bg-zinc-800' }}" title="{{ $r->is_pinned ? 'Unpin from top' : 'Pin to top' }}">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14M12 20V8m0 0l-4 4m4-4l4 4"/></svg>
+                    </button>
                     <button wire:click="togglePublish({{ $r->id }})" class="p-2 rounded-md text-zinc-500 hover:text-white hover:bg-zinc-800 transition" title="{{ $r->is_published ? 'Unpublish' : 'Publish' }}">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                     </button>

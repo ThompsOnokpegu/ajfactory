@@ -8,19 +8,21 @@ use Illuminate\Database\Eloquent\Model;
 class Resource extends Model
 {
     protected $fillable = [
-        'title', 'description', 'category', 'url', 'price', 'price_usd', 'emoji', 'is_published', 'sort_order', 'clicks',
+        'title', 'description', 'category', 'url', 'price', 'price_usd', 'emoji', 'is_published', 'is_pinned', 'sort_order', 'clicks',
     ];
 
     protected $casts = [
         'is_published' => 'boolean',
+        'is_pinned' => 'boolean',
         'price' => 'decimal:2',
         'price_usd' => 'decimal:2',
     ];
 
-    /** Published resources, in the owner's chosen order. */
+    /** Published resources — pinned first, then the owner's chosen order. */
     public function scopePublished(Builder $query): Builder
     {
         return $query->where('is_published', true)
+            ->orderByDesc('is_pinned')
             ->orderBy('sort_order')
             ->orderByDesc('id');
     }
