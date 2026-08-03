@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Middleware\CheckEnrollment;
 use App\Http\Controllers\VaultController;
+use App\Http\Controllers\ResourceController;
 use App\Http\Controllers\TaabController;
 use App\Http\Controllers\TaabLeadController;
 use App\Http\Controllers\MasterclassController;
@@ -59,15 +60,23 @@ Route::get('/checkout', function () {
     return view('checkout');
 })->name('checkout');
 
-// Free resources hub (shared in comments) + click-through redirect
+// Resources hub (free + paid) + click-through redirect
 Route::get('/free', function () {
     return view('resources', ['resources' => \App\Models\Resource::published()->get()]);
 })->name('free');
 Route::get('/r/{resource}', function (\App\Models\Resource $resource) {
     abort_unless($resource->is_published, 404);
+    // A paid resource's url is gated — never redirect to it; send them to checkout.
+    if ($resource->isPaid()) {
+        return redirect()->route('resource.buy', $resource);
+    }
     $resource->increment('clicks');
     return redirect()->away($resource->url);
 })->name('resources.go');
+
+// Paid resources — email-only, one-off purchase → gated access page.
+Route::get('/resources/{resource}/buy', [ResourceController::class, 'buy'])->name('resource.buy');
+Route::get('/resources/access/{purchase}', [ResourceController::class, 'access'])->name('resources.access');
 
 // TAAB — The AI Automation Bootcamp (hub + masterclass registration)
 // Controller (not Route::view) so a re-invite link /taab?i=<token> can pre-fill.

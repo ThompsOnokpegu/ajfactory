@@ -29,6 +29,13 @@ class PaystackWebhookController extends Controller
             $data = $payload['data'];
             $reference = $data['reference'];
 
+            // Resource-store purchases (RES_*) are handled separately — the
+            // enrollment/installment path below is untouched.
+            if (str_starts_with($reference, 'RES_')) {
+                $this->handleResourcePurchase($reference, $secretKey, $data);
+                return response()->json(['status' => 'success']);
+            }
+
             $enrollment = Enrollment::where('payment_reference', $reference)->first();
 
             if ($enrollment) {
@@ -124,6 +131,38 @@ class PaystackWebhookController extends Controller
         } else {
             Log::error("Installment Amount Mismatch for {$reference}: paid {$paidAmount}, expected {$enrollment->balance_due}");
         }
+    }
+
+    /**
+     * A paid-resource purchase (RES_*): verify server-side, mark paid, deliver.
+     * The access page reveals the link once status=paid; the n8n email is a bonus.
+     */
+    private function handleResourcePurchase(string $reference, string $secretKey, array $data): void
+    {
+        $purchase = \App\Models\ResourcePurchase::where('payment_reference', $reference)
+            ->where('status', '!=', 'paid')
+            ->first();
+
+        if (! $purchase) {
+            return;
+        }
+
+        $verify = Http::withToken($secretKey)->get("https://api.paystack.co/transaction/verify/{$reference}");
+
+        if (! $verify->successful() || $verify->json('data.status') !== 'success') {
+            return;
+        }
+
+        $paidAmount = $verify->json('data.amount') / 100;
+
+        if ((float) $paidAmount !== (float) $purchase->amount) {
+            Log::error("Resource purchase amount mismatch for {$reference}: paid {$paidAmount}, expected {$purchase->amount}");
+            $purchase->update(['status' => 'amount_mismatch']);
+            return;
+        }
+
+        $purchase->update(['status' => 'paid', 'paid_at' => now()]);
+        \App\Support\ResourceDelivery::deliver($purchase->fresh());
     }
 
     private function triggerInstallmentCompleted($enrollment, $data): void

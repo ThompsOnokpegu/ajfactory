@@ -13,6 +13,8 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
     public string $emoji = '';
     public int $sortOrder = 0;
     public bool $isPublished = true;
+    public string $price = '';       // NGN; blank = free
+    public string $priceUsd = '';    // USD; blank = not sold in USD
 
     public function mount(): void
     {
@@ -28,6 +30,8 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
             'category' => 'nullable|string|max:80',
             'emoji' => 'nullable|string|max:16',
             'sortOrder' => 'integer',
+            'price' => 'nullable|numeric|min:0',
+            'priceUsd' => 'nullable|numeric|min:0',
         ];
     }
 
@@ -42,6 +46,8 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
             'category' => $this->category ?: null,
             'url' => $this->url,
             'emoji' => $this->emoji ?: null,
+            'price' => $this->price !== '' ? $this->price : null,
+            'price_usd' => $this->priceUsd !== '' ? $this->priceUsd : null,
             'sort_order' => $this->sortOrder,
             'is_published' => $this->isPublished,
         ]);
@@ -60,6 +66,8 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
         $this->emoji = (string) $r->emoji;
         $this->sortOrder = $r->sort_order;
         $this->isPublished = $r->is_published;
+        $this->price = $r->price !== null ? (string) $r->price : '';
+        $this->priceUsd = $r->price_usd !== null ? (string) $r->price_usd : '';
     }
 
     public function togglePublish(int $id): void
@@ -80,7 +88,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
 
     public function resetForm(): void
     {
-        $this->reset(['editingId', 'title', 'description', 'category', 'url', 'emoji']);
+        $this->reset(['editingId', 'title', 'description', 'category', 'url', 'emoji', 'price', 'priceUsd']);
         $this->sortOrder = 0;
         $this->isPublished = true;
         $this->resetValidation();
@@ -94,8 +102,8 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
 
 <div class="max-w-5xl mx-auto space-y-6">
     <div>
-        <h2 class="text-xl font-black tracking-tighter text-white">Free resources</h2>
-        <p class="text-[11px] text-zinc-500 mt-0.5">Manage what shows on <a href="/free" target="_blank" class="text-cyan-500 hover:underline">/free</a> — each is a link you paste (Drive, GitHub, Notion…).</p>
+        <h2 class="text-xl font-black tracking-tighter text-white">Resources</h2>
+        <p class="text-[11px] text-zinc-500 mt-0.5">Manage what shows on <a href="/free" target="_blank" class="text-cyan-500 hover:underline">/free</a> — paste a link (Drive, GitHub, Notion…). Set a <strong class="text-zinc-300">price</strong> to make it paid: the link is then gated behind a one-off checkout and only revealed after payment.</p>
     </div>
 
     <!-- Add / edit form -->
@@ -115,6 +123,16 @@ new #[Layout('components.layouts.admin', ['title' => 'Resources'])] class extend
             <div class="sm:col-span-2">
                 <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Description</label>
                 <textarea wire:model="description" rows="2" placeholder="One line on what it is / does." class="mt-1 w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-lg text-sm focus:border-cyan-500 focus:ring-0"></textarea>
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Price ₦ <span class="text-zinc-700 normal-case tracking-normal">— blank = free</span></label>
+                <input wire:model="price" type="number" step="1" min="0" placeholder="0 (free)" class="mt-1 w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-lg text-sm focus:border-cyan-500 focus:ring-0">
+                @error('price') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
+            </div>
+            <div>
+                <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Price $ <span class="text-zinc-700 normal-case tracking-normal">— optional</span></label>
+                <input wire:model="priceUsd" type="number" step="1" min="0" placeholder="—" class="mt-1 w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-lg text-sm focus:border-cyan-500 focus:ring-0">
+                @error('priceUsd') <span class="text-[10px] text-red-500 uppercase font-bold">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Category</label>

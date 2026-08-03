@@ -19,9 +19,13 @@ Webhook (POST, =N8N_STUDENT_WEBHOOK_URL)
        └─ masterclass_reinvite        → Email + WhatsApp   ("registration open" → register)
 ```
 
-> The same webhook also receives `taab_lead` (lead-magnet tools) and
-> `student_signup`. Add those as extra Switch branches if you want — they're out of
-> scope here.
+> The same webhook also receives `taab_lead` (lead-magnet tools),
+> `student_signup`, and `resource_purchased` (a paid-resource sale). Add those as
+> extra Switch branches. **`resource_purchased`** emails the buyer their unlocked
+> link — fields: `first_name`, `email`, `resource_title`, `resource_url` (the
+> thing they bought), `access_url` (their gated access page). Delivery is
+> best-effort: the access page shows the link too, so a dropped email never locks
+> them out.
 
 ---
 

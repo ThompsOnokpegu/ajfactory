@@ -333,7 +333,7 @@ before committing it.
 | **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module |
 | **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |
 | **Leads & Waitlist** | Every lead with source + scorecard tier/score; CSV export |
-| **Free Resources** | CRUD for `/free` — add a link, publish/unpublish, see click counts |
+| **Resources** | CRUD for `/free` — add a link, publish/unpublish, see click counts. Set a **price** to sell it: the link is gated behind a one-off checkout and only revealed after payment (needs a `resource_purchased` n8n branch to email the buyer). Optional USD price for Flutterwave. |
 
 Grant admin rights with `php artisan user:admin you@example.com` (add `--revoke` to remove).
 The user must already exist.

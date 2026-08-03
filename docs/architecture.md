@@ -56,6 +56,15 @@ a `pending` row paid by transfer, or `manualEnrol()` for someone who never check
 `usesShipToUnlock()` returns `cohort >= 2` — Cohort 1 stays fully open so existing
 students are never retroactively locked out of modules they already had.
 
+### `Resource` / `ResourcePurchase`
+`Resource` powers `/free` — a link the owner pastes (managed in Admin → Resources). A
+`price` makes it **paid**: its `url` is gated, and `/r/{id}` redirects to checkout instead of
+leaking it. A paid buy is email-only + one-off — `ResourcePurchase` records it (RES_* payment
+reference), the Paystack/Flutterwave webhook verifies it server-side (isolated from the
+enrollment path by the `RES_` prefix), marks it `paid`, and fires the `resource_purchased` n8n
+email. The buyer's link lives at a token-gated access page (`resources.access`, bound by a
+random `access_token`, not the id) that reveals the `url` only once `status = paid`.
+
 ### `Checkpoint`
 Proof-of-work submitted per module. `status` gates the next module: a student must have an
 **approved** checkpoint for module *N* before *N+1* opens. Admin reviews these at

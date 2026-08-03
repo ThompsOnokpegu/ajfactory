@@ -37,6 +37,13 @@ class FlutterwaveWebhookController extends Controller
             $flwId = $data['id'];
 
             $secretKey = config('services.flutterwave.secret_key', env('FLW_SECRET_KEY'));
+
+            // Resource-store purchases (RES_*) — separate from enrollments.
+            if (str_starts_with($reference, 'RES_')) {
+                $this->handleResourcePurchase($reference, $flwId, $secretKey);
+                return response()->json(['status' => 'success']);
+            }
+
             $enrollment = Enrollment::where('payment_reference', $reference)->first();
 
             if ($enrollment) {
@@ -93,6 +100,34 @@ class FlutterwaveWebhookController extends Controller
         }
 
         return response()->json(['status' => 'success']);
+    }
+
+    /** A paid-resource purchase (RES_*, USD path): verify, mark paid, deliver. */
+    private function handleResourcePurchase(string $reference, $flwId, string $secretKey): void
+    {
+        $purchase = \App\Models\ResourcePurchase::where('payment_reference', $reference)
+            ->where('status', '!=', 'paid')
+            ->first();
+
+        if (! $purchase) {
+            return;
+        }
+
+        $verify = Http::withToken($secretKey)->get("https://api.flutterwave.com/v3/transactions/{$flwId}/verify");
+
+        if (! $verify->successful() || $verify->json('data.status') !== 'successful') {
+            return;
+        }
+
+        $v = $verify->json('data');
+
+        if (($v['currency'] ?? null) === $purchase->currency && (float) ($v['amount'] ?? 0) >= (float) $purchase->amount) {
+            $purchase->update(['status' => 'paid', 'paid_at' => now()]);
+            \App\Support\ResourceDelivery::deliver($purchase->fresh());
+        } else {
+            Log::error("Flutterwave resource amount/currency mismatch: {$reference}");
+            $purchase->update(['status' => 'amount_mismatch']);
+        }
     }
 
     /**

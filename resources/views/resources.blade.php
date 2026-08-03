@@ -39,7 +39,8 @@
         <!-- Resources -->
         <div class="space-y-3">
             @forelse($resources as $resource)
-                <a href="{{ route('resources.go', $resource) }}" target="_blank" rel="noopener"
+                @php $paid = $resource->isPaid(); @endphp
+                <a href="{{ $paid ? route('resource.buy', $resource) : route('resources.go', $resource) }}" @unless($paid) target="_blank" rel="noopener" @endunless
                    class="card-hover group block w-full bg-zinc-900/70 border border-zinc-800 p-4 sm:p-5 rounded-2xl transition-all duration-300 hover:-translate-y-0.5">
                     <div class="flex items-start gap-4">
                         <div class="flex-shrink-0 h-11 w-11 rounded-xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-xl">
@@ -54,7 +55,13 @@
                                 <p class="text-sm text-zinc-400 mt-1 leading-relaxed">{{ $resource->description }}</p>
                             @endif
                         </div>
-                        <div class="flex-shrink-0 self-center text-cyan-500 font-black text-sm tracking-tight opacity-70 group-hover:opacity-100 transition">Get it →</div>
+                        <div class="flex-shrink-0 self-center text-cyan-500 font-black text-sm tracking-tight opacity-70 group-hover:opacity-100 transition whitespace-nowrap">
+                            @if($paid)
+                                ₦{{ number_format($resource->price) }} →
+                            @else
+                                Get it →
+                            @endif
+                        </div>
                     </div>
                 </a>
             @empty
