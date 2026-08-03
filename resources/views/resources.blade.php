@@ -50,16 +50,18 @@
                             @if($resource->category)
                                 <span class="inline-block text-[9px] font-mono uppercase tracking-widest text-cyan-400/80 mb-1">{{ $resource->category }}</span>
                             @endif
-                            <div class="font-bold text-white tracking-wide group-hover:text-cyan-400 transition-colors leading-snug">{{ $resource->title }}</div>
+                            <div class="flex items-start justify-between gap-3">
+                                <div class="min-w-0 font-bold text-white tracking-wide group-hover:text-cyan-400 transition-colors leading-snug">{{ $resource->title }}</div>
+                                <div class="flex-shrink-0 pt-0.5 text-cyan-500 font-black text-sm tracking-tight opacity-80 group-hover:opacity-100 transition whitespace-nowrap">
+                                    @if($paid)
+                                        ₦{{ number_format($resource->price) }} →
+                                    @else
+                                        Get it →
+                                    @endif
+                                </div>
+                            </div>
                             @if($resource->description)
                                 <p class="text-sm text-zinc-400 mt-1 leading-relaxed">{{ $resource->description }}</p>
-                            @endif
-                        </div>
-                        <div class="flex-shrink-0 self-center text-cyan-500 font-black text-sm tracking-tight opacity-70 group-hover:opacity-100 transition whitespace-nowrap">
-                            @if($paid)
-                                ₦{{ number_format($resource->price) }} →
-                            @else
-                                Get it →
                             @endif
                         </div>
                     </div>
