@@ -74,6 +74,9 @@ Route::get('/r/{resource}', function (\App\Models\Resource $resource) {
     return redirect()->away($resource->url);
 })->name('resources.go');
 
+// Written guides (public — students + anyone)
+Route::view('/guides/n8n-on-google-cloud', 'guides.n8n-google-cloud')->name('guides.n8n-gcp');
+
 // Paid resources — email-only, one-off purchase → gated access page.
 Route::get('/resources/{resource}/buy', [ResourceController::class, 'buy'])->name('resource.buy');
 Route::get('/resources/access/{purchase}', [ResourceController::class, 'access'])->name('resources.access');
