@@ -270,9 +270,9 @@ Google Cloud server  (free e2-micro)
       <!-- 01 -->
       <section id="domain">
         <div class="part-h"><span class="num">01</span><h2>Get a domain name</h2></div>
-        <p class="part-sub">Your web address. Any registrar works — <strong>Namecheap</strong> is used here.</p>
+        <p class="part-sub">Your web address. Any registrar works — <strong>Hostinger</strong> is used here.</p>
         <ol class="steps">
-          <li>Go to <a class="link" href="https://www.namecheap.com" target="_blank" rel="noopener">namecheap.com</a> and search for a domain (e.g. <code class="inl">yourbrand.com</code>).</li>
+          <li>Go to <a class="link" href="https://www.hostinger.com?REFERRALCODE=1AJ9770" target="_blank" rel="noopener">hostinger.com</a> and search for a domain (e.g. <code class="inl">yourbrand.com</code>).</li>
           <li>Add it to the cart and check out. Turn on <strong>free domain privacy</strong> if offered — it hides your personal details.</li>
           <li>Pay. You now own the domain. <strong>Keep this tab open</strong> — you return to it in Part 03.</li>
         </ol>
@@ -335,10 +335,10 @@ Google Cloud server  (free e2-micro)
       <!-- 03 -->
       <section id="dns">
         <div class="part-h"><span class="num">03</span><h2>Point your domain at the server</h2></div>
-        <p class="part-sub">Back in your registrar (Namecheap).</p>
+        <p class="part-sub">Back in your registrar (Hostinger).</p>
         <ol class="steps">
-          <li><strong>Domain List → Manage</strong> → <strong>Advanced DNS</strong> tab.</li>
-          <li>Under <strong>Host Records → Add New Record</strong>:</li>
+          <li><strong>Domain List → Manage</strong> → <strong>Advanced</strong> tab.</li>
+          <li>Under <strong>DNS Editor → Manage → DNS/Nameservers → Manage DNS Records → Add more records</strong>:</li>
         </ol>
         <div class="tablewrap"><table>
           <thead><tr><th>Field</th><th>Value</th></tr></thead>
