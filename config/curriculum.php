@@ -22,6 +22,8 @@
 |        ['id' => 'm02-v1', 'title' => '...', 'video_id' => '<bunny-id>', 'duration' => '08:00', 'library_id' => '<optional>'],
 |        ... 3–5 per module ...
 |   ]
+|   A lesson can instead be a WRITTEN GUIDE: give it 'guide_url' => '/guides/…'
+|   and an empty video_id — the dashboard shows an "Open the guide" panel.
 |
 | Each module below currently carries its original single video as videos[0].
 | ADD the remaining videos per module using their real Bunny IDs — do NOT
@@ -69,6 +71,7 @@ return [
             'has_blueprint' => true,
             'description' => "Learn to shape data in n8n, then put it to work. We cover:\n\n• Shaping data — restructuring and transforming items so each node gets exactly the input it needs.\n• Project 2: The Automated Archivist (basic) — sort incoming files and file them away automatically.\n• Project 2: The Automated Archivist (AI) — add an AI step so it classifies and handles messier, real-world input.\n\nThe original full-length 'Basics of n8n' walkthrough is included as a legacy reference.",
             'videos' => [
+                ['id' => 'module-02-guide', 'title' => 'Self-Hosting n8n on Google Cloud', 'video_id' => '', 'duration' => 'Guide', 'guide_url' => '/guides/n8n-on-google-cloud', 'description' => "Your own n8n on Google Cloud's free tier — domain, server, real HTTPS, the works. A copy-paste, nothing-skipped written guide you follow at your own pace. Click \"Open the guide\" to start."],
                 ['id' => 'module-02-v1', 'title' => 'Concept:Shaping Data in n8n', 'video_id' => '9630a7ee-2b0f-4d9b-9479-d8e4dfdc975f', 'duration' => '03:40 Mins'],
                 ['id' => 'module-02-v2', 'title' => 'Project 2: Automated Archivist - Basic', 'video_id' => 'd2df4aa2-844a-41ff-a36f-82679f119600', 'duration' => '16:49 Mins'],
                 ['id' => 'module-02-v3', 'title' => 'Project 2: Automated Archivist - AI', 'video_id' => '69b3d1b4-9c7e-40cc-b54e-52309ba42d90', 'duration' => '15:27 Mins'],
