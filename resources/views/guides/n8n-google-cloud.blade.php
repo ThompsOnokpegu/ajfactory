@@ -335,24 +335,25 @@ Google Cloud server  (free e2-micro)
       <!-- 03 -->
       <section id="dns">
         <div class="part-h"><span class="num">03</span><h2>Point your domain at the server</h2></div>
-        <p class="part-sub">Back in your registrar (Hostinger).</p>
+        <p class="part-sub">Back in Hostinger (<strong>hPanel</strong>).</p>
         <ol class="steps">
-          <li><strong>Domain List → Manage</strong> → <strong>Advanced</strong> tab.</li>
-          <li>Under <strong>DNS Editor → Manage → DNS/Nameservers → Manage DNS Records → Add more records</strong>:</li>
+          <li>Go to <strong>Domains</strong> and click <strong>Manage</strong> on your domain.</li>
+          <li>Open <strong>DNS / Nameservers → DNS records</strong>. Under <strong>Add new record</strong>, set:</li>
         </ol>
         <div class="tablewrap"><table>
           <thead><tr><th>Field</th><th>Value</th></tr></thead>
           <tbody>
-            <tr><td>Type</td><td><code class="inl">A Record</code></td></tr>
-            <tr><td>Host</td><td><code class="inl">n8n</code> &nbsp;<span style="color:var(--muted)">← makes <code class="inl">n8n.yourdomain.com</code></span></td></tr>
-            <tr><td>Value</td><td>your static IP from Part 2.5 (e.g. <code class="inl">34.121.x.x</code>)</td></tr>
-            <tr><td>TTL</td><td><code class="inl">Automatic</code></td></tr>
+            <tr><td>Type</td><td><code class="inl">A</code></td></tr>
+            <tr><td>Name</td><td><code class="inl">n8n</code> &nbsp;<span style="color:var(--muted)">← makes <code class="inl">n8n.yourdomain.com</code></span></td></tr>
+            <tr><td>Points to</td><td>your static IP from Part 2.5 (e.g. <code class="inl">34.121.x.x</code>)</td></tr>
+            <tr><td>TTL</td><td>leave the default</td></tr>
           </tbody>
         </table></div>
         <ol class="steps" start="3" style="counter-reset:s 2">
-          <li><strong>Save</strong> (the green tick).</li>
-          <li><strong>Delete</strong> any default "parking" record that would conflict — keep your new A record.</li>
+          <li>Click <strong>Add record</strong>.</li>
+          <li>If there's already an <code class="inl">A</code> record for the <code class="inl">n8n</code> name (or a conflicting one), delete it — keep your new one.</li>
         </ol>
+        <div class="call note"><div class="h">↳ using Hostinger's nameservers?</div><p>DNS records only work if the domain uses <strong>Hostinger nameservers</strong> (the default when you buy the domain at Hostinger). If you pointed it elsewhere, add the A record there instead.</p></div>
         <div class="call note"><div class="h">↳ heads up</div><p>DNS takes <strong>5 minutes to a couple of hours</strong> to spread. Carry on with the next parts meanwhile — we check it in Part 07.</p></div>
       </section>
 

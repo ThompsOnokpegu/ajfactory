@@ -47,11 +47,12 @@ You don't need to understand that diagram — the steps build it for you.
 
 ## Part 1 — Get a domain name
 
-A domain is your web address. You can use any registrar; **Namecheap** is used here.
+A domain is your web address. You can use any registrar; **Hostinger** is used here.
 
-1. Go to **namecheap.com** and search for a domain you like (e.g. `yourbrand.com`).
-2. Add it to the cart and check out. Turn on **free WhatsGuard/domain privacy** if
-   offered (hides your personal details) — it's usually free.
+1. Go to **[hostinger.com](https://www.hostinger.com?REFERRALCODE=1AJ9770)** and search
+   for a domain you like (e.g. `yourbrand.com`).
+2. Add it to the cart and check out. Turn on **free domain privacy** if offered (hides
+   your personal details) — it's usually free.
 3. Pay. You now own the domain. **Keep this browser tab open** — you'll come back to
    it in Part 3.
 
@@ -121,17 +122,21 @@ By default the IP can change on reboot, which would break your domain. Lock it.
 
 ## Part 3 — Point your domain at the server
 
-Back in your **domain registrar** (Namecheap):
+Back in Hostinger (**hPanel**):
 
-1. Go to **Domain List → Manage** (on your domain) → **Advanced DNS** tab.
-2. Under **Host Records**, click **Add New Record** and enter:
-   - **Type:** `A Record`
-   - **Host:** `n8n`   ← this makes `n8n.yourdomain.com`
-   - **Value:** *your static IP from Part 2.5* (e.g. `34.121.x.x`)
-   - **TTL:** `Automatic`
-3. **Save** (the green tick).
-4. **Delete** any default "parking" records (like a CNAME to `parkingpage`) that
-   would conflict — leave your new `A` record.
+1. Go to **Domains** and click **Manage** on your domain.
+2. Open **DNS / Nameservers → DNS records**. Under **Add new record**, enter:
+   - **Type:** `A`
+   - **Name:** `n8n`   ← this makes `n8n.yourdomain.com`
+   - **Points to:** *your static IP from Part 2.5* (e.g. `34.121.x.x`)
+   - **TTL:** leave the default
+3. Click **Add record**.
+4. If there's already an `A` record for the `n8n` name (or any conflicting record),
+   delete it — leave your new one.
+
+> DNS records only take effect if the domain is using **Hostinger's nameservers**
+> (the default when you buy the domain there). If you've pointed the domain
+> elsewhere, add the `A` record at that provider instead.
 
 > DNS can take anywhere from **5 minutes to a couple of hours** to spread. You can
 > continue with the next parts while it does; we'll check it in Part 7.
