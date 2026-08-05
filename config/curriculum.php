@@ -30,8 +30,14 @@
 | invent IDs. A module with no 'videos' key still works (the dashboard wraps
 | its top-level video_id into a single video automatically).
 |
-| Cohort 2 drip: modules unlock each MONDAY from 6 July 2026; live sessions
-| each THURSDAY from 9 July 2026. Module 01 = 6 Jul ... Module 09 = 31 Aug.
+| Cohort 2 started 31 July 2026 (`accelerator.cohort_starts_at` — that config is
+| the single source of truth for the start date, not this comment).
+|
+| NOTE: for Core Training, 'release_at' is INERT. Cohort 2+ runs ship-to-unlock:
+| module 01 opens on the cohort start date and every later module opens when the
+| PREVIOUS module's proof checkpoint is approved — so students move at their own
+| pace, not on a weekly drip. Editing a core module's 'release_at' changes
+| nothing. 'release_at' still gates the LIVE ARCHIVE, which is date-based.
 */
 
 return [

@@ -94,6 +94,7 @@ These encode real incidents. Changing them will break something that took a whil
 |---|---|
 | Pricing, cohort dates, seats | `config/accelerator.php` → `App\Support\Accelerator` |
 | Masterclass session, reminder offsets | `config/taab.php` → `App\Support\Masterclass` |
+| Staged student-review questions & ask cadence | `config/reviews.php` → `App\Models\StudentReview` |
 | Turning a payment into a student | `App\Support\StudentProvisioner` |
 | Scheduled/operational commands | `app/Console/Commands/` |
 | Admin screens | `resources/views/livewire/admin/` |

@@ -144,7 +144,39 @@ Three keys, one per role in the checkpoint flow:
 ```php
 'testimonials' => [],   // shape: ['name','role','quote','photo','is_published']
 ```
-Empty renders a graceful empty state. **Never fabricate entries.**
+Empty renders a graceful empty state. **Never fabricate entries.** Real quotes come from
+`/admin/reviews` — only rows marked **Quotable** there (student consented *and* was happy),
+copied across by hand using the credit line admin displays.
+
+---
+
+## `config/reviews.php`
+
+The staged in-course "soft ask" (see `student_reviews` in
+[architecture.md](architecture.md)). Copy lives here so questions can be reworded without
+touching component code.
+
+### Ask behaviour
+```php
+'snooze_days' => 5,          // wait this long before re-showing a dismissed stage
+'max_dismissals' => 2,       // declines allowed before we stop asking that stage entirely
+'unhappy_at_or_below' => 3,  // ratings ≤ this skip the consent ask and route to "what should we fix?"
+'credit_options' => [...],   // full | first | anon — how a consenting student is attributed
+```
+
+### Stages
+Each entry needs `key`, `after_module`, `enabled`, panel copy (`eyebrow` / `headline` /
+`intro`), and `questions` (each with `key`, `label`, `placeholder`, `required`, `rows`).
+
+- `after_module` is a **`config/curriculum.php` module id** — the stage becomes due when that
+  module's checkpoint is approved. A typo silently means the stage never fires; there's no
+  error to see. Verify the id exists after any curriculum reshuffle.
+- **Never rename a `key`** (stage or question) that already has rows — stage keys are stored
+  on the row and question keys inside the answers JSON, so a rename orphans existing responses
+  and admin falls back to showing the raw key instead of the question.
+- Set `enabled => false` to silence a stage without deleting it (keeps its history readable).
+- Stages are evaluated **newest-first**, so a student who blew past module 05 without
+  answering the module 01 ask gets the midpoint questions rather than stale ones.
 
 ---
 

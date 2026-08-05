@@ -4,6 +4,7 @@ use function Livewire\Volt\{state, layout, mount};
 use App\Models\Enrollment;
 use App\Models\Checkpoint;
 use App\Models\LiveAttendance;
+use App\Models\StudentReview;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 
@@ -31,6 +32,13 @@ state([
     'liveAttendance' => [],        // session_key[] the student has marked attendance for
     'attendanceCode' => '',        // bound to the live-attendance form
     'balanceNotice' => null,       // installment balance reminder shown from 3 days before due
+    // Staged review "soft ask" (config/reviews.php)
+    'reviewPrompt' => null,        // the one stage currently due, or null
+    'reviewAnswers' => [],         // question key => free text
+    'reviewRating' => 0,           // 1–5; 0 = not chosen yet
+    'reviewConsent' => false,      // may we quote this publicly
+    'reviewCreditAs' => 'full',    // full | first | anon
+    'reviewThanks' => false,       // show the thank-you state after submitting
 ]);
 
 // Build the embeddable Bunny URL for a given video (videos inherit the module's library_id).
@@ -62,6 +70,56 @@ $normalizeModule = function ($module) {
     unset($module['attendance_code'], $module['playbook_url']);
 
     return $module;
+};
+
+/*
+ * Work out whether a review stage is currently due for this student.
+ *
+ * A stage is due when the module it hangs off has an APPROVED checkpoint — i.e.
+ * they've verifiably shipped — and they haven't already answered it or declined
+ * it too many times. We walk the stages BACKWARDS so the most recent milestone
+ * wins: someone who blew past module 05 without answering the module 01 ask gets
+ * the midpoint questions, not stale ones.
+ *
+ * Cohort 1 (legacy/open, no checkpoints) is never asked — there's no verified
+ * "you just shipped" moment to hang the ask on.
+ */
+$resolveReviewPrompt = function () {
+    $this->reviewPrompt = null;
+
+    if (! $this->shipToUnlock || $this->reviewThanks) {
+        return;
+    }
+
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    if (! $enrollment) {
+        return;
+    }
+
+    $existing = $enrollment->reviews()->get()->keyBy('stage');
+    $snoozeDays = (int) config('reviews.snooze_days', 5);
+    $maxDismissals = (int) config('reviews.max_dismissals', 2);
+
+    foreach (array_reverse(config('reviews.stages', [])) as $stage) {
+        if (! ($stage['enabled'] ?? false)) continue;
+        if (! in_array($stage['after_module'] ?? '', $this->approvedModuleIds, true)) continue;
+
+        $row = $existing[$stage['key']] ?? null;
+
+        if ($row) {
+            if ($row->isSubmitted()) continue;
+            if ($row->dismiss_count >= $maxDismissals) continue;
+            if ($row->dismissed_at && now()->lt($row->dismissed_at->copy()->addDays($snoozeDays))) continue;
+        }
+
+        $this->reviewPrompt = $stage;
+
+        // Seed a blank answer for every question so wire:model has somewhere to bind.
+        $keys = collect($stage['questions'])->pluck('key')->push('improve');
+        $this->reviewAnswers = $keys->mapWithKeys(fn ($k) => [$k => $this->reviewAnswers[$k] ?? ''])->all();
+
+        return;
+    }
 };
 
 // Load this student's progress + checkpoint state from the DB.
@@ -99,6 +157,8 @@ $loadProgress = function () {
             ];
         }
     }
+
+    $this->resolveReviewPrompt();
 };
 
 /*
@@ -285,6 +345,94 @@ $markAttendance = function () {
 
     $this->attendanceCode = '';
     $this->loadProgress();
+};
+
+/*
+ * Staged review: save the answers. Nothing here gates or unlocks anything —
+ * if this whole feature breaks, a student's progress is untouched.
+ *
+ * `consent_public` is only ever true when the student is HAPPY and ticked the
+ * box. An unhappy score can't produce a quotable row no matter what's posted,
+ * because the consent UI isn't rendered for them at all.
+ */
+$submitReview = function () {
+    $stage = $this->reviewPrompt;
+    if (! $stage) return;
+
+    $unhappyAt = (int) config('reviews.unhappy_at_or_below', 3);
+    $isUnhappy = $this->reviewRating > 0 && $this->reviewRating <= $unhappyAt;
+
+    $rules = ['reviewRating' => 'required|integer|min:1|max:5'];
+    $messages = ['reviewRating.required' => 'Pick a score first — it takes one tap.'];
+
+    foreach ($stage['questions'] as $q) {
+        $required = ($q['required'] ?? false) ? 'required' : 'nullable';
+        $rules["reviewAnswers.{$q['key']}"] = "{$required}|string|max:1500";
+        $messages["reviewAnswers.{$q['key']}.required"] = 'A sentence is plenty — but this one we do need.';
+    }
+
+    if ($isUnhappy) {
+        $rules['reviewAnswers.improve'] = 'required|string|max:1500';
+        $messages['reviewAnswers.improve.required'] = "Tell us what's not working — that's the whole point of asking.";
+    }
+
+    $this->validate($rules, $messages);
+
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    if (! $enrollment) return;
+
+    // Store only the keys this stage actually asked about.
+    $keys = collect($stage['questions'])->pluck('key');
+    if ($isUnhappy) {
+        $keys->push('improve');
+    }
+    $answers = $keys->mapWithKeys(fn ($k) => [$k => trim((string) ($this->reviewAnswers[$k] ?? ''))])
+        ->filter(fn ($v) => $v !== '')
+        ->all();
+
+    $existing = $enrollment->reviews()->where('stage', $stage['key'])->first();
+
+    StudentReview::updateOrCreate(
+        ['enrollment_id' => $enrollment->id, 'stage' => $stage['key']],
+        [
+            'status' => 'submitted',
+            'rating' => $this->reviewRating,
+            'answers' => $answers,
+            'consent_public' => ! $isUnhappy && (bool) $this->reviewConsent,
+            'credit_as' => $isUnhappy ? null : $this->reviewCreditAs,
+            'dismiss_count' => $existing->dismiss_count ?? 0,
+            'submitted_at' => now(),
+        ],
+    );
+
+    $this->reviewThanks = true;
+    $this->reviewPrompt = null;
+    $this->reviewAnswers = [];
+    $this->reviewRating = 0;
+    $this->reviewConsent = false;
+};
+
+// "Not now" — the soft part of the soft ask. Snoozes the stage; after
+// `max_dismissals` declines we stop asking it entirely.
+$dismissReview = function () {
+    $stage = $this->reviewPrompt;
+    if (! $stage) return;
+
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    if (! $enrollment) return;
+
+    $row = StudentReview::firstOrNew([
+        'enrollment_id' => $enrollment->id,
+        'stage' => $stage['key'],
+    ]);
+
+    $row->fill([
+        'status' => 'dismissed',
+        'dismiss_count' => (int) $row->dismiss_count + 1,
+        'dismissed_at' => now(),
+    ])->save();
+
+    $this->reviewPrompt = null;
 };
 
 ?>
@@ -652,6 +800,9 @@ $markAttendance = function () {
                         @endif
                     </div>
                 </div>
+
+                {{-- STAGED REVIEW: the soft ask, due only after a checkpoint is approved --}}
+                @include('livewire.dashboard.partials.review-prompt')
 
                 {{-- SHIP-TO-UNLOCK: proof checkpoint panel (Core Training, Cohort 2 only) --}}
                 @php $isCoreSection = ($curriculum[$activeSection]['title'] ?? '') === 'Core Training'; @endphp

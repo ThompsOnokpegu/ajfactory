@@ -299,6 +299,45 @@ toward the completion guarantee.
 Codes are case-insensitive and each student can only mark a session once. Rotate the code
 every session so a leaked one can't be reused later.
 
+### Harvesting reviews for the next cohort's launch
+
+Feedback is collected **during** the cohort, not begged for at the end. Three staged asks
+appear in the student's dashboard once the matching checkpoint is approved (`first-win` after
+module 01, `midpoint` after 05, `finish` after 09). Nothing to run — it's automatic.
+
+**What you do:**
+
+1. **Approve checkpoints promptly.** The ask is triggered by approval, so a backlog in
+   Admin → Checkpoints is also a backlog of reviews you're not collecting. Approving within a
+   day catches students at the moment they're still buzzing about the thing they built.
+2. **Check Admin → Reviews weekly**, on the **Needs a call** tab first. A rating ≤ 3 is a
+   student on the way to churning or to a refund request — that tab exists so you hear about
+   it in week 2 rather than in a review after the cohort. Reach out personally. **These are
+   never marketing material**, no matter how the response is phrased.
+3. **Build launch copy from the Quotable tab.** Those students rated ≥ 4 *and* ticked the
+   consent box. Each card shows the exact credit line to use (`Chidi O., Cohort 2`) —
+   it honours their full-name / first-name / anonymous choice, so use it verbatim.
+4. **Copy quotes into `config/accelerator.php` → `testimonials` by hand.** There is no bulk
+   import on purpose: a quote going on the sales page should be a decision, and raw answers
+   are usually more useful trimmed. Never edit a quote into saying something the student
+   didn't say.
+
+**Which answers map to which piece of Cohort 3 copy:**
+
+| Question | Use it for |
+|---|---|
+| `before` — what they weren't sure about | The objection block on the landing page. It's your audience's fear in their own words. |
+| `win` — what they got working in module 1 | Proof that the first two weeks deliver. Specific builds beat "great course". |
+| `worth_it` — what they'd tell a friend | Price-objection copy, and ad hooks. |
+| `result` — concrete outcome | The strongest asset you have. Also the most fragile — **never** stretch it. |
+| `who_for` — who should join | Ad targeting and the "is this for me?" section. |
+| `one_line` | Short-form social and testimonial cards. |
+
+Tuning lives in `config/reviews.php` (see [configuration.md](configuration.md)) — reword
+questions, change `snooze_days`, or set a stage's `enabled => false`. If response rate is low,
+reword the questions before adding more asks: `max_dismissals` exists so the app never nags,
+and raising it costs more goodwill than the extra responses are worth.
+
 ---
 
 ## Deploying
@@ -331,6 +370,7 @@ before committing it.
 | **Overview** | KPIs + the registration Open/Paused switch |
 | **Enrollments** | All students. Approve a pending offline payment, suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol; per-student live-attendance count |
 | **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module |
+| **Reviews** | Staged in-course feedback. **Quotable** = consented + happy, safe for marketing (credit line shown per row). **Needs a call** = rated ≤ 3, reach out, never publish |
 | **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |
 | **Leads & Waitlist** | Every lead with source + scorecard tier/score; CSV export |
 | **Resources** | CRUD for `/free` — add a link, publish/unpublish, **pin to top**, see click counts. Set a **price** to sell it: the link is gated behind a one-off checkout and only revealed after payment (needs a `resource_purchased` n8n branch to email the buyer). Optional USD price for Flutterwave. |
@@ -348,6 +388,7 @@ The user must already exist.
 | Rows say "reminded" but nobody got email | n8n webhook on "Respond: Immediately" |
 | All sends fail with HTTP 500 | n8n Switch matches no branch — check the exact `type` string |
 | A touch never fired at all | GitHub Actions cron gap — just run the command manually |
+| Nobody is being asked for a review | Checkpoints not approved yet (that's the trigger), stage `after_module` id doesn't match `curriculum.php`, or the cohort is legacy Cohort 1 |
 | Waitlisters got nothing | They're `students`, not registrations — invite them with `masterclass:announce` (they register themselves) |
 | Follow-up can't reach last edition | `taab.masterclass.date` already moved on |
 | Student can't log in after paying | Re-send welcome from admin (issues a new temp password) |

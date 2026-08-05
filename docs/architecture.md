@@ -107,6 +107,31 @@ lives only in `config/curriculum.php` and is validated server-side — it's stri
 Livewire state so it never reaches the browser (otherwise students could read it and skip the
 session). Admin sees each student's count in Enrollments.
 
+### `student_reviews` — staged in-course feedback
+One row per (`enrollment_id`, `stage`), where stage is a key from `config/reviews.php`
+(`first-win` / `midpoint` / `finish`). We deliberately **do not** ask for one big testimonial
+at the end: each stage is triggered by an **approved checkpoint** for its `after_module`, so
+the ask only ever lands on a student who has verifiably just shipped something. Across a
+cohort the three stages stack into a before → middle → after arc per student, which is what
+launch copy actually needs (objection, proof, outcome).
+
+Three properties matter and are enforced server-side, not in the UI:
+
+- **It's soft.** It gates nothing. `dismiss_count` + `dismissed_at` snooze the ask for
+  `reviews.snooze_days`, and after `reviews.max_dismissals` declines that stage stops asking
+  for good. A row exists as soon as the student answers *or* declines.
+- **Unhappy answers can never become marketing.** A rating ≤ `reviews.unhappy_at_or_below`
+  forces `consent_public = false` and `credit_as = null` in `submitReview` regardless of what
+  the client posted — the consent UI isn't even rendered for them. Instead they're asked what
+  to fix, and admin flags the row for a call. A struggling student is a save opportunity.
+- **Consent is stored apart from the answers**, so a quote can't leak into copy just because
+  someone read the JSON. `StudentReview::isUsablePublicly()` is the single gate;
+  `creditLine()` renders attribution honouring the student's `credit_as` choice.
+
+Only cohorts on ship-to-unlock are asked — Cohort 1 is legacy/open and has no verified ship
+moment to hang the ask on. Read at `/admin/reviews`; quotable rows are hand-copied into
+`accelerator.testimonials` (never bulk-imported — see below).
+
 ### `masterclass_invites` — re-invite ledger
 Idempotency for `masterclass:announce`: one row per (`email`, `session_date`) recording that
 someone was nudged to register for a session. Because the target hasn't registered yet, the
