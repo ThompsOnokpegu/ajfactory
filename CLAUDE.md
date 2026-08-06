@@ -83,6 +83,11 @@ These encode real incidents. Changing them will break something that took a whil
 - **Run `npm run build` and commit `public/build`** before pushing UI changes. Hostinger has
   no Node; production serves the committed bundle.
 - **Config is cached in production.** New `.env` values need `php artisan config:cache`.
+- **A written guide is a pair: edit both halves.** Each guide is a standalone page in
+  `resources/views/guides/` plus its markdown source in `docs/guides/`. They've drifted
+  before (the page said one thing, the markdown another). Shared CSS/JS lives in
+  `resources/views/guides/partials/` — both pages `@include` it, so don't paste a second
+  copy of the design system into a new guide.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 
@@ -100,6 +105,7 @@ These encode real incidents. Changing them will break something that took a whil
 | Admin screens | `resources/views/livewire/admin/` |
 | Requirements & costs copy (shared) | `resources/views/components/requirements-costs.blade.php` |
 | Email templates (mirrors of what's in n8n) | `docs/emails/` |
+| Written student guides | `resources/views/guides/` (the live page) + `docs/guides/` (markdown source) |
 
 Runtime flags an operator should change without a deploy belong in the `Setting` key/value
 store (e.g. `accelerator_registration_open`), not in config.

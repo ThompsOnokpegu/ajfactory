@@ -188,6 +188,7 @@ re-send issues a new one and resets the account to it.
 | `/taab` | masterclass hub + registration/waitlist form (`TaabController@hub`; `?i=<token>` pre-fills for re-invited leads) |
 | `/taab/scorecard`, `/taab/roi-calculator`, `/taab/tool-stack` | lead-magnet tools |
 | `/free`, `/r/{resource}` | free resource hub + click-tracking redirect |
+| `/guides/n8n-on-google-cloud`, `/guides/n8n-on-hostinger` | written self-hosting guides, surfaced as Module 02 lessons. Two routes to the same outcome — free-but-fiddly (GCP) and paid-but-one-click (Hostinger, for students GCP won't verify). A student does **one**, not both; each page links to the other |
 | `/links`, `/builders` | link-in-bio, TikTok waitlist |
 | `/terms` | legal |
 

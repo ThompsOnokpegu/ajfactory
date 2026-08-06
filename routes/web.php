@@ -76,6 +76,8 @@ Route::get('/r/{resource}', function (\App\Models\Resource $resource) {
 
 // Written guides (public — students + anyone)
 Route::view('/guides/n8n-on-google-cloud', 'guides.n8n-google-cloud')->name('guides.n8n-gcp');
+// Alternative route for students whose Google Cloud account won't verify.
+Route::view('/guides/n8n-on-hostinger', 'guides.n8n-hostinger')->name('guides.n8n-hostinger');
 
 // Paid resources — email-only, one-off purchase → gated access page.
 Route::get('/resources/{resource}/buy', [ResourceController::class, 'buy'])->name('resource.buy');

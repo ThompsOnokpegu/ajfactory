@@ -71,6 +71,12 @@ A domain is your web address. You can use any registrar; **Hostinger** is used h
    type. Google gives new users free credits too, but our server stays in the
    **Always Free** tier regardless.
 
+> ⚠️ **Stuck at verification?** This is where people get blocked — Google rejects some
+> cards and won't always say why. Don't lose a week to it: the
+> [one-click Hostinger route](/guides/n8n-on-hostinger) gets you the same private n8n
+> with automatic HTTPS in about ten minutes. It costs money (this route is free
+> hosting), but a working n8n beats a free one you can't create.
+
 ### 2.2 — Create a project
 
 A "project" is just a folder for your stuff.
