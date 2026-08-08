@@ -26,9 +26,17 @@ return [
     'installment_grace_hours' => 24, // suspend access this long after the due date if still unpaid
 
     // Completion guarantee: weekly live sessions a student must attend (in
-    // addition to finishing all module checkpoints) to qualify. Set to all 6
-    // Friday sessions. Surfaced on the dashboard progress card.
-    'guarantee_min_live_sessions' => 6,
+    // addition to finishing all module checkpoints) to qualify. Surfaced on the
+    // dashboard progress card.
+    //
+    // MUST stay below the number of sessions a student can ACTUALLY still attend,
+    // which is not the same as the number of sessions in the curriculum. Attendance
+    // only exists for sessions that (a) ran after the student's cohort started and
+    // (b) had an `attendance_code` set — there is no retroactive path. For Cohort 2
+    // that's live-05..live-10 = 6 sessions, so this was 6: a threshold that demanded
+    // 100% attendance and failed anyone who got ill once. 4 leaves real margin while
+    // still requiring genuine participation.
+    'guarantee_min_live_sessions' => 4,
 
     /*
     | Checkout coupons (server-side only — the discount is computed from here,

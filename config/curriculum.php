@@ -226,7 +226,10 @@ return [
             'release_at' => '2026-08-08 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            'attendance_code' => 'PLAYBOOK', // ← the code you announce live on Sat 8 Aug — swap before the call
+            'attendance_code' => 'TUNDRA-907', // ← announce this at the END of the call (Sat 8 Aug). Rotate every session.
+            // 'playbook_url' => '', // ← optional: link unlocked once a student marks attendance. Leave
+            //                       //   unset (not empty-string, not a placeholder) to hide the button —
+            //                       //   a non-empty value renders a live link, so never put a TODO here.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-05-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],

@@ -299,6 +299,15 @@ toward the completion guarantee.
 Codes are case-insensitive and each student can only mark a session once. Rotate the code
 every session so a leaked one can't be reused later.
 
+**Pick the code carefully.** It lives in a git-committed config file and it's the only thing
+separating "was on the call" from "guessed it". Use something random like `TUNDRA-907` —
+never a word anyone could infer from the session title (a session about the playbook had the
+code `PLAYBOOK`, which anyone could have guessed straight into the completion guarantee).
+
+**Before changing `guarantee_min_live_sessions`, count what's actually attendable** — see
+[configuration.md](configuration.md). Sessions that ran before a cohort started, or that had
+no `attendance_code`, can never be credited, and there's no retroactive fix.
+
 ### Harvesting reviews for the next cohort's launch
 
 Feedback is collected **during** the cohort, not begged for at the end. Three staged asks

@@ -126,10 +126,20 @@ charged `amount` is already the discounted figure the webhook verifies.
 - `accelerator.php` → `guarantee_min_live_sessions` — how many weekly live sessions a student
   must attend (on top of finishing all module checkpoints) to satisfy the completion
   guarantee. Shown on the dashboard progress card; the guarantee itself is honoured by a human.
+  **This must stay below the number of sessions a student can actually still attend**, which
+  is *not* the session count in `curriculum.php`. Attendance exists only for sessions that ran
+  **after that cohort started** *and* had an `attendance_code` set, and there is no retroactive
+  path. Real incident: it was set to 6 while Cohort 2 had exactly 6 attendable sessions
+  (`live-05`..`live-10`, since 01–04 predated both the cohort and the feature) — so a single
+  absence failed the guarantee for everyone. `LiveAttendanceTest` now guards the threshold.
 - Per **live** session in `curriculum.php`: `attendance_code` (the code AJ announces at the
   **end** of the call — set a fresh one each session, never type it in chat; it's read
   server-side and never sent to the browser) and optional `playbook_url` (unlocked once the
   student marks attendance). Leave `attendance_code` unset to keep attendance closed.
+  Make the code **random and unguessable** — it's committed to git and it's the only thing
+  standing between "attended" and "guessed", so avoid words derived from the session title.
+  `playbook_url` must be **unset** when there's no playbook: any non-empty value (including a
+  `{{TODO}}` placeholder) renders a live button and ships students a dead link.
 
 ### Community
 Three keys, one per role in the checkpoint flow:

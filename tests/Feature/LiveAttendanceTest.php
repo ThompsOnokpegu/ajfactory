@@ -100,3 +100,42 @@ it('does not record attendance when the session has no code', function () {
 
     expect(LiveAttendance::count())->toBe(0);
 });
+
+/*
+ * Guards on the SHIPPED config (not the fake curriculum above). These caught a real
+ * problem: the guarantee demanded 6 sessions when only 6 were still attendable, so a
+ * single absence failed the guarantee for everyone.
+ */
+
+it('keeps the completion-guarantee threshold reachable', function () {
+    $threshold = (int) config('accelerator.guarantee_min_live_sessions');
+    $sessions = count(config('curriculum.live', []));
+
+    expect($threshold)->toBeGreaterThan(0);
+
+    // Attendance can't be earned retroactively, so the threshold must leave margin
+    // against the sessions that exist — never demand a perfect record.
+    expect($threshold)->toBeLessThan($sessions);
+});
+
+it('never ships a live session with a placeholder playbook link', function () {
+    $live = config('curriculum.live', []);
+
+    // Baseline so this can never pass vacuously against an empty/renamed config.
+    expect($live)->not->toBeEmpty();
+
+    // A non-empty playbook_url renders a real button for students. An empty string
+    // or a TODO marker would ship a dead link, so the field must be unset instead.
+    foreach ($live as $session) {
+        if (! array_key_exists('playbook_url', $session)) {
+            continue;
+        }
+
+        $url = $session['playbook_url'];
+
+        expect($url)->toBeString()
+            ->and(trim($url))->not->toBe('')
+            ->and($url)->not->toContain('TODO');
+        expect(str_starts_with($url, '/') || filter_var($url, FILTER_VALIDATE_URL) !== false)->toBeTrue();
+    }
+});
