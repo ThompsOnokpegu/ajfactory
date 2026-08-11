@@ -101,7 +101,9 @@ return [
 
         [
             'key' => 'midpoint',
-            'after_module' => 'module-05',
+            // Position 5 of 9. Ids are stable keys, not positions — 'module-04' is
+            // the module DISPLAYED as "Module 05: Knowledge Base (RAG)".
+            'after_module' => 'module-04',
             'enabled' => true,
             'eyebrow' => "You're past the halfway mark",
             'headline' => 'Five modules in — how is it really going?',
@@ -133,7 +135,10 @@ return [
 
         [
             'key' => 'finish',
-            'after_module' => 'module-09',
+            // The LAST module — displayed as "Module 09: Deploy Your Automation".
+            // Was 'module-09' (the retired standalone hosting module); leaving it
+            // there would have silently disabled this stage forever.
+            'after_module' => 'module-08',
             'enabled' => true,
             'eyebrow' => "You finished the build track",
             'headline' => 'Nine modules. Nine workflows. Last ask.',

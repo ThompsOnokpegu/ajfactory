@@ -83,6 +83,14 @@ These encode real incidents. Changing them will break something that took a whil
 - **Run `npm run build` and commit `public/build`** before pushing UI changes. Hostinger has
   no Node; production serves the committed bundle.
 - **Config is cached in production.** New `.env` values need `php artisan config:cache`.
+- **Curriculum module ids are stable keys, never positions.** `Checkpoint.module_id`,
+  `Enrollment.completed_lessons`, `accelerator.telegram_threads` and
+  `reviews.stages[].after_module` all key off them. Reordering the curriculum changes the
+  array order and the display `title` **only** — never an `id`. So ids legitimately stop
+  matching their numbers (`module-03` displays as "Module 04"), and "tidying" them up
+  silently reassigns students' approved checkpoints and completed lessons. Renaming an id
+  also breaks review stages with no error — the stage just never fires again.
+  `CurriculumTest` guards this.
 - **A written guide is a pair: edit both halves.** Each guide is a standalone page in
   `resources/views/guides/` plus its markdown source in `docs/guides/`. They've drifted
   before (the page said one thing, the markdown another). Shared CSS/JS lives in

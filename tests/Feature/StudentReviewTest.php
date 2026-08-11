@@ -68,9 +68,14 @@ it('never asks Cohort 1 — there is no verified ship moment to hang it on', fun
 });
 
 it('asks the most recent milestone, not a stale earlier one', function () {
+    // Read the anchor from config rather than hardcoding a module id — the
+    // curriculum gets reordered, and ids are stable keys that no longer match
+    // their displayed numbers. CurriculumTest proves the anchor resolves.
+    $midpointModule = collect(config('reviews.stages'))->firstWhere('key', 'midpoint')['after_module'];
+
     $user = makeReviewStudent();
     approveModule($user, 'module-01');
-    approveModule($user, 'module-05');
+    approveModule($user, $midpointModule);
     $this->actingAs($user);
 
     $prompt = Volt::test('dashboard.terminal')->get('reviewPrompt');

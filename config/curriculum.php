@@ -89,8 +89,26 @@ return [
             ],
         ],
         [
+            // NOTE: 'id' is a STABLE KEY, not a position. It is stored on every
+            // Checkpoint row and inside Enrollment.completed_lessons, and it keys
+            // accelerator.telegram_threads and reviews.stages[].after_module — so
+            // ids are NEVER renumbered when modules are reordered. Only the display
+            // 'title' carries the number. That's why the ids below no longer line up
+            // with their titles (id 'module-03' is displayed as Module 04, etc.).
+            // Order in this array is what students actually see, and what
+            // ship-to-unlock chains against.
+            'id' => 'module-lead-qualifier',
+            'title' => 'Module 03: The Lead Qualifier',
+            'release_at' => '2026-07-20 00:00:00',
+            'has_blueprint' => false, // no snapshot in the vault yet — flip to true once there is one
+            'description' => "Building the Lead Qualifier — the workflow that turns raw enquiries into qualified leads.\n\nPart 1 is up now; the remaining parts land in this module as they're released.",
+            'videos' => [
+                ['id' => 'module-lead-qualifier-v1', 'title' => 'The Lead Qualifier — Part 1', 'video_id' => '8eae1744-245d-4575-ad3e-e6492398910d', 'duration' => '46:54 Mins'],
+            ],
+        ],
+        [
             'id' => 'module-03',
-            'title' => 'Module 03: API Calls With n8n',
+            'title' => 'Module 04: API Calls With n8n',
             'release_at' => '2026-07-20 00:00:00',
             'has_blueprint' => true,
             'description' => "Mastering the most important skill in automation: APIs. This module covers:\n\n• API Concepts for Non-Coders (The Waiter Analogy).\n• Using the HTTP Request Node to fetch live data (Crypto Prices).\n• Handling Authentication and API Keys to access secure data (NewsAPI, Paystack API).",
@@ -100,7 +118,7 @@ return [
         ],
         [
             'id' => 'module-04',
-            'title' => 'Module 04: Knowledge Base (RAG)',
+            'title' => 'Module 05: Knowledge Base (RAG)',
             'release_at' => '2026-07-27 00:00:00',
             'has_blueprint' => true,
             'description' => "Teaching the AI about your specific business data. We cover:\n\n• Understanding Retrieval-Augmented Generation (RAG).\n• Setting up a Pinecone Vector Database with Gemini Dimensions (768).\n• Building an Ingestion Pipeline to read PDFs and save them as vectors.",
@@ -110,7 +128,7 @@ return [
         ],
         [
             'id' => 'module-05',
-            'title' => 'Module 05: WhatsApp Automation',
+            'title' => 'Module 06: WhatsApp Automation',
             'release_at' => '2026-08-03 00:00:00',
             'has_blueprint' => true,
             'description' => "Building a production-ready WhatsApp bot using Twilio. Topics include:\n\n• Buying a Real Number & Setting up a Sender Profile.\n• Understanding the Meta 24-Hour Session Window & Templates.\n• Configuring Production Webhooks to handle live traffic.",
@@ -120,7 +138,7 @@ return [
         ],
         [
             'id' => 'module-06',
-            'title' => 'Module 06: AI Voice Support Agent',
+            'title' => 'Module 07: AI Voice Support Agent',
             'release_at' => '2026-08-10 00:00:00',
             'has_blueprint' => true,
             'description' => "Creating 'Tola', a real-time voice receptionist. This module covers:\n\n• Introduction to Voice AI latency and the Vapi Orchestrator.\n• Configuring the Voice, Transcriber, and System Prompt.\n• Using Function Calling to connect Vapi to n8n for real-time data lookups.",
@@ -130,7 +148,7 @@ return [
         ],
         [
             'id' => 'module-07',
-            'title' => 'Module 07: AI Chat Support Agent',
+            'title' => 'Module 08: AI Chat Support Agent',
             'release_at' => '2026-08-17 00:00:00',
             'has_blueprint' => true,
             'description' => "Bringing it all together into a smart Chat Agent. We cover:\n\n• Using the AI Agent Node with Window Buffer Memory.\n• Connecting your Pinecone Knowledge Base as a 'Tool'.\n• Logic for handling Fallbacks and Human Handoffs via Email.",
@@ -140,22 +158,17 @@ return [
         ],
         [
             'id' => 'module-08',
-            'title' => 'Module 08: Deploy Your Automation',
+            'title' => 'Module 09: Deploy Your Automation',
             'release_at' => '2026-08-24 00:00:00',
             'has_blueprint' => true,
-            'description' => "Taking your bots from 'Student Project' to 'Business Asset'. Topics:\n\n• Building a Global Error Handling workflow (The Safety Net).\n• The critical difference between Test URLs and Production Webhook URLs.\n• Managing Execution Data logs and exporting workflows for backup.\n• Free Google Cloud Hosting setup guide.",
+            'description' => "Taking your bots from 'Student Project' to 'Business Asset'. Topics:\n\n• Building a Global Error Handling workflow (The Safety Net).\n• The critical difference between Test URLs and Production Webhook URLs.\n• Managing Execution Data logs and exporting workflows for backup.\n\nThen the full hosting walkthrough — get your n8n live on the web for free on Google Cloud's Always Free tier:\n\n• Setting up a Google Cloud account and navigating the console.\n• Configuring a Compute Engine VM with Docker to host n8n.\n• A reverse proxy secured with SSL (Let's Encrypt).\n• Connecting your custom domain and configuring DNS.",
             'videos' => [
                 ['id' => 'module-08-v1', 'title' => 'Deploy Your Automation', 'video_id' => '67369c39-c2d7-481f-abbf-6aa879641949', 'duration' => '35:00'],
-            ],
-        ],
-        [
-            'id' => 'module-09',
-            'title' => 'Module 09: FREE Google Cloud Hosting Guide',
-            'release_at' => '2026-08-31 00:00:00',
-            'has_blueprint' => true,
-            'description' => "A step-by-step walkthrough to get your n8n instance live on the web for free using Google Cloud's Always Free tier. We cover:\n\n• Setting up a Google Cloud Account and Navigating the Console.\n• Configuring a Compute Engine VM with Docker to host n8n.\n• Setting up a Reverse Proxy with Nginx and securing it with SSL (Let's Encrypt).\n• Connecting your custom domain and configuring DNS settings.",
-            'videos' => [
-                ['id' => 'module-09-v1', 'title' => 'Google Cloud Hosting Guide', 'video_id' => '27d0d009-27fc-432e-b246-63bfd77fb2a9', 'duration' => '33:00'],
+                // Moved here from the retired standalone hosting module. The video id is
+                // KEPT so it still matches Enrollment.completed_lessons for anyone who
+                // already ticked it off. Neither module set a library_id, so playback
+                // is unaffected by the move.
+                ['id' => 'module-09-v1', 'title' => 'FREE Google Cloud Hosting Guide', 'video_id' => '27d0d009-27fc-432e-b246-63bfd77fb2a9', 'duration' => '33:00'],
             ],
         ],
     ],

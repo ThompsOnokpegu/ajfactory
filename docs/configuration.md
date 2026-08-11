@@ -141,6 +141,21 @@ charged `amount` is already the discounted figure the webhook verifies.
   `playbook_url` must be **unset** when there's no playbook: any non-empty value (including a
   `{{TODO}}` placeholder) renders a live button and ships students a dead link.
 
+### Curriculum ordering (`config/curriculum.php`)
+Students see modules in **array order**; ship-to-unlock chains each module to the previous
+one in that array. The number in `title` is display text and nothing reads it.
+
+**`id` is a stable key, not a position.** It's stored on `Checkpoint.module_id` and inside
+`Enrollment.completed_lessons`, and it keys `accelerator.telegram_threads` and
+`reviews.stages[].after_module`. To reorder or insert a module: change array order, change
+the `title` numbers, give any new module its **own** id — and leave every existing id alone.
+
+Ids therefore drift from their displayed numbers on purpose (`module-03` is "Module 04"), and
+each `telegram_threads` line carries a comment naming its displayed module. Renumbering ids to
+"fix" this reassigns real student progress. Note the knock-on when a module is **removed**: any
+`after_module` still pointing at it silently disables that review stage forever. `CurriculumTest`
+asserts the module count, id uniqueness, and that every stage anchor and thread key resolves.
+
 ### Community
 Three keys, one per role in the checkpoint flow:
 - `telegram_wins_url` — the `#wins` thread. **Build proof / checkpoints go here** — the

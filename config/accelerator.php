@@ -86,17 +86,25 @@ return [
     | Enable Topics in the group, then paste each module's thread URL here (forum
     | topic links look like https://t.me/c/<chatId>/<topicId> for private
     | supergroups). Any module left null falls back to telegram_community_url.
+    |
+    | Keyed by the curriculum module ID, which is a STABLE KEY and not a position —
+    | so these stay correct when modules are reordered. The displayed module number
+    | is in the comment after each line; don't reorder these to "fix" them.
     */
     'telegram_threads' => [
-        'module-01' => 'https://t.me/c/3619461825/3',
-        'module-02' => 'https://t.me/c/3619461825/5',
-        'module-03' => 'https://t.me/c/3619461825/433',
-        'module-04' => 'https://t.me/c/3619461825/304',
-        'module-05' => 'https://t.me/c/3619461825/305',
-        'module-06' => 'https://t.me/c/3619461825/435',
-        'module-07' => 'https://t.me/c/3619461825/438',
-        'module-08' => 'https://t.me/c/3619461825/440',
-        'module-09' => 'https://t.me/c/3619461825/771',
+        'module-01' => 'https://t.me/c/3619461825/3',    // Module 01 · Welcome to the Factory
+        'module-02' => 'https://t.me/c/3619461825/5',    // Module 02 · Basics of n8n
+        // 'module-lead-qualifier' => '',                // Module 03 · The Lead Qualifier — no thread yet;
+        //                                              //   falls back to telegram_community_url until set
+        'module-03' => 'https://t.me/c/3619461825/433',  // Module 04 · API Calls With n8n
+        'module-04' => 'https://t.me/c/3619461825/304',  // Module 05 · Knowledge Base (RAG)
+        'module-05' => 'https://t.me/c/3619461825/305',  // Module 06 · WhatsApp Automation
+        'module-06' => 'https://t.me/c/3619461825/435',  // Module 07 · AI Voice Support Agent
+        'module-07' => 'https://t.me/c/3619461825/438',  // Module 08 · AI Chat Support Agent
+        'module-08' => 'https://t.me/c/3619461825/440',  // Module 09 · Deploy Your Automation
+        // 'module-09' retired — the standalone hosting module was folded into Deploy.
+        // Its Telegram topic (…/771) still exists in the group; point students at the
+        // Deploy thread above, or re-map this line if you'd rather keep using it.
     ],
 
     /*
