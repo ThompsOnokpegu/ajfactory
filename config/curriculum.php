@@ -245,7 +245,7 @@ return [
             //                       //   a non-empty value renders a live link, so never put a TODO here.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
-                ['id' => 'live-05-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+                ['id' => 'live-05-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '325570ad-03fa-44c5-9d22-59c7d96090db', 'duration' => ''],
             ],
         ],
         [
