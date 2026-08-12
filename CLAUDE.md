@@ -113,6 +113,7 @@ These encode real incidents. Changing them will break something that took a whil
 | Admin screens | `resources/views/livewire/admin/` |
 | Requirements & costs copy (shared) | `resources/views/components/requirements-costs.blade.php` |
 | Email templates (mirrors of what's in n8n) | `docs/emails/` |
+| Student-facing snippets (prompts / code) | `snippets` table → `App\Models\Snippet`, admin at `/admin/snippets` |
 | Written student guides | `resources/views/guides/` (the live page) + `docs/guides/` (markdown source) |
 
 Runtime flags an operator should change without a deploy belong in the `Setting` key/value

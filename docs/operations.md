@@ -380,6 +380,7 @@ before committing it.
 | **Enrollments** | All students. Approve a pending offline payment, suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol; per-student live-attendance count |
 | **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module |
 | **Reviews** | Staged in-course feedback. **Quotable** = consented + happy, safe for marketing (credit line shown per row). **Needs a call** = rated ≤ 3, reach out, never publish |
+| **Snippets** | Prompts / code / JSON students copy from their dashboard. Pin one to a module, or leave the module blank to show it on every module. New snippets publish immediately; **Publish** toggles a draft. Editing never silently republishes a draft |
 | **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |
 | **Leads & Waitlist** | Every lead with source + scorecard tier/score; CSV export |
 | **Resources** | CRUD for `/free` — add a link, publish/unpublish, **pin to top**, see click counts. Set a **price** to sell it: the link is gated behind a one-off checkout and only revealed after payment (needs a `resource_purchased` n8n branch to email the buyer). Optional USD price for Flutterwave. |

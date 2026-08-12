@@ -132,6 +132,21 @@ Only cohorts on ship-to-unlock are asked — Cohort 1 is legacy/open and has no 
 moment to hang the ask on. Read at `/admin/reviews`; quotable rows are hand-copied into
 `accelerator.testimonials` (never bulk-imported — see below).
 
+### `snippets` — copy-paste material for students
+Prompts, code, JSON and config blocks surfaced on the student dashboard under the active
+module. In the **DB rather than config** because they're added weekly and must not need a
+deploy; managed at `/admin/snippets`.
+
+`module_id` holds a **curriculum module id** (a config key like `module-lead-qualifier`) and
+is deliberately **not a foreign key** — the curriculum lives in `config/curriculum.php`, not a
+table. `NULL` means global: shown on every module. A snippet can therefore outlive its module,
+so `moduleLabel()` renders "Unknown module (…)" rather than a raw id in admin.
+
+`Snippet::visibleFor($moduleId)` is the single read path and filters on `is_published`, so an
+unpublished draft can never reach a student. The dashboard resolves it per render rather than
+holding it in Livewire state — it's read-only, and that keeps it out of the serialized
+component payload.
+
 ### `masterclass_invites` — re-invite ledger
 Idempotency for `masterclass:announce`: one row per (`email`, `session_date`) recording that
 someone was nudged to register for a session. Because the target hasn't registered yet, the
@@ -209,6 +224,8 @@ enforced.
 ### Admin — `auth` + `admin`
 `/admin` (overview) · `/enrollments` · `/checkpoints` · `/masterclass` · `/leads` ·
 `/resources`, plus CSV exports for masterclass and leads.
+
+`/admin/snippets` manages the student-facing snippet library (see `snippets` above).
 
 ### API webhooks — `routes/api.php`
 `/api/webhooks/paystack` · `/api/webhooks/flutterwave` · `/api/webhooks/vapi`

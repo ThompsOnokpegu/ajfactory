@@ -463,6 +463,12 @@ $dismissReview = function () {
         $alreadyAttended   = in_array($liveSessionKey, $liveAttendance, true);
         $playbookUrl       = $liveCfg['playbook_url'] ?? null;
 
+        // Snippets shared for this module (plus any global ones). Read-only, so
+        // it's resolved per render rather than held in Livewire state.
+        $snippets = ($curModule && ! $isLocked)
+            ? \App\Models\Snippet::visibleFor($curModule['id'])
+            : collect();
+
         // Completion-guarantee progress: all core checkpoints approved + enough
         // live sessions attended. Display-only; the guarantee is honoured by a human.
         $coreModuleIds     = collect($coreModules)->pluck('id')->all();
@@ -800,6 +806,9 @@ $dismissReview = function () {
                         @endif
                     </div>
                 </div>
+
+                {{-- SNIPPETS: prompts / code shared for this module --}}
+                @include('livewire.dashboard.partials.snippets')
 
                 {{-- STAGED REVIEW: the soft ask, due only after a checkpoint is approved --}}
                 @include('livewire.dashboard.partials.review-prompt')

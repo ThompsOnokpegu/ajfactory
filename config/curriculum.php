@@ -104,6 +104,7 @@ return [
             'description' => "Building the Lead Qualifier — the workflow that turns raw enquiries into qualified leads.\n\nPart 1 is up now; the remaining parts land in this module as they're released.",
             'videos' => [
                 ['id' => 'module-lead-qualifier-v1', 'title' => 'The Lead Qualifier — Part 1', 'video_id' => '8eae1744-245d-4575-ad3e-e6492398910d', 'duration' => '46:54 Mins'],
+                ['id' => 'module-lead-qualifier-v2', 'title' => 'The Lead Qualifier - Part 2', 'video_id' => 'a8d32c8c-2f6e-43ae-8538-3d34212a6aa8', 'duration' => ''],
             ],
         ],
         [
