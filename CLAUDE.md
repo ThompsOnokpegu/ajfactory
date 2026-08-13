@@ -60,6 +60,8 @@ in Blade; the landing page and checkout must always agree.
 - **Accelerator / admin / links:** dark `zinc-950` + cyan `#06b6d4`, Space Grotesk.
 - **TAAB:** dark + lime `#c8f064`, Syne / DM Sans.
 - Mobile-first, generous spacing.
+- **Hyphens only in student-facing copy. No em (—) or en (–) dashes.** Applies to
+  curriculum titles and lesson names, page copy, and emails.
 - The Accelerator pages deliberately keep the **Deepr + cyan** look rather than a separate
   "AJBuilds AI" teal brand. That was an explicit decision — don't "correct" it.
 - **Emails are always dark.** Force it (`color-scheme: only dark` + the meta tags) so a
