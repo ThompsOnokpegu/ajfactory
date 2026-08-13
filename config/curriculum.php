@@ -101,7 +101,7 @@ return [
             'title' => 'Module 03: The Lead Qualifier',
             'release_at' => '2026-07-20 00:00:00',
             'has_blueprint' => false, // no snapshot in the vault yet — flip to true once there is one
-            'description' => "Building the Lead Qualifier — the workflow that turns raw enquiries into qualified leads.\n\nPart 1 is up now; the remaining parts land in this module as they're released.",
+            'description' => "Two builds of the same system — the same outcome reached two different ways.\n\nPart 1 — wiring the logic yourself:\n\n• A workflow that listens for property enquiries coming into a real estate business.\n• Qualifying each lead on budget, then routing it as Standard or VIP.\n• Standard leads: saved to the database (Google Sheets) and sent the getting-started and FAQ resources.\n• VIP leads: handed straight to sales in Slack.\n\nPart 2 — letting an agent do it:\n\n• The same workflow rebuilt with the AI Agent node handling the qualifying and the tool calling.",
             'videos' => [
                 ['id' => 'module-lead-qualifier-v1', 'title' => 'The Lead Qualifier — Part 1', 'video_id' => '8eae1744-245d-4575-ad3e-e6492398910d', 'duration' => '46:54 Mins'],
                 ['id' => 'module-lead-qualifier-v2', 'title' => 'The Lead Qualifier - Part 2', 'video_id' => 'a8d32c8c-2f6e-43ae-8538-3d34212a6aa8', 'duration' => ''],
