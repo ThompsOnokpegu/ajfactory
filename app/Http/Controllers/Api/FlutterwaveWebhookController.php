@@ -69,7 +69,7 @@ class FlutterwaveWebhookController extends Controller
                             // A2. Installment: schedule the 2nd payment due date.
                             if ($enrollment->plan_type === 'installment' && (float)$enrollment->balance_due > 0) {
                                 $enrollment->update([
-                                    'second_payment_due_at' => now()->addDays((int) config('accelerator.installment_due_days', 14)),
+                                    'second_payment_due_at' => \App\Support\Accelerator::installmentDueAt(),
                                 ]);
                             }
 

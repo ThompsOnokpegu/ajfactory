@@ -62,7 +62,7 @@ class PaystackWebhookController extends Controller
                             //     webhook on the due date and suspends access if it goes unpaid.
                             if ($enrollment->plan_type === 'installment' && (float)$enrollment->balance_due > 0) {
                                 $enrollment->update([
-                                    'second_payment_due_at' => now()->addDays((int) config('accelerator.installment_due_days', 14)),
+                                    'second_payment_due_at' => \App\Support\Accelerator::installmentDueAt(),
                                 ]);
                             }
 

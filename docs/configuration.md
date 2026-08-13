@@ -100,8 +100,20 @@ the rate moves materially.
   date in prose.
 
 ### Installments
+`installment_due_days` is counted from the **cohort start**, not from when the student paid
+— see `Accelerator::installmentDueAt()`. Counting from payment punished early enrollment: a
+student who paid two weeks before the cohort opened had to clear their balance before they had
+really begun, while someone who paid on day one got the full window. The anchor is the **later
+of (cohort start, payment date)**, so early birds measure from the start line and nobody who
+joins mid-cohort gets less than the full window either.
+
+The due date is **stamped once** onto `second_payment_due_at` at payment time, so changing
+`installment_due_days` only affects enrollments created afterwards. Raising it from 14 to 21
+left earlier students on the old window — run `php artisan installments:realign` to bring
+everyone onto the current rule (see [operations.md](operations.md)).
+
 ```php
-'installment_due_days'    => 14,  // 2nd payment due this long after the 1st
+'installment_due_days'    => 21,  // window length; anchored to the cohort start
 'installment_grace_hours' => 24,  // suspend access this long after the due date
 ```
 

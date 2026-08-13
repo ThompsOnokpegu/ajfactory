@@ -180,6 +180,32 @@ class Accelerator
         return min(max(0.0, $fixed), $amount);
     }
 
+    /**
+     * When an installment student's 2nd payment falls due.
+     *
+     * Anchored to the COHORT START, not the payment date. Counting from payment
+     * punished early enrollment: someone who paid two weeks before the cohort
+     * opened had to clear their balance before they had really started, while
+     * someone who paid on day one got the full window. The anchor is therefore the
+     * LATER of (cohort start, when they paid) — early birds get the full window
+     * measured from the start line, and nobody who joins mid-cohort gets less than
+     * the full window either.
+     *
+     * $paidAt defaults to now, which is the right anchor at checkout time.
+     */
+    public static function installmentDueAt(?Carbon $paidAt = null): Carbon
+    {
+        $days = (int) config('accelerator.installment_due_days', 21);
+        $paidAt = $paidAt ? $paidAt->copy() : Carbon::now();
+
+        $start = config('accelerator.cohort_starts_at');
+        $cohortStart = $start ? Carbon::parse($start, 'Africa/Lagos') : null;
+
+        $anchor = ($cohortStart && $cohortStart->greaterThan($paidAt)) ? $cohortStart : $paidAt;
+
+        return $anchor->copy()->addDays($days);
+    }
+
     /** Published testimonials only — never fabricated, empty by default. */
     public static function publishedTestimonials(): Collection
     {

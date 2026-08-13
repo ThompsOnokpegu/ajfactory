@@ -89,7 +89,7 @@ class StudentProvisioner
         if ($enrollment->plan_type === 'installment'
             && (float) $enrollment->balance_due > 0
             && ! $enrollment->second_payment_due_at) {
-            $updates['second_payment_due_at'] = now()->addDays((int) config('accelerator.installment_due_days', 21));
+            $updates['second_payment_due_at'] = Accelerator::installmentDueAt();
             $updates['second_payment_status'] = 'pending';
         }
 

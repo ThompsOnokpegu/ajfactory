@@ -22,7 +22,12 @@ return [
     'currency'          => 'NGN',
 
     // Installment scheduling
-    'installment_due_days'   => 21,  // 2nd payment is due this many days after the 1st
+    // Days a student gets to clear the 2nd installment. Counted from the COHORT
+    // START, not from when they paid — see Accelerator::installmentDueAt(). Changing
+    // this only affects enrollments stamped AFTER the change; run
+    // `php artisan installments:realign` to bring existing students onto the new
+    // window (it never shortens an existing deadline).
+    'installment_due_days'   => 21,
     'installment_grace_hours' => 24, // suspend access this long after the due date if still unpaid
 
     // Completion guarantee: weekly live sessions a student must attend (in
