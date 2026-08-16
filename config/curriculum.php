@@ -258,7 +258,7 @@ return [
             'release_at' => '2026-08-15 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Sat 15 Aug
+            'attendance_code' => 'AJ500', // ← announced at the END of the call (Sat 15 Aug). Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-06-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
