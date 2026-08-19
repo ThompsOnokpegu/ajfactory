@@ -8,14 +8,14 @@
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ config('app.url') }}">
-        <meta property="og:title" content="AI Automation Accelerator | Cohort 2">
+        <meta property="og:title" content="AI Automation Accelerator | {{ \App\Support\Accelerator::cohortLabel() }}">
         <meta property="og:description" content="Build 9 real AI automations in 6 weeks — and the playbook to charge for them.">
         <meta property="og:image" content="{{ asset('img/og-preview.jpg') }}">
 
         <!-- Twitter -->
         <meta property="twitter:card" content="summary_large_image">
         <meta property="twitter:image" content="{{ asset('img/og-preview.jpg') }}">
-        <title>AI Automation Accelerator | Cohort 2</title>
+        <title>AI Automation Accelerator | {{ \App\Support\Accelerator::cohortLabel() }}</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,6 +32,10 @@
     @php
         use App\Support\Accelerator;
 
+        $cohortLabel  = Accelerator::cohortLabel();        // "Cohort 3"
+        $cohortPadded = Accelerator::cohortLabelPadded();  // "Cohort 03"
+        $hasStarted   = Accelerator::hasStarted();
+
         $seatsLeft   = Accelerator::seatsLeft();
         $cap         = (int) config('accelerator.cohort_cap');
         $soldOut     = Accelerator::isSoldOut();
@@ -47,7 +51,7 @@
         // Registration still open? (cohort has started but the cart hasn't closed)
         $regOpen     = $closesAt ? \Illuminate\Support\Carbon::now('Africa/Lagos')->lt($closesAt) : true;
         $primaryCta  = $soldOut ? '/builders' : '/checkout?plan=full';
-        $primaryText = $soldOut ? 'Join The Waitlist' : 'Join Cohort 2 - ₦'.number_format($fullPrice);
+        $primaryText = $soldOut ? 'Join The Waitlist' : 'Join '.$cohortLabel.' - ₦'.number_format($fullPrice);
     @endphp
     <body class="bg-zinc-950 text-zinc-300 font-sans antialiased selection:bg-cyan-500 selection:text-black">
 
@@ -111,7 +115,11 @@
 
                 @if(!$soldOut && $regOpen)
                     <p class="mt-4 text-sm text-zinc-400 max-w-xl mx-auto">
-                        Cohort 2 has already started — but it's <span class="text-white font-semibold">self-paced</span>, so you can still join and catch up. Doors close <span class="text-amber-400 font-semibold">{{ $closesLabel }}</span>.
+                        @if($hasStarted)
+                            {{ $cohortLabel }} has already started - but it's <span class="text-white font-semibold">self-paced</span>, so you can still join and catch up. Doors close <span class="text-amber-400 font-semibold">{{ $closesLabel }}</span>.
+                        @else
+                            {{ $cohortLabel }} starts <span class="text-white font-semibold">{{ $startLabel }}</span>. It's <span class="text-white font-semibold">self-paced</span>, so you set the pace from day one. Doors close <span class="text-amber-400 font-semibold">{{ $closesLabel }}</span>.
+                        @endif
                     </p>
                 @endif
 
@@ -258,7 +266,7 @@
                     <!-- Graceful empty state — no fabricated testimonials -->
                     <div class="max-w-2xl mx-auto p-12 rounded-3xl border border-dashed border-zinc-800 bg-zinc-950/40 text-center">
                         <p class="text-zinc-500 text-sm leading-relaxed">
-                            Cohort 2 results land here as builders ship. Want to be one of the first case studies?
+                            {{ $cohortLabel }} results land here as builders ship. Want to be one of the first case studies?
                         </p>
                         <a href="{{ $primaryCta }}" class="inline-block mt-6 px-6 py-3 border border-zinc-800 text-zinc-400 hover:text-white hover:border-cyan-500/50 transition-all uppercase font-black text-[10px] tracking-widest rounded-lg">
                             {{ $soldOut ? 'Join The Waitlist' : 'Claim Your Seat' }}
@@ -302,13 +310,13 @@
             <!-- 3.7 PRICING -->
             <section id="pricing" class="max-w-6xl mx-auto px-6 py-24 border-t border-zinc-900">
                 <div class="text-center mb-16 space-y-3">
-                    <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter">Cohort 02.</h2>
+                    <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter">{{ $cohortPadded }}.</h2>
                     @if($soldOut)
                         <p class="text-amber-400 font-bold">This cohort is full. Join the waitlist for the next one.</p>
                     @else
                         <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.@if($earlybird) <span class="text-cyan-400">Early-bird pricing is live.</span>@endif</p>
                         @if($regOpen && $closesLabel)
-                            <p class="mt-2 text-sm font-bold text-amber-400">⏳ Enrolment closes {{ $closesLabel }} — cohort is already live and self-paced, so you can still catch up.</p>
+                            <p class="mt-2 text-sm font-bold text-amber-400">⏳ Enrolment closes {{ $closesLabel }}@if($hasStarted) - cohort is already live and self-paced, so you can still catch up.@else - cohort starts {{ $startLabel }}.@endif</p>
                         @endif
                     @endif
                 </div>
@@ -406,7 +414,7 @@
             <!-- 3.11 FINAL CTA + SCARCITY -->
             <section class="max-w-4xl mx-auto px-6 py-24 text-center border-t border-zinc-900">
                 <h2 class="text-4xl md:text-6xl font-black text-white uppercase italic tracking-tighter mb-6">
-                    {{ $soldOut ? 'Cohort 2 is full.' : 'Your seat is waiting.' }}
+                    {{ $soldOut ? $cohortLabel.' is full.' : 'Your seat is waiting.' }}
                 </h2>
                 <p class="text-zinc-400 max-w-xl mx-auto mb-4 leading-relaxed">
                     Build nine real automations, own your stack, and finish — backed by the completion guarantee. Finish, or we finish with you.

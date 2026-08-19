@@ -29,11 +29,34 @@ class Accelerator
     {
         Setting::put(self::REGISTRATION_FLAG, $open ? '1' : '0');
     }
+
+    /**
+     * The cohort currently being sold. Stamped on new enrollments and used
+     * everywhere the number appears in copy — never hardcode it in a Blade file,
+     * or the next launch ships a page that still says the old number.
+     */
+    public static function cohortNumber(): int
+    {
+        return (int) config('accelerator.cohort_number', 1);
+    }
+
+    /** "Cohort 3" — plain prose form. */
+    public static function cohortLabel(): string
+    {
+        return 'Cohort '.self::cohortNumber();
+    }
+
+    /** "Cohort 03" — zero-padded form used in the big display headings. */
+    public static function cohortLabelPadded(): string
+    {
+        return 'Cohort '.str_pad((string) self::cohortNumber(), 2, '0', STR_PAD_LEFT);
+    }
+
     /** Confirmed (paid) enrolments in the CURRENT cohort — drives seats/early-bird. */
     public static function seatsSold(): int
     {
         return (int) Enrollment::where('status', 'paid')
-            ->where('cohort', (int) config('accelerator.cohort_number', 2))
+            ->where('cohort', self::cohortNumber())
             ->count();
     }
 
@@ -118,6 +141,23 @@ class Accelerator
         $value = config('accelerator.cohort_starts_at');
 
         return $value ? Carbon::parse($value) : null;
+    }
+
+    /**
+     * Has the cohort already begun? Selling copy differs either side of this:
+     * before the start it's "starts Saturday 12th September", after it it's
+     * "already running, but it's self-paced so you can still catch up". Getting
+     * this wrong is a visible lie on the landing page, so it's derived, not typed.
+     */
+    public static function hasStarted(): bool
+    {
+        $value = config('accelerator.cohort_starts_at');
+
+        if (! $value) {
+            return false;
+        }
+
+        return Carbon::now('Africa/Lagos')->gte(Carbon::parse($value, 'Africa/Lagos'));
     }
 
     /** When registration/enrolment closes (cart close). Drives the deadline copy. */

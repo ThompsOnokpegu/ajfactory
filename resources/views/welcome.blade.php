@@ -129,7 +129,7 @@
                     <div class="relative p-8 md:p-10 rounded-[2.5rem] border border-cyan-500/40 bg-zinc-900 shimmer flex flex-col overflow-hidden">
                         <div class="absolute -top-3 left-8 bg-cyan-500 text-black text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded">Go All In</div>
                         <div class="relative z-10 flex flex-col flex-1">
-                            <div class="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-4">The Accelerator · Cohort 2</div>
+                            <div class="text-[10px] font-black uppercase tracking-widest text-zinc-500 mb-4">The Accelerator · {{ \App\Support\Accelerator::cohortLabel() }}</div>
                             <div class="flex items-end gap-2 mb-2">
                                 <div class="text-5xl font-black text-white tracking-tighter italic">₦{{ number_format((int) config('accelerator.price_full')) }}</div>
                                 <div class="text-amber-400 text-sm font-bold mb-2">· or ₦{{ number_format((int) config('accelerator.installment_each')) }} × {{ (int) config('accelerator.installment_count') }}</div>

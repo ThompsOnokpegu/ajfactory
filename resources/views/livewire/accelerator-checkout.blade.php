@@ -29,6 +29,8 @@ new class extends Component {
     public string $couponMessage = '';
 
     // Cohort state
+    public string $cohortLabel = '';   // "Cohort 3"
+    public string $cohortPadded = '';  // "Cohort 03"
     public bool $soldOut = false;
     public bool $registrationOpen = true;
     public int $seatsLeft = 0;
@@ -58,6 +60,8 @@ new class extends Component {
 
     public function refreshCohortState(): void
     {
+        $this->cohortLabel      = Accelerator::cohortLabel();
+        $this->cohortPadded     = Accelerator::cohortLabelPadded();
         $this->soldOut          = Accelerator::isSoldOut();
         $this->registrationOpen = Accelerator::registrationOpen();
         $this->seatsLeft        = Accelerator::seatsLeft();
@@ -250,7 +254,7 @@ new class extends Component {
                     <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
                 </div>
                 @if($soldOut)
-                    <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Cohort 2 is full.</h1>
+                    <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">{{ $cohortLabel }} is full.</h1>
                     <p class="text-zinc-500 text-sm leading-relaxed">All {{ $cap }} seats are taken. Join the waitlist and we'll reach out the moment a seat opens or the next cohort is announced.</p>
                 @else
                     <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter">Registration is paused.</h1>
@@ -264,7 +268,7 @@ new class extends Component {
         <div class="flex-1 p-6 sm:p-8 lg:p-16 border-r border-zinc-900">
             <div class="max-w-md mx-auto">
                 <div class="mb-8">
-                    <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Join Cohort 02.</h1>
+                    <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Join {{ $cohortPadded }}.</h1>
                     <p class="text-[11px] font-mono uppercase tracking-widest {{ $earlybird ? 'text-cyan-400' : 'text-zinc-500' }}">
                         {{ $seatsLeft }} of {{ $cap }} seats left @if($earlybird) · early-bird active @endif
                     </p>
@@ -359,7 +363,7 @@ new class extends Component {
         <!-- RIGHT: ORDER SUMMARY -->
         <div class="w-full lg:w-[450px] p-6 sm:p-8 lg:p-16 bg-zinc-900/10">
             <div class="sticky top-32">
-                <h2 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-600 mb-8">Summary // Cohort_002</h2>
+                <h2 class="text-xs font-black uppercase tracking-[0.3em] text-zinc-600 mb-8">Summary // Cohort_{{ str_pad((string) \App\Support\Accelerator::cohortNumber(), 3, '0', STR_PAD_LEFT) }}</h2>
                 <div class="space-y-6">
                     <div class="flex justify-between items-start">
                         <div>

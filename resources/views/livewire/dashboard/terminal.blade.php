@@ -164,7 +164,7 @@ $loadProgress = function () {
 /*
  * Compute the lock state of every module.
  *  - Cohort 1 (legacy/open): nothing is ever locked.
- *  - Cohort 2 (ship-to-unlock): Core Training is proof-gated — module 1 is gated
+ *  - Cohort 2+ (ship-to-unlock): Core Training is proof-gated — module 1 is gated
  *    only by the cohort start floor, every later module unlocks when the PREVIOUS
  *    module's checkpoint is approved. The Live Archive stays date-gated.
  */
@@ -784,7 +784,7 @@ $dismissReview = function () {
                             </div>
                         </div>
 
-                        {{-- Completion guarantee: checkpoints + live attendance (Cohort 2) --}}
+                        {{-- Completion guarantee: checkpoints + live attendance (Cohort 2+) --}}
                         @if($shipToUnlock)
                             <div class="p-6 border rounded-2xl {{ $guaranteeMet ? 'border-green-500/30 bg-green-500/5' : 'border-zinc-900 bg-zinc-950/50' }}">
                                 <div class="flex items-center justify-between mb-3">
@@ -813,7 +813,7 @@ $dismissReview = function () {
                 {{-- STAGED REVIEW: the soft ask, due only after a checkpoint is approved --}}
                 @include('livewire.dashboard.partials.review-prompt')
 
-                {{-- SHIP-TO-UNLOCK: proof checkpoint panel (Core Training, Cohort 2 only) --}}
+                {{-- SHIP-TO-UNLOCK: proof checkpoint panel (Core Training, Cohort 2+ only) --}}
                 @php $isCoreSection = ($curriculum[$activeSection]['title'] ?? '') === 'Core Training'; @endphp
                 @if($shipToUnlock && $isCoreSection && !$isLocked && $curModule)
                     @php

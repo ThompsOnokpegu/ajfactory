@@ -118,6 +118,34 @@ it('keeps the completion-guarantee threshold reachable', function () {
     expect($threshold)->toBeLessThan($sessions);
 });
 
+it('schedules enough live sessions AFTER the cohort start to win the guarantee', function () {
+    // The counting test above passes on the total session count, which is the wrong
+    // denominator and hid a real near-miss: opening Cohort 3 (start Sat 12 Sep 2026)
+    // against an archive that stopped at live-10 on the start date itself. Sixteen
+    // sessions existed, the threshold was 4, and NOT ONE of them was attendable — every
+    // session belonged to an earlier cohort. Attendance requires the session to run
+    // after the student's cohort began, so that is the only count that means anything.
+    $start = \App\Support\Accelerator::cohortStartsAt();
+    $threshold = (int) config('accelerator.guarantee_min_live_sessions');
+
+    expect($start)->not->toBeNull('accelerator.cohort_starts_at must be set');
+
+    $attendable = collect(config('curriculum.live', []))
+        ->filter(fn ($s) => ! empty($s['release_at'])
+            && \Illuminate\Support\Carbon::parse($s['release_at'], 'Africa/Lagos')->gt($start))
+        ->count();
+
+    // Threshold + 2 is the deliberate margin: a student may miss two sessions (illness,
+    // travel, a clash) and still finish. Landing exactly on the threshold means demanding
+    // a perfect record again, which is the bug this whole family of tests exists for.
+    expect($attendable)->toBeGreaterThanOrEqual(
+        $threshold + 2,
+        "Only {$attendable} live session(s) fall after the cohort start, against a guarantee "
+        ."threshold of {$threshold}. Add sessions to curriculum.live dated after "
+        .'accelerator.cohort_starts_at, or lower the threshold.'
+    );
+});
+
 it('never ships a live session with a placeholder playbook link', function () {
     $live = config('curriculum.live', []);
 

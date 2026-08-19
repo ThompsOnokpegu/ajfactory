@@ -220,21 +220,52 @@ Laravel already waits for each send.
 
 ### Opening
 
-Set the dates in `config/accelerator.php` — these drive the landing page, checkout, and
+Setting the config dates is step 1 of 6, not the whole job. The other five don't fail loudly,
+so work the list. (Cohort 3, opened 19 Aug 2026 for a 12 Sep start, is the worked example.)
+
+**1. Set the dates** in `config/accelerator.php` — these drive the landing page, checkout, and
 scarcity:
 
 ```php
-'cohort_number'     => 2,
+'cohort_number'     => 3,
 'cohort_cap'        => 25,
 'earlybird_seats'   => 10,
-'earlybird_ends_at' => '2026-07-20 23:59:59',
-'cohort_starts_at'  => '2026-07-31',
-'cart_closes_at'    => '2026-08-03 23:59:59',
+'earlybird_ends_at' => '2026-08-31 23:59:59',  // Monday 31 Aug 2026
+'cohort_starts_at'  => '2026-09-12',           // Saturday 12 Sep 2026
+'cart_closes_at'    => '2026-09-14 23:59:59',  // Monday 14 Sep 2026
 ```
 
-Deploy, then confirm the live page shows the new dates (config cache again). Keep the
-welcome email in [emails/7-accelerator-welcome.html](emails/7-accelerator-welcome.html) in
-sync — it states the start date in prose.
+**Check every weekday you write in a comment against a calendar.** Cohort 3's dates first
+landed labelled "Monday 29th August" and "Friday 12th September" when both were Saturdays.
+Nothing validates these, and they're what you'll copy into the launch emails and ads.
+
+**2. Bump the coupon expiry.** `coupons.*.expires_at` is normally pinned to `cart_closes_at`.
+A coupon that outlives the cart still discounts; one that dies early silently stops working
+mid-launch.
+
+**3. Add the live sessions** to `config/curriculum.php` → `live`, dated **after** the cohort
+start. This is the step that bites: attendance only exists for a session that runs after the
+student's cohort began *and* has an `attendance_code`, so sessions inherited from the previous
+cohort count for nobody. Cohort 3 was about to open with the archive ending at `live-10` on
+the start date itself — every new student would have had **zero** attendable sessions against
+a `guarantee_min_live_sessions` of 4, i.e. a completion guarantee nobody could win, with no
+retroactive fix. Schedule at least threshold + 2 sessions inside the cohort window.
+
+**4. Update the copy that isn't derived.** The cohort number now comes from
+`Accelerator::cohortLabel()` / `cohortLabelPadded()` and the start/close dates from
+`cohortStartsAt()` / `cartClosesAt()`, so the landing page, checkout and homepage follow the
+config on their own — but grep for a hardcoded number anyway before you ship. The landing page
+switches between "starts <date>" and "already running, self-paced" off
+`Accelerator::hasStarted()`, so don't hand-write either tense.
+
+**5. Sync the welcome email.** [emails/7-accelerator-welcome.html](emails/7-accelerator-welcome.html)
+states the cohort number and start date in prose, in the subject line, and in the footer. It is
+a **mirror** of the template that lives in n8n — editing the file in this repo changes nothing
+students receive until you paste it into the n8n enrolment workflow.
+
+**6. Build, deploy, verify.** `npm run build` + commit `public/build`, deploy, then load
+`/accelerator` and `/checkout` on production and read the dates back. Config is cached in
+production, so a stale `config:cache` shows the *old* cohort with a straight face.
 
 **Pausing registration** is a runtime switch, no deploy needed: admin overview → the
 Open/Paused toggle. Checkout then shows "Registration is paused" (distinct from sold out).

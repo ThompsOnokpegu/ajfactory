@@ -84,20 +84,33 @@ the rate moves materially.
 
 ### Cohort & scarcity
 ```php
-'cohort_number'     => 2,   // stamped on new enrollments; >= 2 enables ship-to-unlock
+'cohort_number'     => 3,   // stamped on new enrollments; >= 2 enables ship-to-unlock
 'cohort_cap'        => 25,
 'earlybird_seats'   => 10,
-'earlybird_ends_at' => '2026-07-20 23:59:59',
-'cohort_starts_at'  => '2026-07-31',
-'cart_closes_at'    => '2026-08-03 23:59:59',
+'earlybird_ends_at' => '2026-08-31 23:59:59',  // Monday 31 Aug 2026
+'cohort_starts_at'  => '2026-09-12',           // Saturday 12 Sep 2026
+'cart_closes_at'    => '2026-09-14 23:59:59',  // Monday 14 Sep 2026
 ```
 
 - Early-bird is active while `seats_sold < earlybird_seats` **and** `now < earlybird_ends_at`.
 - Seats left = `cohort_cap - seats_sold`; at zero, checkout is disabled and a waitlist CTA shows.
 - `cohort_number >= 2` turns on checkpoint gating. Cohort 1 stays ungated deliberately.
-- Changing `cohort_starts_at`? Update
-  [emails/7-accelerator-welcome.html](emails/7-accelerator-welcome.html) too — it states the
-  date in prose.
+- Changing `cohort_starts_at`? Four other things follow from it, and none of them error
+  if you forget:
+  1. [emails/7-accelerator-welcome.html](emails/7-accelerator-welcome.html) states the date in
+     prose — and it is a *mirror* of the template in n8n, so paste the change there too.
+  2. `curriculum.php` → `live` needs sessions dated **after** the new start, or the completion
+     guarantee becomes unwinnable (see below).
+  3. `cart_closes_at` and any coupon `expires_at` are usually pinned to it.
+  4. **Write the weekday in the comment and check it.** Cohort 3 was first set with the
+     comments "Monday 29th August" and "Friday 12th September" against dates that were both
+     Saturdays. Config comments are what everyone reads when writing the launch copy.
+- The landing page picks its own tense from `Accelerator::hasStarted()` — before the start it
+  says "starts <date>", after it says "already running, self-paced, you can still catch up".
+  Don't hardcode either phrasing.
+- **Never hardcode the cohort number in a Blade file.** Use `Accelerator::cohortLabel()`
+  ("Cohort 3") or `cohortLabelPadded()` ("Cohort 03"). Cohort 2 shipped with the number typed
+  into eight places across the landing page, checkout, and homepage.
 
 ### Installments
 `installment_due_days` is counted from the **cohort start**, not from when the student paid
@@ -126,7 +139,7 @@ price-lock, so a discounted price can never be injected from the client. Each en
     'type'       => 'percent',              // 'percent' | 'fixed'
     'value'      => 25,                       // percent: a number; fixed: ['NGN'=>10000,'USD'=>8]
     'plans'      => ['full', 'installment'],  // plans it applies to
-    'expires_at' => '2026-08-03 23:59:59',    // optional (Africa/Lagos)
+    'expires_at' => '2026-09-14 23:59:59',    // optional (Africa/Lagos) - usually cart close
     'label'      => 'TAAB masterclass — 25% off',
 ],
 ```
@@ -144,6 +157,10 @@ charged `amount` is already the discounted figure the webhook verifies.
   path. Real incident: it was set to 6 while Cohort 2 had exactly 6 attendable sessions
   (`live-05`..`live-10`, since 01–04 predated both the cohort and the feature) — so a single
   absence failed the guarantee for everyone. `LiveAttendanceTest` now guards the threshold.
+  **Re-count on every cohort launch.** Cohort 3 (starts Sat 12 Sep 2026) would have opened with
+  *zero* attendable sessions — the archive stopped at `live-10` on the start date itself — so
+  `live-11`..`live-16` (Saturdays 19 Sep to 24 Oct 2026) were added to give the threshold of 4
+  a six-session pool. Sessions carried over from the previous cohort never count.
 - Per **live** session in `curriculum.php`: `attendance_code` (the code AJ announces at the
   **end** of the call — set a fresh one each session, never type it in chat; it's read
   server-side and never sent to the browser) and optional `playbook_url` (unlocked once the

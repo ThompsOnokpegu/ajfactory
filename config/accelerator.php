@@ -3,7 +3,7 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | AI Automation Accelerator — Cohort 02 Offer Config
+    | AI Automation Accelerator — Cohort 03 Offer Config
     |--------------------------------------------------------------------------
     | Single source of truth for pricing, scarcity, and cohort dates. Drives
     | both the landing page (/accelerator) and the checkout (/checkout). Derived
@@ -37,10 +37,18 @@ return [
     // MUST stay below the number of sessions a student can ACTUALLY still attend,
     // which is not the same as the number of sessions in the curriculum. Attendance
     // only exists for sessions that (a) ran after the student's cohort started and
-    // (b) had an `attendance_code` set — there is no retroactive path. For Cohort 2
-    // that's live-05..live-10 = 6 sessions, so this was 6: a threshold that demanded
-    // 100% attendance and failed anyone who got ill once. 4 leaves real margin while
-    // still requiring genuine participation.
+    // (b) had an `attendance_code` set — there is no retroactive path.
+    //
+    // Cohort 2 learned this the hard way: it was set to 6 when Cohort 2 had exactly
+    // 6 attendable sessions, so the guarantee demanded 100% attendance and failed
+    // anyone who got ill once. 4 leaves real margin while still requiring genuine
+    // participation.
+    //
+    // For Cohort 3 (starts Sat 12 Sep 2026) the attendable set is live-11..live-16,
+    // the six Saturdays from 19 Sep to 24 Oct 2026. live-01..live-09 all ran before the
+    // start; live-10 is Cohort 2's closing session on the morning of the start day and
+    // carries no attendance_code, so it credits nobody either. If you shift the cohort
+    // start, RE-COUNT the sessions that fall after it before trusting this number.
     'guarantee_min_live_sessions' => 4,
 
     /*
@@ -59,20 +67,20 @@ return [
     'coupons' => [
         'TAAB59' => [
             'type' => 'fixed',
-            'value' => ['NGN' => 20000, 'USD' => 14], // ₦20,000 ≈ $14 at ~₦1,400/$
+            'value' => ['NGN' => 10000, 'USD' => 7], // ₦10,000 ≈ $7 at ~₦1,400/$
             'plans' => ['full', 'installment'],
-            'expires_at' => '2026-08-03 23:59:59',     // cart close (Mon 3 Aug, Africa/Lagos)
+            'expires_at' => '2026-09-14 23:59:59',     // cart close (Mon 14 Sep, Africa/Lagos)
             'label' => 'TAAB masterclass discount',
         ],
     ],
 
     // --- Scarcity / cohort ---
-    'cohort_number'     => 2,     // stamped on new enrollments; >= 2 enables ship-to-unlock
+    'cohort_number'     => 3,     // stamped on new enrollments; >= 2 enables ship-to-unlock
     'cohort_cap'        => 25,
     'earlybird_seats'   => 10,    // early-bird active while seats_sold < this
-    'earlybird_ends_at' => '2026-07-20 23:59:59', // Monday 20th July 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
-    'cohort_starts_at'  => '2026-07-31', // Friday 31st July 2026
-    'cart_closes_at'    => '2026-08-03 23:59:59', // Monday 3rd August 2026
+    'earlybird_ends_at' => '2026-08-31 23:59:59', // Monday 31st August 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
+    'cohort_starts_at'  => '2026-09-12', // Saturday 12th September 2026
+    'cart_closes_at'    => '2026-09-14 23:59:59', // Monday 14th September 2026 (doors stay open 2 days into the cohort)
 
     'payment_provider'  => 'paystack', // or 'flutterwave'
 

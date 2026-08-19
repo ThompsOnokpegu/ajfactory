@@ -30,8 +30,8 @@
 | invent IDs. A module with no 'videos' key still works (the dashboard wraps
 | its top-level video_id into a single video automatically).
 |
-| Cohort 2 started 31 July 2026 (`accelerator.cohort_starts_at` — that config is
-| the single source of truth for the start date, not this comment).
+| `accelerator.cohort_starts_at` is the single source of truth for when the current
+| cohort begins — never a comment in here. (Cohort 2: 31 Jul 2026. Cohort 3: 12 Sep 2026.)
 |
 | NOTE: for Core Training, 'release_at' is INERT. Cohort 2+ runs ship-to-unlock:
 | module 01 opens on the cohort start date and every later module opens when the
@@ -233,7 +233,7 @@ return [
 
         /*
         |----------------------------------------------------------------------
-        | Upcoming live sessions — every SATURDAY 9AM WAT from 8 Aug 2026 (6 total).
+        | COHORT 2 RUN — every SATURDAY 9AM WAT from 8 Aug 2026 (6 sessions).
         |----------------------------------------------------------------------
         | Announce the attendance_code at the END of each call. Set a FRESH code
         | per session: uncomment its line and fill it just before you go live
@@ -313,6 +313,97 @@ return [
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-10-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+
+        /*
+        |----------------------------------------------------------------------
+        | COHORT 3 RUN — every SATURDAY 9AM WAT from 19 Sep 2026 (6 sessions).
+        |----------------------------------------------------------------------
+        | These are the ONLY sessions a Cohort 3 student can be credited for:
+        | attendance requires the session to run AFTER their cohort start
+        | (Sat 12 Sep 2026) and to have an `attendance_code` set. live-10 lands on
+        | the start morning but is Cohort 2's closing call with no code set, so it
+        | doesn't count for anyone in Cohort 3 either. Six sessions
+        | against `accelerator.guarantee_min_live_sessions` = 4 leaves margin for
+        | two misses — don't delete one without re-checking that threshold.
+        |
+        | Announce the attendance_code at the END of each call. Set a FRESH code
+        | per session: uncomment its line and fill it just before you go live
+        | (it's server-side only, never sent to the browser). Paste each video_id
+        | after the session is recorded. An unset code means the session simply
+        | can't be credited — there is no retroactive fix.
+        */
+        [
+            'id' => 'live-11',
+            'title' => 'Live Session #11: Build & Q&A',
+            'release_at' => '2026-09-19 09:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set a FRESH code before Sat 19 Sep
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-11-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-12',
+            'title' => 'Live Session #12: Build & Q&A',
+            'release_at' => '2026-09-26 09:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set a FRESH code before Sat 26 Sep
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-12-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-13',
+            'title' => 'Live Session #13: Build & Q&A',
+            'release_at' => '2026-10-03 09:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set a FRESH code before Sat 3 Oct
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-13-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-14',
+            'title' => 'Live Session #14: Build & Q&A',
+            'release_at' => '2026-10-10 09:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set a FRESH code before Sat 10 Oct
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-14-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-15',
+            'title' => 'Live Session #15: Build & Q&A',
+            'release_at' => '2026-10-17 09:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set a FRESH code before Sat 17 Oct
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-15-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
+            ],
+        ],
+        [
+            'id' => 'live-16',
+            'title' => 'Live Session #16: Build & Q&A',
+            'release_at' => '2026-10-24 09:00:00',
+            'library_id' => '589383',
+            'has_blueprint' => false,
+            // 'attendance_code' => '', // ← set a FRESH code before Sat 24 Oct
+            'description' => "Weekly live build & Q&A. Recording appears here after the session.",
+            'videos' => [
+                ['id' => 'live-16-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
             ],
         ],
     ],

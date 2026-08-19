@@ -1,4 +1,4 @@
-<!-- Event: enrollment confirmed  |  Subject: You're in — Cohort 02 starts Fri 31 July
+<!-- Event: enrollment confirmed  |  Subject: You're in - Cohort 03 starts Sat 12 September
 
   Sent from the ENROLMENT workflow (not the student webhook), so the variable
   scoping differs from the masterclass templates — it reads $json from the
@@ -11,9 +11,13 @@
     {{ $('Webhook').item.json.body.login_url }}
 
   Facts are sourced from config/accelerator.php — if the cohort dates change,
-  update BOTH (cohort_starts_at is currently 2026-07-31):
-    cohort_number    => 2
-    cohort_starts_at => 2026-07-31  (Friday 31st July 2026)
+  update BOTH (cohort_starts_at is currently 2026-09-12):
+    cohort_number    => 3
+    cohort_starts_at => 2026-09-12  (Saturday 12th September 2026)
+
+  This file is a MIRROR of the template that lives in n8n. Editing it here does
+  nothing on its own - paste the change into the n8n enrolment workflow too, or
+  students keep receiving the old dates.
 
   Telegram invite is hardcoded below; config/accelerator.php also holds
   ACCELERATOR_TELEGRAM_URL for the app side. Keep them in sync.
@@ -50,19 +54,19 @@
 
         <tr><td class="px" style="padding:28px 36px 4px;">
           <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:19px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">AI Automation <span style="color:#06b6d4;">Accelerator</span></span>
-          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;"> · Cohort 02</span>
+          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;"> · Cohort 03</span>
         </td></tr>
 
         <tr><td class="px" style="padding:16px 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;color:#e4e4e7;">
           <p style="margin:0 0 6px;font-family:'Space Grotesk',Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#06b6d4;">Seat confirmed</p>
           <h1 style="margin:0 0 14px;font-family:'Space Grotesk',Arial,sans-serif;font-size:26px;font-weight:700;line-height:1.2;color:#ffffff;">You're in, {{ $json.full_name }}.</h1>
-          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">Your enrolment is locked in for <strong style="color:#e4e4e7;">Cohort 02</strong>. Over the next 6 weeks you'll build 9 production automations end to end — and get the playbook to charge for them.</p>
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">Your enrolment is locked in for <strong style="color:#e4e4e7;">Cohort 03</strong>. Over the next 6 weeks you'll build 9 production automations end to end - and get the playbook to charge for them.</p>
 
           <!-- Start date -->
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px;background:#18181b;border:1px solid rgba(6,182,212,0.25);border-radius:12px;">
             <tr><td style="padding:18px 20px;font-family:'Space Grotesk',Arial,sans-serif;">
               <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;">Cohort starts</p>
-              <p style="margin:0;font-size:19px;font-weight:700;color:#ffffff;">Friday, 31st July 2026</p>
+              <p style="margin:0;font-size:19px;font-weight:700;color:#ffffff;">Saturday, 12th September 2026</p>
               <p style="margin:6px 0 0;font-size:13.5px;line-height:1.6;color:#a1a1aa;">Your terminal is open now for pre-flight checks — log in, set up your profile, and confirm your access works. Module 01 unlocks on start day.</p>
             </td></tr>
           </table>
@@ -130,7 +134,7 @@
 
         <tr><td class="px" style="padding:24px 36px 32px;border-top:1px solid rgba(255,255,255,0.07);">
           <p style="margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;line-height:1.6;color:#52525b;">
-            AI Automation Accelerator · Cohort 02 · You're receiving this because you enrolled.<br>
+            AI Automation Accelerator · Cohort 03 · You're receiving this because you enrolled.<br>
             Questions? Reply to this email or reach us at <a href="mailto:hello@ajbuildai.com" style="color:#71717a;">hello@ajbuildai.com</a>.<br>
             &copy; 2026 Deepr Web Services.
           </p>
