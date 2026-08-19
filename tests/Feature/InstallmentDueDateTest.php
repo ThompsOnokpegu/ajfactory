@@ -22,6 +22,9 @@ function installmentEnrollment(array $overrides = []): Enrollment
 
 beforeEach(function () {
     config([
+        // These fixtures are cohort 2, so make cohort 2 the one being sold: the start
+        // floor only applies to the CURRENT cohort (see Accelerator::startFloorFor).
+        'accelerator.cohort_number' => 2,
         'accelerator.cohort_starts_at' => '2026-07-31',
         'accelerator.installment_due_days' => 21,
         'accelerator.installment_grace_hours' => 24,
@@ -64,6 +67,30 @@ it('extends the old 14-day deadline of an early enroller', function () {
 
     $this->artisan('installments:realign')->assertSuccessful();
 
+    expect($e->fresh()->second_payment_due_at->toDateString())->toBe('2026-08-21');
+});
+
+it('does not re-anchor a past-cohort student to the next cohort start', function () {
+    // The Cohort 3 launch bug, in its money-moving form: installments:realign recomputes
+    // EVERY outstanding student, and installmentDueAt anchored to the global
+    // cohort_starts_at. Opening Cohort 3 on 12 Sep would have pushed a mid-course
+    // Cohort 2 student's deadline out to 3 Oct (12 Sep + 21d) - six weeks of free extra
+    // time they never earned - and un-suspended anyone suspended for non-payment.
+    Carbon::setTestNow('2026-08-19 09:00');
+    config([
+        'accelerator.cohort_number' => 3,
+        'accelerator.cohort_starts_at' => '2026-09-12',
+    ]);
+
+    $e = installmentEnrollment([
+        'cohort' => 2,
+        'paid_at' => Carbon::parse('2026-07-21 10:00'),
+        'second_payment_due_at' => Carbon::parse('2026-08-21 10:00'),
+    ]);
+
+    $this->artisan('installments:realign')->assertSuccessful();
+
+    // Unchanged: their window is anchored to Cohort 2's start, not Cohort 3's.
     expect($e->fresh()->second_payment_due_at->toDateString())->toBe('2026-08-21');
 });
 

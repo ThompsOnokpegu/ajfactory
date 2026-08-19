@@ -120,6 +120,13 @@ really begun, while someone who paid on day one got the full window. The anchor 
 of (cohort start, payment date)**, so early birds measure from the start line and nobody who
 joins mid-cohort gets less than the full window either.
 
+**"Cohort start" means the STUDENT'S cohort**, resolved via `Accelerator::startFloorFor()`,
+which returns `null` for any cohort earlier than the one being sold. Pass the cohort when
+recomputing an existing student; omit it at checkout, where they're joining the current one.
+Anchoring everyone to the global `cohort_starts_at` meant that opening Cohort 3 for 12 Sep
+would have had `installments:realign` push mid-course Cohort 2 deadlines out to 3 Oct and
+un-suspend students suspended for non-payment. Same root cause as the module-01 lockout.
+
 The due date is **stamped once** onto `second_payment_due_at` at payment time, so changing
 `installment_due_days` only affects enrollments created afterwards. Raising it from 14 to 21
 left earlier students on the old window — run `php artisan installments:realign` to bring

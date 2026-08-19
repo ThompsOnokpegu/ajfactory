@@ -256,14 +256,21 @@ class Accelerator
      * the full window either.
      *
      * $paidAt defaults to now, which is the right anchor at checkout time.
+     *
+     * $cohort is the STUDENT'S cohort. Omit it at checkout (they're joining the cohort
+     * being sold); pass it when recomputing an existing student, or the current cohort's
+     * start becomes their anchor. `installments:realign` recomputes every outstanding
+     * student regardless of cohort, so with Cohort 3 starting 12 Sep it would have handed
+     * mid-course Cohort 2 students a deadline three weeks later than they'd earned and
+     * un-suspended anyone already suspended for non-payment. Same root cause as the
+     * module-01 lockout — see startFloorFor().
      */
-    public static function installmentDueAt(?Carbon $paidAt = null): Carbon
+    public static function installmentDueAt(?Carbon $paidAt = null, ?int $cohort = null): Carbon
     {
         $days = (int) config('accelerator.installment_due_days', 21);
         $paidAt = $paidAt ? $paidAt->copy() : Carbon::now();
 
-        $start = config('accelerator.cohort_starts_at');
-        $cohortStart = $start ? Carbon::parse($start, 'Africa/Lagos') : null;
+        $cohortStart = self::startFloorFor($cohort);
 
         $anchor = ($cohortStart && $cohortStart->greaterThan($paidAt)) ? $cohortStart : $paidAt;
 

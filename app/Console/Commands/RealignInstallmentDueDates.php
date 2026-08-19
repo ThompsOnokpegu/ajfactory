@@ -55,7 +55,8 @@ class RealignInstallmentDueDates extends Command
 
         foreach ($enrollments as $enrollment) {
             $anchor = $enrollment->paid_at ?: $enrollment->created_at;
-            $computed = Accelerator::installmentDueAt($anchor);
+            // Anchored to THIS student's cohort — never the one currently being sold.
+            $computed = Accelerator::installmentDueAt($anchor, (int) $enrollment->cohort);
             $current = $enrollment->second_payment_due_at;
 
             // Only ever extend. A student must not lose time because we recalculated.

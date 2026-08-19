@@ -322,8 +322,8 @@ php artisan installments:realign --dry-run   # table of exactly what would move
 php artisan installments:realign             # apply
 ```
 
-It recomputes from the cohort start (`Accelerator::installmentDueAt()`) and **never shortens an
-existing deadline**, so it can't make anyone suddenly overdue and is safe to re-run. It also
+It recomputes from **the student's own cohort start** (`Accelerator::installmentDueAt($anchor,
+$cohort)`) and **never shortens an existing deadline**, so it can't make anyone suddenly overdue and is safe to re-run. It also
 undoes what the old deadline already triggered: a student flipped to `link_sent` goes back to
 `pending` (so `installments:process` sends the link on the real date) and anyone suspended is
 un-suspended — provided the new deadline plus grace hasn't already passed. Genuinely overdue
