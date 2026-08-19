@@ -46,14 +46,47 @@ it('gates Cohort 2 core modules behind the previous checkpoint', function () {
     expect($locks['0-1']['reason'])->toBe('checkpoint');
 });
 
-it('still locks Cohort 2 module 1 before the start floor', function () {
+it('still locks module 1 for the CURRENT cohort before the start floor', function () {
+    // Uses the configured cohort number, not a literal: this test hardcoded "2" and so
+    // silently stopped testing the current cohort the moment Cohort 3 was scheduled.
     config(['accelerator.cohort_starts_at' => now()->addWeek()]); // floor in the future
 
-    $this->actingAs(makeStudent(2));
+    $this->actingAs(makeStudent((int) config('accelerator.cohort_number')));
 
     $locks = Volt::test('dashboard.terminal')->get('lockMap');
     expect($locks['0-0']['locked'])->toBeTrue();
     expect($locks['0-0']['reason'])->toBe('date');
+});
+
+it('never re-locks module 1 for an earlier cohort when the next cohort is scheduled', function () {
+    // The Cohort 3 launch incident: module 01 was gated on the GLOBAL
+    // accelerator.cohort_starts_at, so moving it to a future date to open the next
+    // cohort instantly shut every mid-course Cohort 2 student out of module 01 —
+    // including students who had already shipped approved checkpoints.
+    config([
+        'accelerator.cohort_number' => 3,
+        'accelerator.cohort_starts_at' => now()->addWeeks(3),  // Cohort 3 hasn't started
+    ]);
+
+    $this->actingAs(makeStudent(2));  // a Cohort 2 student, mid-course
+
+    $locks = Volt::test('dashboard.terminal')
+        ->assertSet('shipToUnlock', true)
+        ->get('lockMap');
+
+    expect($locks['0-0']['locked'])->toBeFalse(
+        'A past-cohort student must never be date-gated by a future cohort start'
+    );
+});
+
+it('applies no start floor at all to a past cohort', function () {
+    config(['accelerator.cohort_number' => 3, 'accelerator.cohort_starts_at' => now()->addYear()]);
+
+    expect(\App\Support\Accelerator::startFloorFor(2))->toBeNull()
+        ->and(\App\Support\Accelerator::startFloorFor(1))->toBeNull();
+
+    // The current cohort still gets its floor.
+    expect(\App\Support\Accelerator::startFloorFor(3))->not->toBeNull();
 });
 
 it('lets a Cohort 2 student submit a proof checkpoint', function () {

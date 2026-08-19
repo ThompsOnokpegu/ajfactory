@@ -70,6 +70,19 @@ Proof-of-work submitted per module. `status` gates the next module: a student mu
 **approved** checkpoint for module *N* before *N+1* opens. Admin reviews these at
 `/admin/checkpoints`. This is the "ship-to-unlock" mechanic.
 
+**Module 01 is the exception** — it has no previous checkpoint, so it's gated by a *date
+floor* instead, resolved through `Accelerator::startFloorFor($studentCohort)`.
+
+The floor is **per student, not global**. It exists only to stop someone who paid early from
+starting before day one, so it applies to the cohort currently being sold and returns `null`
+for any earlier cohort — a student whose cohort has already begun is permanently past their
+own start line. Never gate module 01 on `config('accelerator.cohort_starts_at')` directly.
+
+That's a real incident: opening Cohort 3 set the global start to a future date, and every
+mid-course Cohort 2 student was instantly locked out of module 01, approved checkpoints and
+all. `ShipToUnlockTest` covers both directions - the current cohort still gets its floor, and
+an earlier cohort never does.
+
 ### `Student` — the lead table
 Every lead lands here regardless of source, deduplicated by email. Two fields carry the
 segmentation:

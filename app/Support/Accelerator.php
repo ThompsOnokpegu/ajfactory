@@ -160,6 +160,30 @@ class Accelerator
         return Carbon::now('Africa/Lagos')->gte(Carbon::parse($value, 'Africa/Lagos'));
     }
 
+    /**
+     * The date floor that gates module 01 for a student in $cohort, or null for no floor.
+     *
+     * The floor exists to stop someone who paid early from starting before day one. It is
+     * therefore only meaningful for the cohort currently being sold: a student from an
+     * EARLIER cohort is by definition already past their own start date.
+     *
+     * Reading `cohort_starts_at` for everyone is a live incident, not a hypothetical.
+     * Scheduling Cohort 3 for 12 Sep moved the global start into the future and instantly
+     * re-locked module 01 for every Cohort 2 student mid-course — they had shipped
+     * checkpoints and were simply shut out. A start floor must never move forward
+     * underneath someone who has already begun.
+     */
+    public static function startFloorFor(?int $cohort): ?Carbon
+    {
+        if ($cohort !== null && $cohort < self::cohortNumber()) {
+            return null;
+        }
+
+        $value = config('accelerator.cohort_starts_at');
+
+        return $value ? Carbon::parse($value, 'Africa/Lagos') : null;
+    }
+
     /** When registration/enrolment closes (cart close). Drives the deadline copy. */
     public static function cartClosesAt(): ?Carbon
     {

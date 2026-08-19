@@ -22,6 +22,8 @@ state([
     'unlockLabel' => '',           // date string, or the title of the module that gates this one
     // Ship-to-unlock state
     'shipToUnlock' => false,       // false for Cohort 1 (legacy/open)
+    'cohort' => null,              // THIS student's cohort — the module-01 date floor is
+                                   // theirs, never the cohort currently being sold
     'approvedModuleIds' => [],
     'checkpoints' => [],           // module_id => ['status','proof_url','note']
     'lockMap' => [],               // "sIndex-mIndex" => ['locked','reason','label']
@@ -128,6 +130,7 @@ $loadProgress = function () {
 
     $this->completedLessons = is_array($enrollment?->completed_lessons) ? $enrollment->completed_lessons : [];
     $this->shipToUnlock = $enrollment ? $enrollment->usesShipToUnlock() : false;
+    $this->cohort = $enrollment ? (int) $enrollment->cohort : null;
 
     $cps = $enrollment ? $enrollment->checkpoints()->get() : collect();
     $this->checkpoints = $cps->mapWithKeys(fn($c) => [
@@ -165,12 +168,15 @@ $loadProgress = function () {
  * Compute the lock state of every module.
  *  - Cohort 1 (legacy/open): nothing is ever locked.
  *  - Cohort 2+ (ship-to-unlock): Core Training is proof-gated — module 1 is gated
- *    only by the cohort start floor, every later module unlocks when the PREVIOUS
+ *    only by THIS STUDENT'S cohort start floor (see Accelerator::startFloorFor —
+ *    past cohorts have no floor), every later module unlocks when the PREVIOUS
  *    module's checkpoint is approved. The Live Archive stays date-gated.
  */
 $rebuildGate = function () {
     $now = Carbon::now('Africa/Lagos');
-    $start = config('accelerator.cohort_starts_at');
+    // Resolved against THIS student's cohort: a past-cohort student has no date floor,
+    // so scheduling the next cohort can never re-lock module 01 under them.
+    $start = \App\Support\Accelerator::startFloorFor($this->cohort);
     $map = [];
 
     foreach ($this->curriculum as $sIndex => $section) {
@@ -186,8 +192,8 @@ $rebuildGate = function () {
 
             if ($isCore) {
                 if ($mIndex === 0) {
-                    $locked = $start ? $now->lt(Carbon::parse($start, 'Africa/Lagos')) : false;
-                    $map[$key] = ['locked' => $locked, 'reason' => 'date', 'label' => $start ? Carbon::parse($start, 'Africa/Lagos')->format('M d, Y') : ''];
+                    $locked = $start ? $now->lt($start) : false;
+                    $map[$key] = ['locked' => $locked, 'reason' => 'date', 'label' => $start ? $start->format('M d, Y') : ''];
                 } else {
                     $prev = $section['modules'][$mIndex - 1];
                     $approved = in_array($prev['id'] ?? '', $this->approvedModuleIds, true);

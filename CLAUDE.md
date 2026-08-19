@@ -85,6 +85,12 @@ These encode real incidents. Changing them will break something that took a whil
 - **Run `npm run build` and commit `public/build`** before pushing UI changes. Hostinger has
   no Node; production serves the committed bundle.
 - **Config is cached in production.** New `.env` values need `php artisan config:cache`.
+- **The module-01 date floor belongs to the student's cohort, not the current one.** Use
+  `Accelerator::startFloorFor($cohort)`; it returns `null` for any past cohort. Reading
+  `accelerator.cohort_starts_at` directly re-locks every mid-course student the moment you
+  schedule the next cohort - that happened on the Cohort 3 launch and shut Cohort 2 out of
+  module 01 with approved checkpoints in hand. A start floor must never move forward under
+  someone who has already begun.
 - **Curriculum module ids are stable keys, never positions.** `Checkpoint.module_id`,
   `Enrollment.completed_lessons`, `accelerator.telegram_threads` and
   `reviews.stages[].after_module` all key off them. Reordering the curriculum changes the
