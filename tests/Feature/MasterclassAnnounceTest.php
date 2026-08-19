@@ -4,11 +4,26 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
-// Config ships with the current session = 2026-08-01, registration_closes
-// 2026-07-31. Freeze "now" inside that open window so registrationOpen() is true.
+// These tests need "now" to sit inside the current edition's open registration
+// window. DERIVE it from the shipped config — never hardcode a date. Pinning literal
+// dates here broke the suite the first time the session rolled (2026-08-01 -> 2026-08-29),
+// because "after the session" silently became "before the session".
 beforeEach(function () {
-    Carbon::setTestNow('2026-07-20 10:00:00');
+    Carbon::setTestNow(openRegistrationMoment());
 });
+
+/** A moment while registration is still open for the configured session. */
+function openRegistrationMoment(): Carbon
+{
+    return Carbon::parse(config('taab.masterclass.registration_closes'), 'Africa/Lagos')
+        ->subDay()->setTime(10, 0);
+}
+
+/** A moment after registration has closed for the configured session. */
+function closedRegistrationMoment(): Carbon
+{
+    return Carbon::parse(config('taab.masterclass.starts_at'), 'Africa/Lagos')->addHour();
+}
 
 afterEach(function () {
     Carbon::setTestNow();
@@ -146,7 +161,7 @@ it('writes nothing and sends nothing on a dry run', function () {
 
 it('does nothing when registration is closed', function () {
     Http::fake();
-    Carbon::setTestNow('2026-08-05 10:00:00'); // after the session
+    Carbon::setTestNow(closedRegistrationMoment()); // after the session has started
     seedAnnounceWaitlister('ada@example.com');
 
     $this->artisan('masterclass:announce')->assertSuccessful();

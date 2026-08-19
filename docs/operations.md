@@ -71,14 +71,25 @@ sends indefinitely.
 
 ### 1. Set up the session (a week out)
 
+> **Send the previous edition's follow-up FIRST.** It only reaches people while
+> `taab.masterclass.date` still points at their session (see step 4), so rolling the config
+> strands anyone still unsent. Recovery is to set `date` back, run `masterclass:remind`, then
+> roll forward again - but it's much easier to just do it in this order.
+
 Edit `config/taab.php`:
 
 ```php
-'date'                => '2026-08-01',        // the session day
-'registration_closes' => '2026-07-31',
-'starts_at'           => '2026-08-01 09:00',  // real datetimes drive the reminders
-'ends_at'             => '2026-08-01 11:00',
+'date'                => '2026-08-29',        // the session day (a Saturday)
+'registration_closes' => '2026-08-28',        // the Friday before
+'starts_at'           => '2026-08-29 09:00',  // real datetimes drive the reminders
+'ends_at'             => '2026-08-29 11:00',
 ```
+
+**Don't hardcode this date in a test.** `MasterclassAnnounceTest` and `TaabPrefillTest` freeze
+"now" relative to the session, and both broke on the first roll because they pinned literal
+dates - one silently flipped from testing "registration closed" to testing "registration
+open". They now derive their frozen time from the config via `openRegistrationMoment()` /
+`closedRegistrationMoment()`. Keep it that way.
 
 Then set the join links **in the server `.env`** (not just config):
 

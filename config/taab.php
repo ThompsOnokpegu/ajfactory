@@ -21,22 +21,29 @@ return [
     /*
     | Next masterclass session. Drives the /taab hub copy and what each
     | registration is tagged with. Set `date` to null to show "Date to be
-    | announced". {{TODO: confirm the next session date/time}}
+    | announced".
+    |
+    | Feeds Cohort 3: the TAAB59 checkout coupon runs to cart close on 14 Sep 2026,
+    | so this session sits inside that window on purpose.
     */
     'masterclass' => [
-        'date' => '2026-08-01',                 // a Saturday
-        'time' => '9:00 AM – 11:00 AM WAT',
+        'date' => '2026-08-29',                 // Saturday 29 August 2026
+        'time' => '9:00 AM - 11:00 AM WAT',
         'location' => 'Live · Google Meet',
-        'registration_closes' => '2026-07-31',  // the Friday before
+        'registration_closes' => '2026-08-28',  // the Friday before
         'host' => 'AJ Thompson',
 
         // Real datetimes the reminder scheduler uses (display strings above are
         // for the page). Interpreted in `timezone`, since app default is UTC.
-        'starts_at' => '2026-08-01 09:00',
-        'ends_at' => '2026-08-01 11:00',
+        'starts_at' => '2026-08-29 09:00',
+        'ends_at' => '2026-08-29 11:00',
         'timezone' => 'Africa/Lagos',
 
-        // Links sent in the reminders. {{TODO: owner supplies the real links}}
+        // Links sent in the reminders. These come from the SERVER .env, which a deploy
+        // does NOT update — changing the session date here while the server still holds
+        // the previous edition's TAAB_MEET_URL sends every attendee to a dead call.
+        // Set them on the server, then `php artisan config:cache`, then verify with
+        // `php artisan tinker --execute="echo config('taab.masterclass.meet_url');"`.
         'meet_url' => env('TAAB_MEET_URL'),
         'whatsapp_group_url' => env('TAAB_WA_GROUP_URL'),
         'recording_url' => env('TAAB_RECORDING_URL'), // optional, used in follow-up

@@ -238,11 +238,11 @@ Each entry needs `key`, `after_module`, `enabled`, panel copy (`eyebrow` / `head
 
 ### Session
 ```php
-'date'                => '2026-08-01',   // selects registrations; null = "date to be announced"
-'time'                => '9:00 AM – 11:00 AM WAT',   // display string only
-'registration_closes' => '2026-07-31',
-'starts_at'           => '2026-08-01 09:00',   // real datetimes — these drive reminders
-'ends_at'             => '2026-08-01 11:00',
+'date'                => '2026-08-29',   // selects registrations; null = "date to be announced"
+'time'                => '9:00 AM - 11:00 AM WAT',   // display string only
+'registration_closes' => '2026-08-28',
+'starts_at'           => '2026-08-29 09:00',   // real datetimes — these drive reminders
+'ends_at'             => '2026-08-29 11:00',
 'timezone'            => 'Africa/Lagos',
 ```
 
