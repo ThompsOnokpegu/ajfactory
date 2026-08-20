@@ -58,11 +58,13 @@ jobs:
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
           # inputs.* are null on a scheduled run, so every flag falls back to the
           # documented default rather than silently sending uncapped.
+          #
+          # KEEP THE ARTISAN CALL ON ONE LINE. drone-ssh (what this action runs) does
+          # not preserve `\` line continuations - it passed the backslash through as a
+          # literal argument and the command died with:
+          #   No arguments expected for "masterclass:announce" command, got "\"
+          # Every other workflow here uses one-line commands for the same reason.
           script: |
             set -e
             cd ~/domains/ajbuildai.com/public_html/laravel
-            php artisan masterclass:announce \
-              --limit=${{ github.event.inputs.limit || '270' }} \
-              --past-sessions=${{ github.event.inputs.past_sessions || '2' }} \
-              ${{ github.event.inputs.throttle && format('--throttle={0}', github.event.inputs.throttle) || '' }} \
-              ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+            php artisan masterclass:announce --limit=${{ github.event.inputs.limit || '270' }} --past-sessions=${{ github.event.inputs.past_sessions || '2' }} ${{ github.event.inputs.throttle && format('--throttle={0}', github.event.inputs.throttle) || '' }} ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
