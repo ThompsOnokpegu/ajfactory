@@ -117,9 +117,9 @@ return [
             'has_blueprint' => true,
             'description' => "Mastering the most important skill in automation: APIs. This module covers:\n\n• API Concepts for Non-Coders (The Waiter Analogy).\n• Using the HTTP Request Node to fetch live data (Crypto Prices).\n• Handling Authentication and API Keys to access secure data (NewsAPI, Paystack API, ExchangeRate API).",
             'videos' => [
-                ['id' => 'module-03-v2', 'title' => 'API Concepts', 'video_id' => '3dd815a3-608d-455b-88ca-68f947525a4a', 'duration' => '9:57 Mins'],
-                ['id' => 'module-03-v3', 'title' => 'Airtable Database Setup', 'video_id' => 'ae4e490c-c05b-4f84-946e-0e68e0aca9b0', 'duration' => '7:30 Mins'],
-                ['id' => 'module-03-v4', 'title' => 'Understanding API Documentation', 'video_id' => '50cca698-0c59-43de-b65a-65e00ebe4f9c', 'duration' => '5:23 Mins'],
+                ['id' => 'module-03-v2', 'title' => 'API Concepts', 'video_id' => '3dd815a3-608d-455b-88ca-68f947525a4a', 'duration' => '09:57 Mins'],
+                ['id' => 'module-03-v3', 'title' => 'Airtable Database Setup', 'video_id' => 'ae4e490c-c05b-4f84-946e-0e68e0aca9b0', 'duration' => '07:30 Mins'],
+                ['id' => 'module-03-v4', 'title' => 'Understanding API Documentation', 'video_id' => '50cca698-0c59-43de-b65a-65e00ebe4f9c', 'duration' => '05:23 Mins'],
                 ['id' => 'module-03-v5', 'title' => 'E-Commerce FX Engine', 'video_id' => '86405d9f-8d0a-4cfc-ad2d-091f22ab2c56', 'duration' => '19:49 Mins'],
                 // Kept its original lesson id: it is stored in Enrollment.completed_lessons,
                 // so it stays put even though it now sits second. Ids are keys, not positions.
