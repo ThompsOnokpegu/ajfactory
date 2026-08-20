@@ -9,6 +9,15 @@ name: Masterclass re-invite (registration-open announcement)
 # Hostinger's hPanel cron isn't executing for this account, so the Laravel
 # scheduler never ticks; this runs the command directly on the server, mirroring
 # the reminders workflow.
+#
+# WHY THE RUN IS CAPPED: Hostinger allows 100 emails/day per mailbox. The n8n
+# `masterclass_reinvite` branch round-robins across hello@ / aj@ / taab@ for ~300
+# a day, but hello@ also carries transactional mail, so 270 is the documented
+# ceiling (~90 per sender). Uncapped, a big audience blows the quota and the
+# overflow bounces — and an async bounce still returns 2xx to Laravel, so those
+# people get stamped as invited and never retried. Capping is what keeps the
+# ledger honest. Anyone held back is simply left unstamped and goes out on the
+# next run. See docs/operations.md → "Re-invite the funnel to register".
 
 on:
   workflow_dispatch:
@@ -17,6 +26,18 @@ on:
         description: 'Preview the audience without sending'
         type: boolean
         default: false
+      limit:
+        description: 'Max invites this run (SMTP cap ~270/day). Raise only if you know the quota is clear.'
+        type: string
+        default: '270'
+      past_sessions:
+        description: 'How many prior sessions of registrants to re-invite'
+        type: string
+        default: '2'
+      throttle:
+        description: 'Override send_throttle_ms, e.g. 2000, if n8n drops sends under burst. Blank = config default.'
+        type: string
+        default: ''
   schedule:
     - cron: '0 9 * * *'   # 09:00 UTC (~10:00 WAT); command decides if there's anyone to invite
 
@@ -35,7 +56,13 @@ jobs:
           username: ${{ secrets.HOSTINGER_SSH_USER }}
           key: ${{ secrets.HOSTINGER_SSH_KEY }}
           port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          # inputs.* are null on a scheduled run, so every flag falls back to the
+          # documented default rather than silently sending uncapped.
           script: |
             set -e
             cd ~/domains/ajbuildai.com/public_html/laravel
-            php artisan masterclass:announce ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+            php artisan masterclass:announce \
+              --limit=${{ github.event.inputs.limit || '270' }} \
+              --past-sessions=${{ github.event.inputs.past_sessions || '2' }} \
+              ${{ github.event.inputs.throttle && format('--throttle={0}', github.event.inputs.throttle) || '' }} \
+              ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}

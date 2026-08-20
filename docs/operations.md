@@ -115,9 +115,16 @@ People who signed up while registration was closed sit in `students` with
 preferred play is to **invite both pools to register** for this session — not silently
 enrol them — so we re-capture each person's goal and a fresh intent signal:
 
+**From the Actions tab (no SSH needed)** — Actions → *Masterclass re-invite
+(registration-open announcement)* → **Run workflow**. Inputs: `dry_run`, `limit`
+(defaults to 270), `past_sessions`, `throttle`. Run it once with `dry_run` ticked to see
+the audience, then again without.
+
+On the server:
+
 ```bash
-php artisan masterclass:announce --dry-run   # preview exactly who'd be invited
-php artisan masterclass:announce             # send the "registration is open" invite
+php artisan masterclass:announce --dry-run          # preview exactly who'd be invited
+php artisan masterclass:announce --limit=270        # send the "registration is open" invite
 ```
 
 It targets current waitlisters **plus** registrants from the last 2 sessions
@@ -141,8 +148,15 @@ php artisan masterclass:announce --limit=270        # send up to 270 today (~90 
 php artisan masterclass:announce --limit=270
 ```
 
-Repeat daily until `--dry-run` reports nobody left. Without `--limit` the command tries to
-send to everyone at once, which would blow past the per-mailbox cap and bounce.
+Repeat daily until `--dry-run` reports nobody left.
+
+`--limit` is not optional in practice. Without it the command sends to everyone at once,
+blowing past the per-mailbox cap — and the overflow bounces *asynchronously*, so n8n still
+returns 2xx and Laravel stamps those people as invited. They then never retry, which is the
+one failure mode the unstamped-on-failure design can't recover from. **The GitHub Actions
+workflow therefore defaults `--limit` to 270 on both the manual and the scheduled run**, so
+an unattended daily tick can't do this. Raise it only when you know the day's quota is
+clear.
 
 > `masterclass:enroll-waitlist` (the older command that auto-moves waitlisters straight into
 > registrations) still exists but is **deprecated** — it creates registrations with no goal
