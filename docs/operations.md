@@ -333,11 +333,13 @@ students stay suspended.
 1. sends the 2nd-payment link when `installment_due_days` elapses,
 2. suspends access `installment_grace_hours` after a missed due date.
 
-Both fire n8n events — `installment_due` and `installment_overdue_suspended`. They route on
-`event` (not `type`), and the n8n side is documented in
-[n8n-enrollment-flow.md](n8n-enrollment-flow.md), which also covers the
-`N8N_INSTALLMENT_WEBHOOK` env-var misspelling that currently sends them to the enrolment
-webhook instead.
+Both fire n8n events — `installment_due` and `installment_overdue_suspended` — handled by
+the **Accelerator - Installments & Balance** workflow. They route on `event` (not `type`),
+and the n8n side is documented in [n8n-enrollment-flow.md](n8n-enrollment-flow.md).
+
+If a student reports no pay link, check `config('services.n8n.installment_webhook')` is
+actually set before anything else: unset, it falls back to the enrolment webhook and the
+events go to a workflow with no branch for them.
 
 Admin → Enrollments exposes **Re-send pay link** and **Mark balance paid** per student.
 Suspended students are bounced to `/checkout` by `CheckEnrollment` until the balance clears.

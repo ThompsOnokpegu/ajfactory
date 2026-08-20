@@ -54,7 +54,7 @@ They're emitted from `app/Support/StudentProvisioner.php`,
 
 ---
 
-## ⚠️ `N8N_INSTALLMENT_WEBHOOK` is currently misspelled in `.env`
+## ⚠️ The installment URL resolves through a fallback
 
 Every installment sender resolves its URL like this:
 
@@ -62,29 +62,33 @@ Every installment sender resolves its URL like this:
 config('services.n8n.installment_webhook') ?: config('services.n8n.enrollment_webhook')
 ```
 
-`config/services.php` reads `env('N8N_INSTALLMENT_WEBHOOK')`, but the `.env` sets
-**`N8N_INSTALLMENT_WEBHOOK_URL`**. The key therefore resolves to `null` and all three
-installment events **fall back onto the enrolment webhook** — which is why
-`installment_overdue_suspended` shows up at `/webhook/enrollment_finalized`, and why the
-dedicated `/webhook/installment_webhook` endpoint receives nothing.
-
-To split them properly, on the server:
+So an unset `N8N_INSTALLMENT_WEBHOOK` doesn't fail — it silently redirects all three
+installment events onto the enrolment webhook. **The env var name must match exactly**:
 
 ```bash
-# .env  — drop the _URL suffix so config/services.php actually reads it
+# .env  — no _URL suffix; config/services.php reads env('N8N_INSTALLMENT_WEBHOOK')
 N8N_INSTALLMENT_WEBHOOK=https://ai.deeprmarketing.com/webhook/installment_webhook
 
 php artisan config:cache
 php artisan tinker --execute="echo config('services.n8n.installment_webhook');"
 ```
 
-If that prints an empty line the fallback is still active. **Import and activate the
-installment workflow before renaming the var**, or the three events will POST to a path
-n8n doesn't serve.
+An empty line there means the fallback is active and the dedicated endpoint is receiving
+nothing.
 
-Prefer to keep everything on one webhook? Then delete the unused `.env` line so the next
-person doesn't read it as configured, and add the three branches to the enrolment
-workflow instead.
+> **This bit us once.** The var was spelled `N8N_INSTALLMENT_WEBHOOK_URL`, which
+> `config/services.php` never reads, so every installment event landed on
+> `/webhook/enrollment_finalized` while `/webhook/installment_webhook` sat idle. Nothing
+> errored — the fallback is exactly what it's designed to do. It was only spotted by
+> someone asking why a suspension event was arriving at the enrolment webhook. Renamed and
+> `config:cache`d on 19 Aug 2026, with the workflow imported and activated first.
+
+**Order matters when changing this**: import and activate the workflow *before* pointing
+the env var at it, or the events POST to a path n8n isn't serving yet.
+
+Prefer to keep everything on one webhook instead? Delete the `N8N_INSTALLMENT_WEBHOOK`
+line so the fallback is deliberate rather than accidental, and add the three branches to
+the enrolment workflow.
 
 ---
 
@@ -254,9 +258,27 @@ curl -X POST https://ai.deeprmarketing.com/webhook/installment_webhook \
       }'
 ```
 
-A `2xx` means the branch matched *and* the email actually sent. Swap `event` for something
-unknown and you should get a non-2xx from the Stop and Error node — if that returns `200`,
-the response mode or the fallback wiring is wrong.
+A `2xx` means the branch matched *and* the email actually sent.
+
+**Verify the response mode without sending anything** by posting an event that matches no
+branch. It routes straight to Stop and Error, so no email goes out:
+
+```bash
+curl -s -w '
+HTTP %{http_code}
+' -X POST   https://ai.deeprmarketing.com/webhook/installment_webhook   -H 'Content-Type: application/json'   -d '{"event":"__unknown__","email":"noreply@ajbuildai.com"}'
+```
+
+| Response | Meaning |
+|---|---|
+| `HTTP 500` | Correct. Respond mode is *When Last Node Finishes* and the fallback works. |
+| `HTTP 200` + `{"message":"Workflow was started"}` | **Broken.** That body is n8n's *Respond: Immediately* signature. Every send will be stamped successful whether or not it happened. Open the Webhook node, set Respond to *When Last Node Finishes*, save. |
+| `HTTP 404` | Workflow inactive, or the path doesn't match the env var. |
+
+This caught a live misconfiguration the first time it was run: the imported workflow was
+answering `{"message":"Workflow was started"}` even though the exported JSON had
+`responseMode: "lastNode"`. **Re-check this after every import** — the setting does not
+reliably survive one.
 
 From the app side, `installments:process` is idempotent and reports what it did:
 

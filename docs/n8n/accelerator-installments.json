@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Installment + balance emails\n\n**Webhook path must match `N8N_INSTALLMENT_WEBHOOK` in the server .env.**\nToday that env var is spelled `N8N_INSTALLMENT_WEBHOOK_URL`, which\n`config/services.php` does not read - so every event below is currently\nfalling back to the enrollment webhook instead. Fix the .env name, then\n`php artisan config:cache`.\n\n**Routes on `body.event`, NOT `body.type`.** The masterclass workflow uses\n`type`; this one does not. Copying a Switch across breaks silently.\n\n**Respond mode is \"When Last Node Finishes\"** - required. With \"Immediately\"\nn8n returns 200 before the workflow runs and Laravel stamps sends that never\nhappened.\n\nFull contract: docs/n8n-enrollment-flow.md\n",
+        "content": "## Installment + balance emails\n\n**This path must match `N8N_INSTALLMENT_WEBHOOK` in the server .env**\n- spelled exactly that, no `_URL` suffix. If the var is unset, Laravel\nsilently falls back to the enrolment webhook and this workflow receives\nnothing. Check with:\n`php artisan tinker --execute=\"echo config('services.n8n.installment_webhook');\"`\n\n**Routes on `body.event`, NOT `body.type`.** The masterclass workflow uses\n`type`; this one does not. Copying a Switch across breaks silently.\n\n**Respond mode is \"When Last Node Finishes\"** - required. With \"Immediately\"\nn8n returns 200 before the workflow runs and Laravel stamps sends that never\nhappened.\n\nFull contract: docs/n8n-enrollment-flow.md\n",
         "height": 400,
         "width": 460,
         "color": 7
