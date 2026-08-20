@@ -1,0 +1,100 @@
+<!-- Event: installment_due  |  Subject: Your second Accelerator payment is due ({{ $json.due_display }})
+
+  Sent from the INSTALLMENT workflow (N8N_INSTALLMENT_WEBHOOK), which routes on
+  `body.event` - NOT `body.type` like the masterclass workflow. See
+  docs/n8n-enrollment-flow.md for the full contract.
+
+  Fields used here:
+    {{ $json.first_name }}      derived from body.full_name by the Normalize node
+    {{ $json.amount_display }}  derived from body.amount + body.currency
+    {{ $json.due_display }}     derived from body.due_at
+    {{ $json.body.pay_url }}    signed, never expires - straight from Laravel
+
+  NOTE: `amount` on this event is the REMAINING BALANCE, not the course price.
+  Don't reuse this copy for enrollment_finalized, where amount means the price paid.
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+  <title>Your second payment is due - AI Automation Accelerator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+    :root { color-scheme: only dark; }
+    body { margin:0; padding:0; width:100% !important; background:#09090b; }
+    a { color:#22d3ee; }
+    @media (max-width:600px) {
+      .card { width:100% !important; border-radius:0 !important; }
+      .px { padding-left:22px !important; padding-right:22px !important; }
+      h1 { font-size:23px !important; line-height:1.22 !important; }
+      .key-val { font-size:14px !important; word-break:break-all !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#09090b;">
+  <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">Your second installment is due. One tap clears it and keeps your access running.</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#09090b;">
+    <tr><td align="center" style="padding:28px 12px;">
+      <!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:0;"><![endif]-->
+      <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#111114;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+        <tr><td style="height:4px;background:#06b6d4;line-height:4px;font-size:0;">&nbsp;</td></tr>
+
+        <tr><td class="px" style="padding:28px 36px 4px;">
+          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:19px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">AI Automation <span style="color:#06b6d4;">Accelerator</span></span>
+          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;"> &middot; Payment 2 of 2</span>
+        </td></tr>
+
+        <tr><td class="px" style="padding:16px 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;color:#e4e4e7;">
+          <h1 style="margin:0 0 14px;font-size:27px;line-height:1.2;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">Time to clear your balance</h1>
+
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">Hi {{ $json.first_name }}, this is your heads-up: the second and final payment on your Accelerator plan is due.</p>
+
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 12px;background:#0b0b0e;border:1px solid rgba(255,255,255,0.08);border-radius:12px;">
+            <tr><td style="padding:16px 20px;font-family:'Space Grotesk',Arial,sans-serif;">
+              <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;">Amount due</p>
+              <p style="margin:0;font-size:22px;font-weight:700;color:#ffffff;">{{ $json.amount_display }}</p>
+            </td></tr>
+          </table>
+
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;background:#0b0b0e;border:1px solid rgba(255,255,255,0.08);border-radius:12px;">
+            <tr><td style="padding:16px 20px;font-family:'Space Grotesk',Arial,sans-serif;">
+              <p style="margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;">Due by</p>
+              <p style="margin:0;font-size:19px;font-weight:700;color:#ffffff;">{{ $json.due_display }}</p>
+            </td></tr>
+          </table>
+        </td></tr>
+
+        <tr><td class="px" style="padding:0 36px 22px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td align="center" style="background:#06b6d4;border-radius:10px;">
+              <a href="{{ $json.body.pay_url }}" style="display:inline-block;padding:14px 30px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;font-weight:700;color:#000000;text-decoration:none;letter-spacing:-0.01em;">Pay {{ $json.amount_display }} now</a>
+            </td>
+          </tr></table>
+        </td></tr>
+
+        <tr><td class="px" style="padding:0 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;">
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">That link is yours alone and it does not expire, so you can come back to this email whenever you are ready to pay.</p>
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">No surprises: this is the second of your two payments. Once it clears, there is nothing further to pay.</p>
+        </td></tr>
+
+        <tr><td class="px" style="padding:8px 36px 30px;">
+          <p style="margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:13px;line-height:1.6;color:#71717a;">Questions about your payment? Just reply to this email and a human will answer.</p>
+        </td></tr>
+
+        <tr><td style="height:1px;background:rgba(255,255,255,0.08);line-height:1px;font-size:0;">&nbsp;</td></tr>
+        <tr><td class="px" style="padding:20px 36px 26px;">
+          <p style="margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:11.5px;line-height:1.6;color:#52525b;">
+            AI Automation Accelerator &middot; Deepr Web Services &middot; You're receiving this because you enrolled.<br>
+            <a href="https://ajbuildai.com" style="color:#52525b;text-decoration:underline;">ajbuildai.com</a> &middot; hello@ajbuildai.com
+          </p>
+        </td></tr>
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td></tr>
+  </table>
+</body>
+</html>

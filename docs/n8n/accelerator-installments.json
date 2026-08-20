@@ -1,0 +1,312 @@
+{
+  "name": "Accelerator - Installments & Balance",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Installment + balance emails\n\n**Webhook path must match `N8N_INSTALLMENT_WEBHOOK` in the server .env.**\nToday that env var is spelled `N8N_INSTALLMENT_WEBHOOK_URL`, which\n`config/services.php` does not read - so every event below is currently\nfalling back to the enrollment webhook instead. Fix the .env name, then\n`php artisan config:cache`.\n\n**Routes on `body.event`, NOT `body.type`.** The masterclass workflow uses\n`type`; this one does not. Copying a Switch across breaks silently.\n\n**Respond mode is \"When Last Node Finishes\"** - required. With \"Immediately\"\nn8n returns 200 before the workflow runs and Laravel stamps sends that never\nhappened.\n\nFull contract: docs/n8n-enrollment-flow.md\n",
+        "height": 400,
+        "width": 460,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1040,
+        -180
+      ],
+      "id": "sticky-contract",
+      "name": "Sticky Note - contract"
+    },
+    {
+      "parameters": {
+        "content": "## No WhatsApp branch yet - deliberate\n\nThe masterclass workflow sends WhatsApp via Twilio using **pre-approved\nContent Template SIDs**. There are no approved templates for these three\nmessages yet, and a SID cannot be invented - an unapproved one fails at send.\n\nTo add WhatsApp:\n1. Create + get approval for a Twilio content template per event.\n2. Copy the `WA - ...` httpRequest node from the masterclass workflow.\n3. Swap in the new ContentSid and map ContentVariables.\n4. Guard for an empty `body.phone` first - it is nullable.\n\nEmail-only is correct until then.\n",
+        "height": 300,
+        "width": 420,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        180,
+        -180
+      ],
+      "id": "sticky-whatsapp",
+      "name": "Sticky Note - whatsapp"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "installment_webhook",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -540,
+        300
+      ],
+      "id": "installment-webhook",
+      "name": "Webhook"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Derive the display fields the installment emails need, and keep `body` intact so\n// every downstream node can still read {{ $json.body.<field> }}.\n//\n// Laravel sends `amount` as a NUMBER and `due_at` as ISO 8601 in Africa/Lagos.\n// `due_at` and `pay_url` are ABSENT on installment_completed, so guard them rather\n// than assuming every event carries the same fields - they do not.\n//\n// `amount` means a different thing per event:\n//   installment_due / installment_overdue_suspended -> the REMAINING balance\n//   installment_completed                           -> the FULL course total\n// The templates word themselves accordingly. Don't \"unify\" that.\n\nreturn $input.all().map((item) => {\n  const b = item.json.body ?? item.json;\n\n  const fullName = String(b.full_name ?? '').trim();\n  const firstName = fullName ? fullName.split(/\\s+/)[0] : 'there';\n\n  const currency = String(b.currency ?? 'NGN').toUpperCase();\n  const symbol = currency === 'NGN' ? '\\u20A6' : '$';\n  const amount = Number(b.amount ?? 0);\n  const amountDisplay = symbol + amount.toLocaleString('en-NG', {\n    minimumFractionDigits: 0,\n    maximumFractionDigits: 2,\n  });\n\n  let dueDisplay = '';\n  if (b.due_at) {\n    dueDisplay = new Date(b.due_at).toLocaleDateString('en-GB', {\n      weekday: 'long',\n      day: 'numeric',\n      month: 'long',\n      year: 'numeric',\n      timeZone: 'Africa/Lagos',\n    });\n  }\n\n  return {\n    json: {\n      ...item.json,\n      first_name: firstName,\n      amount_display: amountDisplay,\n      due_display: dueDisplay,\n    },\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -300,
+        300
+      ],
+      "id": "normalize",
+      "name": "Normalize"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "i1",
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "installment_due",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Due"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "i2",
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "installment_overdue_suspended",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Overdue"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "i3",
+                    "leftValue": "={{ $json.body.event }}",
+                    "rightValue": "installment_completed",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Completed"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra",
+          "renameFallbackOutput": "Unmatched"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -60,
+        300
+      ],
+      "id": "route-on-event",
+      "name": "Route on event"
+    },
+    {
+      "parameters": {
+        "fromEmail": "AJ Thompson <hello@ajbuildai.com>",
+        "toEmail": "={{ $json.body.email }}",
+        "subject": "=Your second Accelerator payment is due ({{ $json.due_display }})",
+        "html": "=<!-- Event: installment_due  |  Subject: Your second Accelerator payment is due ({{ $json.due_display }})\n\n  Sent from the INSTALLMENT workflow (N8N_INSTALLMENT_WEBHOOK), which routes on\n  `body.event` - NOT `body.type` like the masterclass workflow. See\n  docs/n8n-enrollment-flow.md for the full contract.\n\n  Fields used here:\n    {{ $json.first_name }}      derived from body.full_name by the Normalize node\n    {{ $json.amount_display }}  derived from body.amount + body.currency\n    {{ $json.due_display }}     derived from body.due_at\n    {{ $json.body.pay_url }}    signed, never expires - straight from Laravel\n\n  NOTE: `amount` on this event is the REMAINING BALANCE, not the course price.\n  Don't reuse this copy for enrollment_finalized, where amount means the price paid.\n-->\n<!DOCTYPE html>\n<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"x-apple-disable-message-reformatting\">\n  <meta name=\"color-scheme\" content=\"dark\">\n  <meta name=\"supported-color-schemes\" content=\"dark\">\n  <title>Your second payment is due - AI Automation Accelerator</title>\n  <style>\n    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');\n    :root { color-scheme: only dark; }\n    body { margin:0; padding:0; width:100% !important; background:#09090b; }\n    a { color:#22d3ee; }\n    @media (max-width:600px) {\n      .card { width:100% !important; border-radius:0 !important; }\n      .px { padding-left:22px !important; padding-right:22px !important; }\n      h1 { font-size:23px !important; line-height:1.22 !important; }\n      .key-val { font-size:14px !important; word-break:break-all !important; }\n    }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#09090b;\">\n  <span style=\"display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;\">Your second installment is due. One tap clears it and keeps your access running.</span>\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#09090b;\">\n    <tr><td align=\"center\" style=\"padding:28px 12px;\">\n      <!--[if mso]><table role=\"presentation\" width=\"600\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td style=\"padding:0;\"><![endif]-->\n      <table role=\"presentation\" class=\"card\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:100%;max-width:600px;background:#111114;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;\">\n        <tr><td style=\"height:4px;background:#06b6d4;line-height:4px;font-size:0;\">&nbsp;</td></tr>\n\n        <tr><td class=\"px\" style=\"padding:28px 36px 4px;\">\n          <span style=\"font-family:'Space Grotesk',Arial,sans-serif;font-size:19px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;\">AI Automation <span style=\"color:#06b6d4;\">Accelerator</span></span>\n          <span style=\"font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;\"> &middot; Payment 2 of 2</span>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:16px 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;color:#e4e4e7;\">\n          <h1 style=\"margin:0 0 14px;font-size:27px;line-height:1.2;font-weight:700;color:#ffffff;letter-spacing:-0.02em;\">Time to clear your balance</h1>\n\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">Hi {{ $json.first_name }}, this is your heads-up: the second and final payment on your Accelerator plan is due.</p>\n\n          <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin:0 0 12px;background:#0b0b0e;border:1px solid rgba(255,255,255,0.08);border-radius:12px;\">\n            <tr><td style=\"padding:16px 20px;font-family:'Space Grotesk',Arial,sans-serif;\">\n              <p style=\"margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;\">Amount due</p>\n              <p style=\"margin:0;font-size:22px;font-weight:700;color:#ffffff;\">{{ $json.amount_display }}</p>\n            </td></tr>\n          </table>\n\n          <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin:0 0 20px;background:#0b0b0e;border:1px solid rgba(255,255,255,0.08);border-radius:12px;\">\n            <tr><td style=\"padding:16px 20px;font-family:'Space Grotesk',Arial,sans-serif;\">\n              <p style=\"margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;\">Due by</p>\n              <p style=\"margin:0;font-size:19px;font-weight:700;color:#ffffff;\">{{ $json.due_display }}</p>\n            </td></tr>\n          </table>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:0 36px 22px;\">\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr>\n            <td align=\"center\" style=\"background:#06b6d4;border-radius:10px;\">\n              <a href=\"{{ $json.body.pay_url }}\" style=\"display:inline-block;padding:14px 30px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;font-weight:700;color:#000000;text-decoration:none;letter-spacing:-0.01em;\">Pay {{ $json.amount_display }} now</a>\n            </td>\n          </tr></table>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:0 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;\">\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">That link is yours alone and it does not expire, so you can come back to this email whenever you are ready to pay.</p>\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">No surprises: this is the second of your two payments. Once it clears, there is nothing further to pay.</p>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:8px 36px 30px;\">\n          <p style=\"margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:13px;line-height:1.6;color:#71717a;\">Questions about your payment? Just reply to this email and a human will answer.</p>\n        </td></tr>\n\n        <tr><td style=\"height:1px;background:rgba(255,255,255,0.08);line-height:1px;font-size:0;\">&nbsp;</td></tr>\n        <tr><td class=\"px\" style=\"padding:20px 36px 26px;\">\n          <p style=\"margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:11.5px;line-height:1.6;color:#52525b;\">\n            AI Automation Accelerator &middot; Deepr Web Services &middot; You're receiving this because you enrolled.<br>\n            <a href=\"https://ajbuildai.com\" style=\"color:#52525b;text-decoration:underline;\">ajbuildai.com</a> &middot; hello@ajbuildai.com\n          </p>\n        </td></tr>\n      </table>\n      <!--[if mso]></td></tr></table><![endif]-->\n    </td></tr>\n  </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        120
+      ],
+      "id": "installment-due-email",
+      "name": "Installment Due Email",
+      "credentials": {
+        "smtp": {
+          "id": "7RGhNLHFADXdsIsp",
+          "name": "AJ BuildAI@hello"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "AJ Thompson <hello@ajbuildai.com>",
+        "toEmail": "={{ $json.body.email }}",
+        "subject": "=Your Accelerator access is paused - balance outstanding",
+        "html": "=<!-- Event: installment_overdue_suspended  |  Subject: Your Accelerator access is paused - balance outstanding\n\n  Sent from the INSTALLMENT workflow (N8N_INSTALLMENT_WEBHOOK), which routes on\n  `body.event` - NOT `body.type` like the masterclass workflow. See\n  docs/n8n-enrollment-flow.md for the full contract.\n\n  Access is ALREADY suspended by the time this fires - ProcessInstallments sets\n  access_suspended = true and then fires the webhook. So the copy says \"paused\",\n  present tense, and it is accurate.\n\n  Fields used here:\n    {{ $json.first_name }}      derived from body.full_name by the Normalize node\n    {{ $json.amount_display }}  derived from body.amount + body.currency\n    {{ $json.due_display }}     derived from body.due_at (the date already missed)\n    {{ $json.body.pay_url }}    signed, never expires - deliberately, so an overdue\n                                student can always still pay\n\n  Tone: no shaming, no threats. The student keeps everything; this is a pause, not\n  a cancellation. Keep it that way.\n-->\n<!DOCTYPE html>\n<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"x-apple-disable-message-reformatting\">\n  <meta name=\"color-scheme\" content=\"dark\">\n  <meta name=\"supported-color-schemes\" content=\"dark\">\n  <title>Your Accelerator access is paused</title>\n  <style>\n    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');\n    :root { color-scheme: only dark; }\n    body { margin:0; padding:0; width:100% !important; background:#09090b; }\n    a { color:#22d3ee; }\n    @media (max-width:600px) {\n      .card { width:100% !important; border-radius:0 !important; }\n      .px { padding-left:22px !important; padding-right:22px !important; }\n      h1 { font-size:23px !important; line-height:1.22 !important; }\n      .key-val { font-size:14px !important; word-break:break-all !important; }\n    }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#09090b;\">\n  <span style=\"display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;\">Your balance is past due, so access is paused. Nothing is lost - clear it and you are straight back in.</span>\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#09090b;\">\n    <tr><td align=\"center\" style=\"padding:28px 12px;\">\n      <!--[if mso]><table role=\"presentation\" width=\"600\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td style=\"padding:0;\"><![endif]-->\n      <table role=\"presentation\" class=\"card\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:100%;max-width:600px;background:#111114;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;\">\n        <tr><td style=\"height:4px;background:#f59e0b;line-height:4px;font-size:0;\">&nbsp;</td></tr>\n\n        <tr><td class=\"px\" style=\"padding:28px 36px 4px;\">\n          <span style=\"font-family:'Space Grotesk',Arial,sans-serif;font-size:19px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;\">AI Automation <span style=\"color:#06b6d4;\">Accelerator</span></span>\n          <span style=\"font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;\"> &middot; Access paused</span>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:16px 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;color:#e4e4e7;\">\n          <h1 style=\"margin:0 0 14px;font-size:27px;line-height:1.2;font-weight:700;color:#ffffff;letter-spacing:-0.02em;\">Your access is paused</h1>\n\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">Hi {{ $json.first_name }}, your second Accelerator payment was due on {{ $json.due_display }} and we have not seen it yet, so your access is paused for now.</p>\n\n          <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin:0 0 20px;background:#0b0b0e;border:1px solid rgba(245,158,11,0.28);border-radius:12px;\">\n            <tr><td style=\"padding:16px 20px;font-family:'Space Grotesk',Arial,sans-serif;\">\n              <p style=\"margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;\">Outstanding balance</p>\n              <p style=\"margin:0;font-size:22px;font-weight:700;color:#f59e0b;\">{{ $json.amount_display }}</p>\n            </td></tr>\n          </table>\n\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\"><strong style=\"color:#e4e4e7;\">Nothing is lost.</strong> Your progress, your approved checkpoints and every lesson you have completed are exactly where you left them. Clearing the balance switches your access straight back on.</p>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:0 36px 22px;\">\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr>\n            <td align=\"center\" style=\"background:#f59e0b;border-radius:10px;\">\n              <a href=\"{{ $json.body.pay_url }}\" style=\"display:inline-block;padding:14px 30px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;font-weight:700;color:#000000;text-decoration:none;letter-spacing:-0.01em;\">Clear {{ $json.amount_display }} and restore access</a>\n            </td>\n          </tr></table>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:0 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;\">\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">That link does not expire, so it will still work whenever you get to it.</p>\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">If money is tight right now, or something has gone wrong with the payment, reply to this email and tell us. We would far rather sort it out with you than leave you locked out.</p>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:8px 36px 30px;\">\n          <p style=\"margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:13px;line-height:1.6;color:#71717a;\">Questions about your payment? Just reply to this email and a human will answer.</p>\n        </td></tr>\n\n        <tr><td style=\"height:1px;background:rgba(255,255,255,0.08);line-height:1px;font-size:0;\">&nbsp;</td></tr>\n        <tr><td class=\"px\" style=\"padding:20px 36px 26px;\">\n          <p style=\"margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:11.5px;line-height:1.6;color:#52525b;\">\n            AI Automation Accelerator &middot; Deepr Web Services &middot; You're receiving this because you enrolled.<br>\n            <a href=\"https://ajbuildai.com\" style=\"color:#52525b;text-decoration:underline;\">ajbuildai.com</a> &middot; hello@ajbuildai.com\n          </p>\n        </td></tr>\n      </table>\n      <!--[if mso]></td></tr></table><![endif]-->\n    </td></tr>\n  </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        300
+      ],
+      "id": "overdue-suspended-email",
+      "name": "Overdue Suspended Email",
+      "credentials": {
+        "smtp": {
+          "id": "7RGhNLHFADXdsIsp",
+          "name": "AJ BuildAI@hello"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "AJ Thompson <hello@ajbuildai.com>",
+        "toEmail": "={{ $json.body.email }}",
+        "subject": "=Payment received - you're all paid up",
+        "html": "=<!-- Event: installment_completed  |  Subject: Payment received - you're all paid up\n\n  Sent from the INSTALLMENT workflow (N8N_INSTALLMENT_WEBHOOK), which routes on\n  `body.event` - NOT `body.type` like the masterclass workflow. See\n  docs/n8n-enrollment-flow.md for the full contract.\n\n  Fired by the Paystack/Flutterwave webhook once the SECOND payment clears.\n\n  Fields used here:\n    {{ $json.first_name }}             derived from body.full_name by Normalize\n    {{ $json.amount_display }}         derived from body.amount + body.currency\n    {{ $json.body.reference }}         the SECOND payment reference\n    {{ $json.body.original_reference }} the original enrolment reference\n\n  CAREFUL - `amount` on this event is `amount_total`, the FULL course price, not\n  the second installment. The copy below says \"total paid\" for that reason. This\n  event also has NO pay_url and NO due_at, so don't copy a CTA over from\n  10-installment-due.html without changing the link.\n-->\n<!DOCTYPE html>\n<html lang=\"en\" xmlns=\"http://www.w3.org/1999/xhtml\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"x-apple-disable-message-reformatting\">\n  <meta name=\"color-scheme\" content=\"dark\">\n  <meta name=\"supported-color-schemes\" content=\"dark\">\n  <title>You're all paid up - AI Automation Accelerator</title>\n  <style>\n    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');\n    :root { color-scheme: only dark; }\n    body { margin:0; padding:0; width:100% !important; background:#09090b; }\n    a { color:#22d3ee; }\n    @media (max-width:600px) {\n      .card { width:100% !important; border-radius:0 !important; }\n      .px { padding-left:22px !important; padding-right:22px !important; }\n      h1 { font-size:23px !important; line-height:1.22 !important; }\n      .key-val { font-size:14px !important; word-break:break-all !important; }\n    }\n  </style>\n</head>\n<body style=\"margin:0;padding:0;background:#09090b;\">\n  <span style=\"display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;\">Your final installment landed. Your Accelerator balance is cleared in full.</span>\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:#09090b;\">\n    <tr><td align=\"center\" style=\"padding:28px 12px;\">\n      <!--[if mso]><table role=\"presentation\" width=\"600\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><td style=\"padding:0;\"><![endif]-->\n      <table role=\"presentation\" class=\"card\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"width:100%;max-width:600px;background:#111114;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;\">\n        <tr><td style=\"height:4px;background:#22c55e;line-height:4px;font-size:0;\">&nbsp;</td></tr>\n\n        <tr><td class=\"px\" style=\"padding:28px 36px 4px;\">\n          <span style=\"font-family:'Space Grotesk',Arial,sans-serif;font-size:19px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;\">AI Automation <span style=\"color:#06b6d4;\">Accelerator</span></span>\n          <span style=\"font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;\"> &middot; Paid in full</span>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:16px 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;color:#e4e4e7;\">\n          <h1 style=\"margin:0 0 14px;font-size:27px;line-height:1.2;font-weight:700;color:#ffffff;letter-spacing:-0.02em;\">You're all paid up</h1>\n\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">Hi {{ $json.first_name }}, your final payment came through. That clears your Accelerator balance in full, with nothing further to pay.</p>\n\n          <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"margin:0 0 20px;background:#0b0b0e;border:1px solid rgba(34,197,94,0.28);border-radius:12px;\">\n            <tr><td style=\"padding:16px 20px;font-family:'Space Grotesk',Arial,sans-serif;\">\n              <p style=\"margin:0 0 4px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;\">Total paid</p>\n              <p style=\"margin:0;font-size:22px;font-weight:700;color:#22c55e;\">{{ $json.amount_display }}</p>\n            </td></tr>\n          </table>\n\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">Your access carries on uninterrupted, including lifetime access to the lessons and every future update.</p>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:0 36px 22px;\">\n          <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr>\n            <td align=\"center\" style=\"background:#22c55e;border-radius:10px;\">\n              <a href=\"https://ajbuildai.com/login\" style=\"display:inline-block;padding:14px 30px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;font-weight:700;color:#000000;text-decoration:none;letter-spacing:-0.01em;\">Back to your dashboard</a>\n            </td>\n          </tr></table>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:0 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;\">\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">Keep this email as your receipt. Payment reference <span class=\"key-val\" style=\"color:#e4e4e7;\">{{ $json.body.reference }}</span>, against your original enrolment <span class=\"key-val\" style=\"color:#e4e4e7;\">{{ $json.body.original_reference }}</span>.</p>\n          <p style=\"margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;\">Now go and finish the build.</p>\n        </td></tr>\n\n        <tr><td class=\"px\" style=\"padding:8px 36px 30px;\">\n          <p style=\"margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:13px;line-height:1.6;color:#71717a;\">Questions about your payment? Just reply to this email and a human will answer.</p>\n        </td></tr>\n\n        <tr><td style=\"height:1px;background:rgba(255,255,255,0.08);line-height:1px;font-size:0;\">&nbsp;</td></tr>\n        <tr><td class=\"px\" style=\"padding:20px 36px 26px;\">\n          <p style=\"margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:11.5px;line-height:1.6;color:#52525b;\">\n            AI Automation Accelerator &middot; Deepr Web Services &middot; You're receiving this because you enrolled.<br>\n            <a href=\"https://ajbuildai.com\" style=\"color:#52525b;text-decoration:underline;\">ajbuildai.com</a> &middot; hello@ajbuildai.com\n          </p>\n        </td></tr>\n      </table>\n      <!--[if mso]></td></tr></table><![endif]-->\n    </td></tr>\n  </table>\n</body>\n</html>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        220,
+        480
+      ],
+      "id": "paid-in-full-email",
+      "name": "Paid In Full Email",
+      "credentials": {
+        "smtp": {
+          "id": "7RGhNLHFADXdsIsp",
+          "name": "AJ BuildAI@hello"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "=Unhandled installment event: {{ $json.body.event }} for {{ $json.body.email }}. Laravel will NOT stamp this as sent, so it retries - add a Switch branch."
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        220,
+        660
+      ],
+      "id": "unmatched-event",
+      "name": "Unknown event"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize": {
+      "main": [
+        [
+          {
+            "node": "Route on event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route on event": {
+      "main": [
+        [
+          {
+            "node": "Installment Due Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Overdue Suspended Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Paid In Full Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unknown event",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timezone": "Africa/Lagos"
+  },
+  "versionId": "installment-v1",
+  "meta": {
+    "instanceId": "ajbuildai"
+  },
+  "id": "accelerator-installments",
+  "tags": []
+}

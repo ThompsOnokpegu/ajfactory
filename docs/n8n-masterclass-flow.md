@@ -1,5 +1,9 @@
 # n8n — TAAB Masterclass automations
 
+> Covers the **free** funnel only, on `N8N_STUDENT_WEBHOOK_URL`, routed on `type`.
+> The paid side (enrolment + installments, routed on **`event`**) is in
+> [n8n-enrollment-flow.md](n8n-enrollment-flow.md).
+
 Everything the app sends for the masterclass funnel goes to the **single student
 webhook** (`N8N_STUDENT_WEBHOOK_URL`). Build **one workflow** that receives the
 webhook, routes on the `type` field, and sends the right Email + WhatsApp message.

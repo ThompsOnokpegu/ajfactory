@@ -27,8 +27,9 @@ links to the architecture, configuration, and operations docs.
    change** — code without the doc update is incomplete. Match the change to its home:
    `docs/architecture.md` (domain model, tables, data flow), `docs/configuration.md` (env
    vars / config keys), `docs/operations.md` (runbooks — how to operate a feature),
-   `docs/n8n-masterclass-flow.md` (any new/renamed n8n event `type` — it's the app↔n8n
-   contract), `DEPLOY.md` (deploy/server), or this file (durable conventions). A one-off fix
+   `docs/n8n-masterclass-flow.md` / `docs/n8n-enrollment-flow.md` (any new/renamed n8n
+   event — they're the app↔n8n contract; masterclass routes on `type`, enrolment and
+   installments route on `event`), `DEPLOY.md` (deploy/server), or this file (durable conventions). A one-off fix
    doesn't need a doc; a new command, table, event type, config key, route, or a reversed
    design decision does.
 
@@ -78,7 +79,8 @@ These encode real incidents. Changing them will break something that took a whil
 - **Payments are verified server-side** via webhook before access is granted. Never trust a
   client-side success callback.
 - **Laravel never sends email or WhatsApp** — it fires a typed event at n8n and records the
-  outcome. See [docs/n8n-masterclass-flow.md](docs/n8n-masterclass-flow.md) for the exact
+  outcome. See [docs/n8n-masterclass-flow.md](docs/n8n-masterclass-flow.md) and
+  [docs/n8n-enrollment-flow.md](docs/n8n-enrollment-flow.md) for the exact
   event names; a one-character mismatch fails every send at once.
 - **Stamp a send only on genuine success**, and never swallow a non-2xx. Failures must stay
   unstamped so the next run retries them — that's what makes recovery work at any headcount.

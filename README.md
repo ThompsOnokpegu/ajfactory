@@ -23,7 +23,8 @@ account provisioning → a ship-to-unlock member dashboard, with an admin for ru
 | [docs/architecture.md](docs/architecture.md) | Domain model, routes, the two funnels, how data flows |
 | [docs/configuration.md](docs/configuration.md) | Every env var and config file that matters, and what breaks without it |
 | [docs/operations.md](docs/operations.md) | **Runbooks** — running a masterclass, opening a cohort, and recovering when sends fail |
-| [docs/n8n-masterclass-flow.md](docs/n8n-masterclass-flow.md) | The n8n event contract (exact event names, payloads, webhook settings) |
+| [docs/n8n-masterclass-flow.md](docs/n8n-masterclass-flow.md) | n8n contract for the **free** TAAB funnel (event names, payloads, webhook settings) |
+| [docs/n8n-enrollment-flow.md](docs/n8n-enrollment-flow.md) | n8n contract for **enrolment + installments** (the paid side) |
 | [DEPLOY.md](DEPLOY.md) | Server layout, GitHub Actions deploy, one-time Hostinger setup |
 | [docs/emails/](docs/emails/) | The HTML email templates that live in n8n (versioned here so they don't drift) |
 
@@ -80,7 +81,9 @@ TikTok / socials
 
 Everything the student *receives* — every email and WhatsApp message — is sent by **n8n**.
 Laravel's job is to decide *when* something should be sent, fire a typed event at a webhook,
-and record that it happened. See [docs/n8n-masterclass-flow.md](docs/n8n-masterclass-flow.md).
+and record that it happened. See [docs/n8n-masterclass-flow.md](docs/n8n-masterclass-flow.md)
+for the masterclass events and [docs/n8n-enrollment-flow.md](docs/n8n-enrollment-flow.md)
+for enrolment and installments.
 
 ## Project map
 
