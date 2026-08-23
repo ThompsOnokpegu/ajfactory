@@ -276,7 +276,7 @@ return [
             'release_at' => '2026-08-22 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Sat 22 Aug
+            'attendance_code' => 'LAHAI23', // ← announced at the END of the call (Sat 22 Aug). Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-07-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
