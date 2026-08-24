@@ -20,6 +20,7 @@
 <div class="wrap">
   <nav class="toc" aria-label="Guide contents">
     <div class="lbl">The build</div>
+    <a href="#watch"><span class="n">▶</span> Watch it first</a>
     <a href="#start"><span class="n">00</span> Before you start</a>
     <a href="#domain"><span class="n">01</span> Get a domain</a>
     <a href="#server"><span class="n">02</span> Create the server</a>
@@ -55,6 +56,41 @@
           </div>
         </div>
       </div>
+
+      @php
+        // Resolved from config/curriculum.php rather than hardcoded, so a re-record
+        // that changes the lesson's video_id reaches this page automatically. The
+        // lesson inherits its module's library_id, falling back to the Bunny default,
+        // exactly as the dashboard player does.
+        $walkthrough = collect(config('curriculum.core', []))
+          ->flatMap(fn ($m) => collect($m['videos'] ?? [])
+            ->map(fn ($v) => $v + ['library_id' => $v['library_id'] ?? ($m['library_id'] ?? null)]))
+          ->firstWhere('id', 'module-02-v5');
+
+        $libraryId = $walkthrough['library_id'] ?? config('services.bunny.library_id');
+        // No id, no library, no embed — render nothing rather than a broken player.
+        $watchUrl = ($walkthrough && ! empty($walkthrough['video_id']) && $libraryId)
+          ? "https://iframe.mediadelivery.net/embed/{$libraryId}/{$walkthrough['video_id']}?autoplay=false&loop=false&muted=false&preload=false&responsive=true"
+          : null;
+      @endphp
+
+      @if($watchUrl)
+      <section id="watch">
+        <div class="part-h"><span class="num">▶</span><h2>Watch it first (optional)</h2></div>
+        <p class="part-sub">The same build, start to finish, so you know what's coming.</p>
+        <div class="videobox">
+          <div class="frame">
+            <iframe src="{{ $watchUrl }}" loading="lazy" allow="accelerometer;gyroscope;encrypted-media;picture-in-picture;fullscreen" allowfullscreen title="{{ $walkthrough['title'] }}"></iframe>
+          </div>
+          <div class="cap">
+            <span><b>{{ $walkthrough['title'] }}</b></span>
+            @if(!empty($walkthrough['duration']))<span>⏱ {{ $walkthrough['duration'] }}</span>@endif
+            <span>Accelerator · Module 02</span>
+          </div>
+        </div>
+        <div class="call note"><div class="h">↳ how to use both</div><p>Watch once to see it happen, then <strong>follow the written steps below</strong> at your own pace — copying and pasting beats retyping from a video, which is where mistakes creep in. You only need <em>one</em> hosting route: this one, or <a class="link" href="/guides/n8n-on-hostinger">the Hostinger route</a> if Google won't verify your account.</p></div>
+      </section>
+      @endif
 
       <p style="color:var(--muted)">You'll move between three places: your <strong>domain registrar</strong>, the <strong>Google Cloud Console</strong>, and a <strong>black terminal window</strong> on your server. The diagram below is what the steps quietly build — you don't need to understand it now.</p>
 

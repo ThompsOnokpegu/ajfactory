@@ -133,6 +133,15 @@
   .term-mock .body { padding: 1rem 1.1rem; font-family: var(--font-mono); font-size: .82rem; line-height: 1.85; color: var(--con-text); }
   .term-mock .body .c { color: var(--con-prompt); } .term-mock .body .g { color: #6ee7a8; } .term-mock .body .m { color: var(--con-muted); }
 
+  /* video walkthrough embed — shared, so any guide with a recording can use it.
+     Padding-top holds a 16:9 box before the iframe loads, so the page doesn't
+     jump when it does. */
+  .videobox { margin: 1.6rem 0 .4rem; }
+  .videobox .frame { position: relative; padding-top: 56.25%; border: 1px solid var(--con-border); border-radius: 12px; overflow: hidden; background: var(--con-bg); box-shadow: 0 24px 50px -30px rgba(0,0,0,.6); }
+  .videobox .frame iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+  .videobox .cap { display: flex; flex-wrap: wrap; gap: .55rem 1rem; align-items: baseline; margin-top: .75rem; font-family: var(--font-mono); font-size: .74rem; letter-spacing: .04em; color: var(--faint); }
+  .videobox .cap b { color: var(--accent); font-weight: 600; }
+
   /* sections */
   section { padding-top: 2.5rem; scroll-margin-top: 5rem; }
   .part-h { display: flex; align-items: baseline; gap: 1rem; margin-bottom: .4rem; }

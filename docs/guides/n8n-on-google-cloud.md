@@ -18,6 +18,27 @@ written. Every step is spelled out — nothing assumed, nothing skipped.
 
 ---
 
+## Watch it first (optional)
+
+There's a **video walkthrough of this exact build** in the Accelerator, Module 02:
+*Self-Hosting n8n on Google Cloud (Walkthrough)* (23:54). The live page embeds it at
+the top; here it's the same lesson in `config/curriculum.php` under lesson id
+`module-02-v5`.
+
+Watch it once to see the whole thing happen, then **follow the written steps below** at
+your own pace. Copying and pasting beats retyping from a video, which is where the
+mistakes creep in.
+
+You only need **one** hosting route: this one, or the
+[Hostinger route](n8n-on-hostinger.md) if Google won't verify your account.
+
+> The page reads the video id from `config/curriculum.php` rather than hardcoding it, so
+> a re-record reaches the guide automatically. If the lesson id `module-02-v5` is ever
+> renamed, the embed silently disappears — the page renders without it rather than
+> showing a broken player.
+
+---
+
 ## What you'll end up with
 
 ```
