@@ -106,6 +106,13 @@ These encode real incidents. Changing them will break something that took a whil
   before (the page said one thing, the markdown another). Shared CSS/JS lives in
   `resources/views/guides/partials/` — both pages `@include` it, so don't paste a second
   copy of the design system into a new guide.
+- **The written guides are a PAID resource, not public.** They're free to Accelerator
+  students and buyable by everyone else. A new guide route must have its path listed in
+  `config/guides.php` **and** carry the `guide` middleware — miss either and it ships
+  wide open, returning a perfectly normal 200. That is exactly how both guides sat fully
+  public until 24 Aug 2026. `GuideAccessTest` guards it, and asserts on page *content*
+  rather than status, because the locked page is deliberately a 200 sales page and
+  `assertOk()` passes either way.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 

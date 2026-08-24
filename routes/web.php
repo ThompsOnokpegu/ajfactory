@@ -74,10 +74,15 @@ Route::get('/r/{resource}', function (\App\Models\Resource $resource) {
     return redirect()->away($resource->url);
 })->name('resources.go');
 
-// Written guides (public — students + anyone)
-Route::view('/guides/n8n-on-google-cloud', 'guides.n8n-google-cloud')->name('guides.n8n-gcp');
+// Written guides — a PAID resource, free to Accelerator students. Gated by the
+// `guide` middleware against config/guides.php; non-members get a sales page, not a
+// 404. These were served publicly until 24 Aug 2026 by mistake, so if you add a
+// guide route here, list its path in config/guides.php too or it ships wide open.
+Route::view('/guides/n8n-on-google-cloud', 'guides.n8n-google-cloud')
+    ->middleware('guide')->name('guides.n8n-gcp');
 // Alternative route for students whose Google Cloud account won't verify.
-Route::view('/guides/n8n-on-hostinger', 'guides.n8n-hostinger')->name('guides.n8n-hostinger');
+Route::view('/guides/n8n-on-hostinger', 'guides.n8n-hostinger')
+    ->middleware('guide')->name('guides.n8n-hostinger');
 
 // Paid resources — email-only, one-off purchase → gated access page.
 Route::get('/resources/{resource}/buy', [ResourceController::class, 'buy'])->name('resource.buy');

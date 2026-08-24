@@ -387,6 +387,35 @@ code `PLAYBOOK`, which anyone could have guessed straight into the completion gu
 [configuration.md](configuration.md). Sessions that ran before a cohort started, or that had
 no `attendance_code`, can never be credited, and there's no retroactive fix.
 
+### Selling a written guide
+
+The guides are gated by default and free to Accelerator students. To sell one to
+everybody else, create the product in **Admin → Resources**:
+
+| Field | Value |
+|---|---|
+| `url` | the guide path, e.g. `/guides/n8n-on-google-cloud` — this is what links the Resource to the gate |
+| `price` | NGN. A price of 0/null leaves it un-sellable and the locked page just points at the Accelerator |
+| `price_usd` | optional |
+| `is_published` | on |
+
+One row is enough for both guides — a purchase of either unlocks both, deliberately.
+
+Buyers land on `/resources/access/{token}` after paying (also emailed), and the "Open
+your resource" button carries the token that unlocks the guide for their browser. **Don't
+hand anyone a bare `/guides/…` link** — without the token they'll hit the sales page
+having already paid. Send them their access link instead.
+
+To check the gate is actually on, request a guide signed out:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://ajbuildai.com/guides/n8n-on-google-cloud
+curl -s https://ajbuildai.com/guides/n8n-on-google-cloud | grep -c 'this guide is for members'
+```
+
+`200` plus a `1` from the grep is correct — the sales page. A `0` means the guide body is
+being served to the public.
+
 ### Harvesting reviews for the next cohort's launch
 
 Feedback is collected **during** the cohort, not begged for at the end. Three staged asks

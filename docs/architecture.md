@@ -65,6 +65,35 @@ enrollment path by the `RES_` prefix), marks it `paid`, and fires the `resource_
 email. The buyer's link lives at a token-gated access page (`resources.access`, bound by a
 random `access_token`, not the id) that reveals the `url` only once `status = paid`.
 
+### Written guides — a paid resource with a free student tier
+
+The self-hosting guides (`/guides/…`) are pages in this app, not external links, so
+`App\Http\Middleware\GuideAccess` gates them instead of the `Resource.url` gate above.
+Paths are listed in `config/guides.php`; anything not listed is served normally, so a new
+guide is only protected once it's added there.
+
+Three ways in, checked in this order:
+
+1. **An admin.**
+2. **A logged-in student** with a `paid`, un-suspended `Enrollment` — the same rule
+   `CheckEnrollment` applies to the terminal. An overdue installment balance therefore
+   pauses the guides too, and clearing it restores them.
+3. **A buyer**, via their purchase's `access_token`. Their access page links to the guide
+   as `?t=<token>`; the middleware validates it, moves it into the session and redirects
+   to the clean URL, so the token never lingers in the address bar or a Referer header.
+
+The token is re-validated against the database on **every** request rather than trusted
+from the session, so a refund or reversal revokes access immediately.
+
+**One product, both routes.** A student follows either the Google Cloud guide or the
+Hostinger one, never both, so any paid purchase of a guide resource unlocks every gated
+guide — charging twice for a fallback route would be a trap.
+
+Non-members get a **200 sales page** (`guides/locked`), not a 403 or 404: someone landing
+from a search result is a prospect. It shows a Buy button only when a published, priced
+`Resource` whose `url` matches a gated path exists — with none, it points at the
+Accelerator rather than inventing a price.
+
 ### `Checkpoint`
 Proof-of-work submitted per module. `status` gates the next module: a student must have an
 **approved** checkpoint for module *N* before *N+1* opens. Admin reviews these at

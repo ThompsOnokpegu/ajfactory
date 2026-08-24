@@ -19,8 +19,18 @@
             </div>
             <h1 class="text-3xl font-black text-white uppercase italic tracking-tighter mb-3">You're in.</h1>
             <p class="text-zinc-400 mb-8">Your purchase of <strong class="text-white">{{ $purchase->resource?->title }}</strong> is confirmed. Here's your access — we've also emailed this link to {{ $purchase->email }}.</p>
-            @if($purchase->resource?->url)
-                <a href="{{ $purchase->resource->url }}" target="_blank"
+            @php
+                $resourceUrl = $purchase->resource?->url;
+                // A gated written guide lives on this site rather than behind an
+                // external link, so it needs the purchase token once to unlock it for
+                // this browser. GuideAccess stores it in the session and strips it back
+                // out of the URL, so it never sits in the address bar.
+                if ($resourceUrl && in_array($resourceUrl, config('guides.gated_paths', []), true)) {
+                    $resourceUrl .= '?t=' . $purchase->access_token;
+                }
+            @endphp
+            @if($resourceUrl)
+                <a href="{{ $resourceUrl }}" target="_blank"
                    class="inline-block px-10 py-5 bg-cyan-500 text-black font-black uppercase tracking-tighter text-lg rounded-xl hover:bg-white transition-all">
                     Open your resource →
                 </a>

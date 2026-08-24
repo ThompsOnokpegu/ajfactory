@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * The guides are gated (see GuideAccessTest) - a signed-out request gets the sales
+ * page, not the guide. Everything here asserts on guide CONTENT, so it runs as an
+ * enrolled student.
+ */
+beforeEach(fn () => test()->actingAs(anEnrolledStudent()));
+
 it('serves both self-hosting guides', function () {
     $this->get('/guides/n8n-on-google-cloud')
         ->assertOk()
