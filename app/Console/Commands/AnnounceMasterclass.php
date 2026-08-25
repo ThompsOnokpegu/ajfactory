@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
  * silent auto-enrol (that's `masterclass:enroll-waitlist`). We nudge two pools to
  * re-register so we capture their fresh goal + a live intent signal:
  *
- *   1. Waitlisters (students.source = 'waitlist') who never registered.
+ *   1. Leads in `students`, selected by source (--sources, default 'waitlist').
  *   2. Registrants from the last N sessions — most only ever attend once
  *      (~30–35% show rate), so recycling past intent is cheaper than new traffic.
  *
@@ -30,6 +30,7 @@ class AnnounceMasterclass extends Command
 {
     protected $signature = 'masterclass:announce
         {--dry-run : List who would be invited without writing or sending}
+        {--sources=waitlist : Comma-separated students.source values to invite, e.g. waitlist,accelerator_waitlist,scorecard,roi,tool-stack. Empty string skips the student pool entirely.}
         {--past-sessions=2 : How many prior sessions of registrants to re-invite}
         {--limit= : Cap invites sent this run, to stay under daily SMTP limits (default: all). Re-run after the cap resets to send the rest.}
         {--throttle= : Override send_throttle_ms (e.g. 2000) if n8n drops sends under burst}';
@@ -56,22 +57,52 @@ class AnnounceMasterclass extends Command
         // --- Build the audience, keyed by lowercased email so the two pools dedupe.
         $audience = [];
 
-        // Pool 1: waitlisters who opted in but never registered.
-        DB::table('students')
-            ->where('interest', 'masterclass')
-            ->where('source', 'waitlist')
-            ->get()
-            ->each(function ($s) use (&$audience) {
-                $email = strtolower(trim($s->email));
-                if ($email === '' || isset($audience[$email])) {
-                    return;
-                }
-                $audience[$email] = [
-                    'name' => $s->name,
-                    'whatsapp' => $s->whatsapp,
-                    'audience' => 'waitlist',
-                ];
-            });
+        // Pool 1: leads in `students`, selected by source.
+        //
+        // Defaults to 'waitlist' alone, which is what this command shipped with. The
+        // other capture sources — accelerator_waitlist, scorecard, roi, tool-stack —
+        // are every bit as invitable, and leaving them out meant the command only ever
+        // reached a small slice of the list. Pass --sources to widen it.
+        //
+        // Filtering on `source` ONLY, deliberately. This used to also require
+        // interest='masterclass', which is true for every source='waitlist' row (that
+        // pairing is written together by MasterclassController) but false for most
+        // others: the accelerator waitlist writes interest='accelerator', the scorecard
+        // writes interest='scorecard'. Keeping that clause would have made --sources
+        // look like it worked while silently matching nobody.
+        $sources = collect(explode(',', (string) $this->option('sources')))
+            ->map(fn ($s) => trim($s))
+            ->filter()
+            ->unique()
+            ->values();
+
+        if ($sources->isNotEmpty()) {
+            // A typo'd source matches zero rows and fails silently, which on a
+            // deadline looks identical to "nobody left to invite". Say so instead.
+            $known = DB::table('students')->whereNotNull('source')
+                ->distinct()->pluck('source')->map(fn ($s) => trim($s))->all();
+
+            foreach ($sources->diff($known) as $unknown) {
+                $this->warn("Source '{$unknown}' matches no rows in `students` — check the spelling. Known: " . implode(', ', $known));
+            }
+
+            DB::table('students')
+                ->whereIn('source', $sources->all())
+                ->get()
+                ->each(function ($s) use (&$audience) {
+                    $email = strtolower(trim($s->email));
+                    if ($email === '' || isset($audience[$email])) {
+                        return;
+                    }
+                    $audience[$email] = [
+                        'name' => $s->name,
+                        'whatsapp' => $s->whatsapp,
+                        // Record the real source, not a flat 'waitlist', so the ledger
+                        // can report which pool actually converted.
+                        'audience' => $s->source ?: 'student',
+                    ];
+                });
+        }
 
         // Pool 2: registrants from the last N distinct sessions before this one.
         if ($pastSessions > 0) {

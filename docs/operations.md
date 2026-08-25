@@ -125,11 +125,30 @@ On the server:
 ```bash
 php artisan masterclass:announce --dry-run          # preview exactly who'd be invited
 php artisan masterclass:announce --limit=270        # send the "registration is open" invite
+
+# Reach the WHOLE list, not just the masterclass waitlist:
+php artisan masterclass:announce --dry-run --sources=waitlist,accelerator_waitlist,scorecard,roi,tool-stack --past-sessions=6
 ```
 
-It targets current waitlisters **plus** registrants from the last 2 sessions
-(`--past-sessions=N` to change the reach), and suppresses anyone already registered for this
-session, anyone who has **paid** for the Accelerator, and anyone already invited (the
+> **`--sources` defaults to `waitlist` alone, which is a small slice of `students`.** The
+> other capture sources (`accelerator_waitlist`, `scorecard`, `roi`, `tool-stack`) are just
+> as invitable and were never reached until 25 Aug 2026 — a ~500-row list was being worked as
+> if it were ~50. Check what you actually have before choosing:
+> `SELECT source, COUNT(*) FROM students GROUP BY source ORDER BY 2 DESC;`
+>
+> The pool filters on `source` only. It used to also require `interest='masterclass'`, which
+> is true for every `source=waitlist` row but false for most others (the accelerator waitlist
+> writes `interest='accelerator'`, the scorecard writes `interest='scorecard'`) — so keeping
+> that clause would have made `--sources` appear to work while matching nobody. A misspelled
+> source now prints a warning rather than silently inviting zero people.
+>
+> The ledger stamps the **real** source in `masterclass_invites.audience`, so you can see
+> which pool converted: `SELECT audience, COUNT(*) FROM masterclass_invites GROUP BY audience;`
+
+It targets `students` rows by **source** (`--sources`, default `waitlist`) **plus** registrants
+from the last 2 sessions (`--past-sessions=N` to change the reach), and suppresses anyone
+already registered for this session, anyone who has **paid** for the Accelerator, and anyone
+already invited (the
 `masterclass_invites` ledger makes it idempotent — safe to re-run and it runs daily via
 `.github/workflows/masterclass-announce.yml`). It fires the `masterclass_reinvite` n8n event,
 so that Switch branch must exist (see [n8n-masterclass-flow.md](n8n-masterclass-flow.md)).

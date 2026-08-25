@@ -42,6 +42,24 @@ function seedAnnounceWaitlister(string $email, string $name = 'Ada Lovelace'): v
     ]);
 }
 
+/**
+ * A lead captured by something other than the masterclass waitlist form. `interest`
+ * is intentionally settable and defaults to something OTHER than 'masterclass' —
+ * these rows are exactly what the old interest='masterclass' clause filtered out.
+ */
+function seedAnnounceLead(string $email, string $source, string $interest, string $name = 'Cold Lead'): void
+{
+    DB::table('students')->insert([
+        'name' => $name,
+        'email' => $email,
+        'whatsapp' => '+2348000000001',
+        'interest' => $interest,
+        'source' => $source,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+}
+
 function seedAnnounceRegistrant(string $email, string $sessionDate, string $first = 'Grace', string $last = 'Hopper'): void
 {
     DB::table('masterclass_registrations')->insert([
@@ -148,6 +166,71 @@ it('suppresses a buyer even when an earlier abandoned attempt exists on the same
 
     expect(DB::table('masterclass_invites')->count())->toBe(0);
     Http::assertNothingSent();
+});
+
+it('invites only source=waitlist by default, leaving the rest of the list alone', function () {
+    Http::fake();
+
+    seedAnnounceWaitlister('ada@example.com');
+    seedAnnounceLead('cold@example.com', 'scorecard', 'scorecard');
+
+    $this->artisan('masterclass:announce')->assertSuccessful();
+
+    expect(DB::table('masterclass_invites')->pluck('email')->all())
+        ->toBe(['ada@example.com']);
+});
+
+it('widens the audience to other capture sources with --sources', function () {
+    Http::fake();
+
+    // Each of these carries a DIFFERENT `interest` than 'masterclass' — the filter
+    // this command used to apply. If that clause ever comes back, this fails.
+    seedAnnounceWaitlister('ada@example.com');
+    seedAnnounceLead('acc@example.com', 'accelerator_waitlist', 'accelerator');
+    seedAnnounceLead('score@example.com', 'scorecard', 'scorecard');
+    seedAnnounceLead('roi@example.com', 'roi', 'masterclass');
+    seedAnnounceLead('ignored@example.com', 'clients', 'clients');
+
+    $this->artisan('masterclass:announce --sources=waitlist,accelerator_waitlist,scorecard,roi')
+        ->assertSuccessful();
+
+    $invited = DB::table('masterclass_invites')->pluck('email')->all();
+    expect($invited)->toHaveCount(4)
+        ->toContain('ada@example.com', 'acc@example.com', 'score@example.com', 'roi@example.com')
+        ->and($invited)->not->toContain('ignored@example.com');
+});
+
+it('stamps the real source on the ledger so pools can be reported on', function () {
+    Http::fake();
+    seedAnnounceLead('score@example.com', 'scorecard', 'scorecard');
+
+    $this->artisan('masterclass:announce --sources=scorecard')->assertSuccessful();
+
+    expect(DB::table('masterclass_invites')->where('email', 'score@example.com')->value('audience'))
+        ->toBe('scorecard');
+});
+
+it('warns instead of silently matching nobody when a source is misspelled', function () {
+    Http::fake();
+    seedAnnounceLead('score@example.com', 'scorecard', 'scorecard');
+
+    $this->artisan('masterclass:announce --sources=scorcard')   // typo
+        ->expectsOutputToContain("Source 'scorcard' matches no rows")
+        ->assertSuccessful();
+
+    Http::assertNothingSent();
+});
+
+it('skips the student pool entirely on --sources=', function () {
+    Http::fake();
+    seedAnnounceWaitlister('ada@example.com');
+    seedAnnounceRegistrant('grace@example.com', '2026-07-01');
+
+    $this->artisan('masterclass:announce --sources=')->assertSuccessful();
+
+    // Only the past-registrant pool remains.
+    expect(DB::table('masterclass_invites')->pluck('email')->all())
+        ->toBe(['grace@example.com']);
 });
 
 it('is idempotent — a second run invites nobody new', function () {
