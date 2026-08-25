@@ -85,7 +85,7 @@ the rate moves materially.
 ### Cohort & scarcity
 ```php
 'cohort_number'     => 3,   // stamped on new enrollments; >= 2 enables ship-to-unlock
-'cohort_cap'        => 25,
+'cohort_cap'        => 30,  // raised from 25 on 25 Aug 2026, before the launch campaign sent
 'earlybird_seats'   => 10,
 'earlybird_ends_at' => '2026-08-31 23:59:59',  // Monday 31 Aug 2026
 'cohort_starts_at'  => '2026-09-12',           // Saturday 12 Sep 2026
@@ -94,6 +94,9 @@ the rate moves materially.
 
 - Early-bird is active while `seats_sold < earlybird_seats` **and** `now < earlybird_ends_at`.
 - Seats left = `cohort_cap - seats_sold`; at zero, checkout is disabled and a waitlist CTA shows.
+- `cohort_cap` is **public** — it renders as "N of {cap} seats left" on the landing page and
+  checkout. Move it between launches, not during one: raising it after leads have seen a
+  smaller count is visible fake scarcity to an audience sold on "no surprises".
 - `cohort_number >= 2` turns on checkpoint gating. Cohort 1 stays ungated deliberately.
 - Changing `cohort_starts_at`? Four other things follow from it, and none of them error
   if you forget:

@@ -105,6 +105,51 @@ it('suppresses people already registered for this session and Accelerator buyers
     Http::assertNothingSent();
 });
 
+it('still invites someone who abandoned the checkout — a pending enrollment is not a buyer', function () {
+    Http::fake();
+
+    // The checkout writes a `pending` enrollment the moment the pay button is
+    // clicked, before the payment modal opens. Treating that as a buyer excluded
+    // every abandoned cart — our hottest segment — from every invite, silently.
+    seedAnnounceWaitlister('bailed@example.com', 'Nearly Bought');
+    DB::table('enrollments')->insert([
+        'full_name' => 'Nearly Bought', 'email' => 'bailed@example.com',
+        'payment_reference' => 'ACC_abandoned', 'amount' => 69000,
+        'status' => 'pending',
+        'created_at' => now(), 'updated_at' => now(),
+    ]);
+
+    $this->artisan('masterclass:announce')->assertSuccessful();
+
+    expect(DB::table('masterclass_invites')->where('email', 'bailed@example.com')->count())->toBe(1);
+    Http::assertSentCount(1);
+});
+
+it('suppresses a buyer even when an earlier abandoned attempt exists on the same email', function () {
+    Http::fake();
+
+    // Checkout uses Enrollment::create (not updateOrCreate), so someone who bailed
+    // once and paid on the second attempt has BOTH rows. The paid one must win.
+    seedAnnounceWaitlister('secondtime@example.com', 'Second Time');
+    DB::table('enrollments')->insert([
+        [
+            'full_name' => 'Second Time', 'email' => 'secondtime@example.com',
+            'payment_reference' => 'ACC_try1', 'amount' => 69000, 'status' => 'pending',
+            'created_at' => now(), 'updated_at' => now(),
+        ],
+        [
+            'full_name' => 'Second Time', 'email' => 'secondtime@example.com',
+            'payment_reference' => 'ACC_try2', 'amount' => 69000, 'status' => 'paid',
+            'created_at' => now(), 'updated_at' => now(),
+        ],
+    ]);
+
+    $this->artisan('masterclass:announce')->assertSuccessful();
+
+    expect(DB::table('masterclass_invites')->count())->toBe(0);
+    Http::assertNothingSent();
+});
+
 it('is idempotent — a second run invites nobody new', function () {
     Http::fake();
     seedAnnounceWaitlister('ada@example.com');

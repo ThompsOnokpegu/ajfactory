@@ -38,12 +38,12 @@
 
       <div class="hero" id="top">
         <span class="eyebrow">Self-hosting guide · no code required</span>
-        <h1>Your own n8n. Live. <em>₦0 a month.</em></h1>
+        <h1>Your own n8n. Live. <em>$0 a month.</em></h1>
         <p class="lede">A private n8n on your own web address, on Google Cloud's Always-Free server, with a real HTTPS padlock. You copy and paste, exactly as written — every step spelled out, nothing assumed, nothing skipped.</p>
         <div class="meta">
           <span class="chip">⏱ <b>45–60 min</b> first time</span>
-          <span class="chip">💳 hosting <b>₦0/mo</b></span>
-          <span class="chip">🌐 domain ~<b>₦8–15k/yr</b></span>
+          <span class="chip">💳 hosting <b>$0/mo</b></span>
+          <span class="chip">🌐 domain ~<b>$6-11/yr</b></span>
           <span class="chip">🧑‍💻 <b>no coding</b></span>
         </div>
 
@@ -110,8 +110,8 @@ Google Cloud server  (free e2-micro)
         <p class="part-sub">Four things to have ready.</p>
         <ul class="clean check">
           <li>A <strong>Google account</strong> (a normal Gmail is fine).</li>
-          <li>A <strong>debit/credit card</strong> — Google requires one to verify you're human. On the Always-Free server <strong>you won't be charged</strong>; we also set a ₦0 budget alert as a safety net in Part 02.</li>
-          <li>About <strong>₦8,000–15,000</strong> for a domain name (yearly).</li>
+          <li>A <strong>debit/credit card</strong> — Google requires one to verify you're human. On the Always-Free server <strong>you won't be charged</strong>; we also set a $1 budget alert as a safety net in Part 02.</li>
+          <li>About <strong>$6-11</strong> for a domain name (yearly).</li>
           <li>A computer with a browser — Windows, Mac, or Linux. Everything happens in the browser.</li>
         </ul>
       </section>
@@ -372,7 +372,7 @@ EOF</code></pre></div>
         <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
 <pre><code>sudo docker run --rm -v n8n_n8n_data:/data -v ~:/backup alpine tar czf /backup/n8n-backup-$(date +%F).tar.gz -C /data .</code></pre></div>
         <p>Then download that <code class="inl">.tar.gz</code> from the SSH window (top-right <strong>⚙ → Download file</strong>) and keep it safe.</p>
-        <div class="call note"><div class="h">↳ still free?</div><p>Google Cloud → <strong>Billing</strong>. As long as it's the <code class="inl">e2-micro</code> in a free region with a 30 GB standard disk, hosting stays ₦0. Watch only for large <strong>network egress</strong> — normal automation traffic is tiny.</p></div>
+        <div class="call note"><div class="h">↳ still free?</div><p>Google Cloud → <strong>Billing</strong>. As long as it's the <code class="inl">e2-micro</code> in a free region with a 30 GB standard disk, hosting stays $0. Watch only for large <strong>network egress</strong> — normal automation traffic is tiny.</p></div>
       </section>
 
       <!-- 09 -->
@@ -398,9 +398,9 @@ EOF</code></pre></div>
         <div class="tablewrap"><table>
           <thead><tr><th>Item</th><th>Cost</th></tr></thead>
           <tbody>
-            <tr><td>Google Cloud server (e2-micro, free region)</td><td><b>₦0 / month</b></td></tr>
-            <tr><td>SSL certificate (Caddy + Let's Encrypt)</td><td><b>₦0</b></td></tr>
-            <tr><td>Domain name</td><td>~₦8,000–15,000 / year</td></tr>
+            <tr><td>Google Cloud server (e2-micro, free region)</td><td><b>$0 / month</b></td></tr>
+            <tr><td>SSL certificate (Caddy + Let's Encrypt)</td><td><b>$0</b></td></tr>
+            <tr><td>Domain name</td><td>~$6-11 / year</td></tr>
             <tr><td>Your own production n8n</td><td><b>done ✓</b></td></tr>
           </tbody>
         </table></div>

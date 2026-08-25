@@ -129,10 +129,19 @@ php artisan masterclass:announce --limit=270        # send the "registration is 
 
 It targets current waitlisters **plus** registrants from the last 2 sessions
 (`--past-sessions=N` to change the reach), and suppresses anyone already registered for this
-session, anyone who already enrolled in the Accelerator, and anyone already invited (the
+session, anyone who has **paid** for the Accelerator, and anyone already invited (the
 `masterclass_invites` ledger makes it idempotent — safe to re-run and it runs daily via
 `.github/workflows/masterclass-announce.yml`). It fires the `masterclass_reinvite` n8n event,
 so that Switch branch must exist (see [n8n-masterclass-flow.md](n8n-masterclass-flow.md)).
+
+> **"Paid" is load-bearing there.** The checkout writes an `enrollments` row with
+> `status='pending'` the instant the pay button is clicked, before the payment modal opens —
+> so an abandoned cart looks exactly like a buyer in that table. Until 25 Aug 2026 the
+> suppression set was an unfiltered pluck of `enrollments`, which meant **every abandoned
+> checkout was silently excluded from every invite, permanently**, with nothing in any log to
+> show for it. Those are the hottest leads in the database. The filter now excludes
+> `status='pending'` rather than selecting `status='paid'`, so an unexpected status still
+> fails safe (suppressed). `MasterclassAnnounceTest` guards both directions.
 
 **Mind the email cap.** Hostinger allows **100 emails/day per mailbox**. The n8n
 `masterclass_reinvite` branch round-robins across three senders — `hello@`, `aj@`, `taab@`
@@ -253,7 +262,7 @@ scarcity:
 
 ```php
 'cohort_number'     => 3,
-'cohort_cap'        => 25,
+'cohort_cap'        => 30,
 'earlybird_seats'   => 10,
 'earlybird_ends_at' => '2026-08-31 23:59:59',  // Monday 31 Aug 2026
 'cohort_starts_at'  => '2026-09-12',           // Saturday 12 Sep 2026
@@ -438,6 +447,19 @@ module 01, `midpoint` after 05, `finish` after 09). Nothing to run — it's auto
    import on purpose: a quote going on the sales page should be a decision, and raw answers
    are usually more useful trimmed. Never edit a quote into saying something the student
    didn't say.
+
+   > **Read the quote against the rest of the page before publishing it.** A Cohort 2
+   > answer credited "the OpenAI API" — this course teaches Gemini, and
+   > `requirements-costs.blade.php` advertises that key at ₦0. Publishing it would have put
+   > a testimonial naming a paid API it doesn't teach on the same page as the costs table.
+   > You can't correct it without putting words in their mouth, so the fix is to pick a
+   > different answer from the same student.
+
+   > **The Proof section on `/accelerator` was commented out** from launch until 25 Aug 2026
+   > while the array was empty. Populating the config is only half the job — if that block
+   > is ever hidden again, quotes render nowhere and nothing errors. `AcceleratorProofTest`
+   > asserts against the rendered page for exactly that reason. The `@else` branch is a
+   > graceful CTA empty state, so the section is safe to leave enabled permanently.
 
 **Which answers map to which piece of Cohort 3 copy:**
 

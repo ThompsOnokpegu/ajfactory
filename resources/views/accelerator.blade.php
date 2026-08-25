@@ -236,8 +236,10 @@
                 </div>
             </section>
 
-            {{-- 3.5 PROOF — temporarily hidden until we have real testimonials. Re-enable this whole block once config('accelerator.testimonials') is populated. --}}
-            {{--
+            {{-- 3.5 PROOF — live since 25 Aug 2026 (three real Cohort 2 reviews in
+                 config('accelerator.testimonials')). The @else branch below is a graceful
+                 empty state, so this block is safe to leave enabled even if the array is
+                 ever emptied — it degrades to a CTA rather than to fabricated proof. --}}
             <section class="max-w-7xl mx-auto px-6 py-24 border-t border-zinc-900">
                 <div class="text-center mb-12 space-y-3">
                     <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Proof</div>
@@ -271,11 +273,9 @@
                         <a href="{{ $primaryCta }}" class="inline-block mt-6 px-6 py-3 border border-zinc-800 text-zinc-400 hover:text-white hover:border-cyan-500/50 transition-all uppercase font-black text-[10px] tracking-widest rounded-lg">
                             {{ $soldOut ? 'Join The Waitlist' : 'Claim Your Seat' }}
                         </a>
-                        TODO: owner adds real testimonials + build/result clips via config('accelerator.testimonials')
                     </div>
                 @endif
             </section>
-            --}}
 
             <!-- 3.6 OFFER STACK -->
             <section class="max-w-4xl mx-auto px-6 py-24 border-t border-zinc-900">

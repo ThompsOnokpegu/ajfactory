@@ -2,8 +2,8 @@
 
 This gets you a **private n8n running on your own web address** (like
 `https://n8n.yourdomain.com`), hosted on Google Cloud's **Always Free** server,
-with a proper **padlock (HTTPS)** — for **₦0/month** in hosting. The only real
-cost is a domain name (~₦8,000–15,000/year).
+with a proper **padlock (HTTPS)** — for **$0/month** in hosting. The only real
+cost is a domain name (~$6-11/year).
 
 You do **not** need to know how to code. You'll copy and paste commands exactly as
 written. Every step is spelled out — nothing assumed, nothing skipped.
@@ -59,9 +59,9 @@ You don't need to understand that diagram — the steps build it for you.
 
 - [ ] A **Google account** (a normal Gmail is fine).
 - [ ] A **debit/credit card** — Google requires one to verify you're human. On the
-      Always-Free server **you will not be charged**; we'll also set a ₦0 budget
+      Always-Free server **you will not be charged**; we'll also set a $1 budget
       alert as a safety net (Part 2).
-- [ ] About **₦8,000–15,000** for a domain name (yearly).
+- [ ] About **$6-11** for a domain name (yearly).
 - [ ] A computer (Windows, Mac, or Linux). Everything is done in a browser.
 
 ---
@@ -452,7 +452,7 @@ Then download that `.tar.gz` from the Google SSH window (top-right **⚙ → Dow
 file**) and keep it safe.
 
 **Check you're still free:** Google Cloud → **Billing**. As long as it's the
-`e2-micro` in a free region with a 30 GB standard disk, hosting stays ₦0. Watch only
+`e2-micro` in a free region with a 30 GB standard disk, hosting stays $0. Watch only
 for large **network egress** (sending lots of data out) — normal automation traffic
 is tiny.
 
@@ -478,9 +478,9 @@ is tiny.
 
 | Item | Cost |
 |---|---|
-| Google Cloud server (e2-micro, free region) | **₦0 / month** |
-| SSL certificate (Caddy + Let's Encrypt) | **₦0** |
-| Domain name | ~₦8,000–15,000 / year |
+| Google Cloud server (e2-micro, free region) | **$0 / month** |
+| SSL certificate (Caddy + Let's Encrypt) | **$0** |
+| Domain name | ~$6-11 / year |
 | **Your own production n8n** | **done ✅** |
 
 You now own your automation infrastructure — no monthly n8n subscription, no trial

@@ -76,7 +76,13 @@ return [
 
     // --- Scarcity / cohort ---
     'cohort_number'     => 3,     // stamped on new enrollments; >= 2 enables ship-to-unlock
-    'cohort_cap'        => 25,
+    // Raised 25 -> 30 on 25 Aug 2026, deliberately BEFORE the Cohort 3 list campaign
+    // sent anything. This number is the public scarcity counter ("N of 30 seats left")
+    // on the landing page and checkout, and `Accelerator::isSoldOut()` hard-blocks
+    // checkout when it's reached. Raising it mid-launch, after leads have already seen
+    // a smaller number, reads as fake scarcity to an audience we sell "no surprises"
+    // to — so if it moves again, move it before the next send, not during one.
+    'cohort_cap'        => 30,
     'earlybird_seats'   => 10,    // early-bird active while seats_sold < this
     'earlybird_ends_at' => '2026-08-31 23:59:59', // Monday 31st August 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
     'cohort_starts_at'  => '2026-09-12', // Saturday 12th September 2026
@@ -132,9 +138,52 @@ return [
     ],
 
     /*
-    | Testimonials / proof. Empty by default — DO NOT fabricate. The owner adds
-    | entries here with 'is_published' => true to make them appear. Shape:
+    | Testimonials / proof. DO NOT fabricate. Shape:
     | ['name' => '', 'role' => '', 'quote' => '', 'photo' => '', 'is_published' => true]
+    |
+    | These are real Cohort 2 review submissions, added 25 Aug 2026. Each student
+    | rated 5/5 and ticked the consent box; `name` is their chosen credit line copied
+    | verbatim from the Quotable card in Admin → Reviews, which honours their
+    | full-name / first-name / anonymous choice. Don't "tidy" a name here.
+    |
+    | Quotes are TRIMMED, never rewritten. Cuts are marked with an ellipsis and
+    | capitalisation is corrected; not one word has been added or changed. If a quote
+    | needs a claim it doesn't make, the answer is a different quote.
+    |
+    | ⚠️ Adding entries here is only half the job — the Proof section in
+    | resources/views/accelerator.blade.php must be uncommented, or these render
+    | nowhere and the page silently keeps its empty state.
     */
-    'testimonials' => [],
+    'testimonials' => [
+        [
+            // Answers the "I'll just learn it free on YouTube" objection, unprompted.
+            'name' => 'Janet',
+            'role' => 'Cohort 2',
+            'quote' => 'The process explained is simpler than watching YouTube videos.',
+            'photo' => '',
+            'is_published' => true,
+        ],
+        [
+            // Names the exact Module 01 wall (OAuth/API credentials) that stalls most
+            // students. Left in his own plain phrasing on purpose — that's what makes
+            // it read as a real person. Only OAuth/API were capitalised.
+            'name' => 'James A.',
+            'role' => 'Cohort 2',
+            'quote' => 'In Module 1, I could not configure those OAuth and API properly - but now I am good.',
+            'photo' => '',
+            'is_published' => true,
+        ],
+        [
+            // The core objection for this audience: "can I do this without being a
+            // programmer?". Taken from his "what surprised you" answer, middle sentence
+            // trimmed. NOT his Module 1 answer, which credits "the OpenAI API" — this
+            // course teaches Gemini, and requirements-costs.blade.php advertises that
+            // key at ₦0. Publishing it would contradict the costs table on the same page.
+            'name' => 'Michael Egwuchukwu Ugochukwu',
+            'role' => 'Cohort 2',
+            'quote' => 'What surprised me most was how much you can build without being an expert programmer... Seeing my first automation actually work gave me the confidence that I can build solutions for real businesses.',
+            'photo' => '',
+            'is_published' => true,
+        ],
+    ],
 ];

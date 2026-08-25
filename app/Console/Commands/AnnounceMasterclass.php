@@ -107,7 +107,18 @@ class AnnounceMasterclass extends Command
             DB::table('masterclass_registrations')->where('session_date', $session)
                 ->pluck('email')->map(fn ($e) => strtolower(trim($e)))->all(),
             // Already an Accelerator buyer — don't pull them back to the free funnel.
-            DB::table('enrollments')
+            //
+            // An ABANDONED CART IS NOT A BUYER. The checkout writes an enrollment row
+            // with status='pending' the moment someone clicks pay — before the payment
+            // modal even opens — so this pluck was unfiltered and treated every
+            // abandoned cart as a buyer. Those are the hottest leads in the database and
+            // they were silently excluded from every invite, permanently, with nothing
+            // in any log to show for it.
+            //
+            // Excluding 'pending' rather than selecting 'paid' on purpose: it names the
+            // thing we're correcting, and it fails SAFE. Any unexpected status stays
+            // suppressed instead of being mailed a free-funnel invite.
+            DB::table('enrollments')->where('status', '!=', 'pending')
                 ->pluck('email')->map(fn ($e) => strtolower(trim($e)))->all(),
             // Already invited to this session — idempotency.
             DB::table('masterclass_invites')->where('session_date', $session)
