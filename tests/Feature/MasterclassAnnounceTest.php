@@ -233,6 +233,60 @@ it('skips the student pool entirely on --sources=', function () {
         ->toBe(['grace@example.com']);
 });
 
+it('reaches NULL-source legacy leads via --interests', function () {
+    Http::fake();
+
+    // Every lead captured before the `source` column existed has source = NULL, and
+    // whereIn('source', …) can never match NULL — so no value of --sources reaches
+    // these. They are the OLDEST rows in the table and a large share of it.
+    DB::table('students')->insert([
+        ['name' => 'Old Lead', 'email' => 'legacy@example.com', 'whatsapp' => '08012345678',
+         'interest' => 'course', 'source' => null, 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Community', 'email' => 'comm@example.com', 'whatsapp' => null,
+         'interest' => 'community', 'source' => null, 'created_at' => now(), 'updated_at' => now()],
+        ['name' => 'Not Wanted', 'email' => 'other@example.com', 'whatsapp' => null,
+         'interest' => 'something-else', 'source' => null, 'created_at' => now(), 'updated_at' => now()],
+    ]);
+
+    $this->artisan('masterclass:announce --sources= --interests=course,community')
+        ->assertSuccessful();
+
+    $invited = DB::table('masterclass_invites')->pluck('email')->all();
+    expect($invited)->toHaveCount(2)
+        ->toContain('legacy@example.com', 'comm@example.com')
+        ->and($invited)->not->toContain('other@example.com');
+});
+
+it('ORs --sources and --interests rather than intersecting them', function () {
+    Http::fake();
+
+    seedAnnounceWaitlister('ada@example.com');                       // source only
+    DB::table('students')->insert([                                   // interest only
+        'name' => 'Old Lead', 'email' => 'legacy@example.com', 'whatsapp' => null,
+        'interest' => 'course', 'source' => null,
+        'created_at' => now(), 'updated_at' => now(),
+    ]);
+
+    $this->artisan('masterclass:announce --sources=waitlist --interests=course')
+        ->assertSuccessful();
+
+    expect(DB::table('masterclass_invites')->count())->toBe(2);
+});
+
+it('tags interest-matched leads on the ledger so the pool is reportable', function () {
+    Http::fake();
+    DB::table('students')->insert([
+        'name' => 'Old Lead', 'email' => 'legacy@example.com', 'whatsapp' => null,
+        'interest' => 'mentorship', 'source' => null,
+        'created_at' => now(), 'updated_at' => now(),
+    ]);
+
+    $this->artisan('masterclass:announce --sources= --interests=mentorship')->assertSuccessful();
+
+    expect(DB::table('masterclass_invites')->where('email', 'legacy@example.com')->value('audience'))
+        ->toBe('interest:mentorship');
+});
+
 it('is idempotent — a second run invites nobody new', function () {
     Http::fake();
     seedAnnounceWaitlister('ada@example.com');

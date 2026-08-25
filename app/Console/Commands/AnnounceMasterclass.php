@@ -30,7 +30,8 @@ class AnnounceMasterclass extends Command
 {
     protected $signature = 'masterclass:announce
         {--dry-run : List who would be invited without writing or sending}
-        {--sources=waitlist : Comma-separated students.source values to invite, e.g. waitlist,accelerator_waitlist,scorecard,roi,tool-stack. Empty string skips the student pool entirely.}
+        {--sources=waitlist : Comma-separated students.source values to invite, e.g. waitlist,accelerator_waitlist,scorecard,roi,tool-stack. Empty string skips selecting by source.}
+        {--interests= : Comma-separated students.interest values to invite, e.g. course,community,mentorship. OR-ed with --sources. This is the only way to reach pre-June-2026 leads, whose `source` is NULL.}
         {--past-sessions=2 : How many prior sessions of registrants to re-invite}
         {--limit= : Cap invites sent this run, to stay under daily SMTP limits (default: all). Re-run after the cap resets to send the rest.}
         {--throttle= : Override send_throttle_ms (e.g. 2000) if n8n drops sends under burst}';
@@ -76,18 +77,33 @@ class AnnounceMasterclass extends Command
             ->unique()
             ->values();
 
-        if ($sources->isNotEmpty()) {
-            // A typo'd source matches zero rows and fails silently, which on a
-            // deadline looks identical to "nobody left to invite". Say so instead.
-            $known = DB::table('students')->whereNotNull('source')
-                ->distinct()->pluck('source')->map(fn ($s) => trim($s))->all();
+        // `source` is NULL for every lead captured before that column was added
+        // (migration 2026_06_10_000000). Those are the OLDEST rows in the table and a
+        // large share of it — and `whereIn('source', …)` can never match NULL, so no
+        // value of --sources reaches them. They do carry a meaningful `interest`
+        // ('course', 'community', 'mentorship'), so --interests selects on that
+        // instead. The two are OR'd: a row matching either is in the audience.
+        $interests = collect(explode(',', (string) $this->option('interests')))
+            ->map(fn ($s) => trim($s))
+            ->filter()
+            ->unique()
+            ->values();
 
-            foreach ($sources->diff($known) as $unknown) {
-                $this->warn("Source '{$unknown}' matches no rows in `students` — check the spelling. Known: " . implode(', ', $known));
-            }
+        if ($sources->isNotEmpty() || $interests->isNotEmpty()) {
+            // A typo matches zero rows and fails silently, which on a deadline looks
+            // identical to "nobody left to invite". Say so instead.
+            $this->warnUnknown('Source', $sources, 'source');
+            $this->warnUnknown('Interest', $interests, 'interest');
 
             DB::table('students')
-                ->whereIn('source', $sources->all())
+                ->where(function ($q) use ($sources, $interests) {
+                    if ($sources->isNotEmpty()) {
+                        $q->orWhereIn('source', $sources->all());
+                    }
+                    if ($interests->isNotEmpty()) {
+                        $q->orWhereIn('interest', $interests->all());
+                    }
+                })
                 ->get()
                 ->each(function ($s) use (&$audience) {
                     $email = strtolower(trim($s->email));
@@ -97,9 +113,10 @@ class AnnounceMasterclass extends Command
                     $audience[$email] = [
                         'name' => $s->name,
                         'whatsapp' => $s->whatsapp,
-                        // Record the real source, not a flat 'waitlist', so the ledger
-                        // can report which pool actually converted.
-                        'audience' => $s->source ?: 'student',
+                        // Record where they actually came from, not a flat 'waitlist',
+                        // so the ledger can report which pool converted. Rows matched
+                        // on interest have no source, so tag them by interest.
+                        'audience' => $s->source ?: ($s->interest ? 'interest:'.$s->interest : 'student'),
                     ];
                 });
         }
@@ -221,6 +238,29 @@ class AnnounceMasterclass extends Command
         }
 
         return self::SUCCESS;
+    }
+
+    /**
+     * Warn about any requested value that matches no row in `students`.
+     *
+     * A misspelled --sources/--interests value simply selects nothing, which is
+     * indistinguishable from "everyone has already been invited" — and that is a
+     * silent no-op on the one day you needed the send to go out.
+     *
+     * @param  \Illuminate\Support\Collection<int,string>  $requested
+     */
+    private function warnUnknown(string $label, $requested, string $column): void
+    {
+        if ($requested->isEmpty()) {
+            return;
+        }
+
+        $known = DB::table('students')->whereNotNull($column)
+            ->distinct()->pluck($column)->map(fn ($v) => trim((string) $v))->all();
+
+        foreach ($requested->diff($known) as $unknown) {
+            $this->warn("{$label} '{$unknown}' matches no rows in `students` — check the spelling. Known: " . implode(', ', $known));
+        }
     }
 
     /**

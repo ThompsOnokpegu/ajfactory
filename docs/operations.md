@@ -127,8 +127,16 @@ php artisan masterclass:announce --dry-run          # preview exactly who'd be i
 php artisan masterclass:announce --limit=270        # send the "registration is open" invite
 
 # Reach the WHOLE list, not just the masterclass waitlist:
-php artisan masterclass:announce --dry-run --sources=waitlist,accelerator_waitlist,scorecard,roi,tool-stack --past-sessions=6
+php artisan masterclass:announce --dry-run --sources=waitlist,accelerator_waitlist,scorecard,roi,tool-stack --interests=course,community,mentorship --past-sessions=6
 ```
+
+> **`--interests` is the only way to reach the oldest leads.** `students.source` is NULL for
+> everything captured before migration `2026_06_10_000000` added the column, and
+> `whereIn('source', …)` never matches NULL — so no value of `--sources` reaches them, and
+> they are a large share of the table. They do carry an `interest` (`course`, `community`,
+> `mentorship`), which is what `--interests` selects on. The two options are **OR-ed**.
+> Check both columns before choosing:
+> `SELECT source, interest, COUNT(*) FROM students GROUP BY source, interest ORDER BY 3 DESC;`
 
 > **`--sources` defaults to `waitlist` alone, which is a small slice of `students`.** The
 > other capture sources (`accelerator_waitlist`, `scorecard`, `roi`, `tool-stack`) are just

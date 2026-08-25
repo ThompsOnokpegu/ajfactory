@@ -34,6 +34,10 @@ on:
         description: 'students.source values to invite (comma-separated). Widen to reach the whole list: waitlist,accelerator_waitlist,scorecard,roi,tool-stack'
         type: string
         default: 'waitlist'
+      interests:
+        description: 'students.interest values to invite (comma-separated), OR-ed with sources. The ONLY way to reach pre-June-2026 leads, whose source is NULL: course,community,mentorship'
+        type: string
+        default: ''
       past_sessions:
         description: 'How many prior sessions of registrants to re-invite'
         type: string
@@ -71,4 +75,4 @@ jobs:
           script: |
             set -e
             cd ~/domains/ajbuildai.com/public_html/laravel
-            php artisan masterclass:announce --limit=${{ github.event.inputs.limit || '270' }} --sources="${{ github.event.inputs.sources || 'waitlist' }}" --past-sessions=${{ github.event.inputs.past_sessions || '2' }} ${{ github.event.inputs.throttle && format('--throttle={0}', github.event.inputs.throttle) || '' }} ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
+            php artisan masterclass:announce --limit=${{ github.event.inputs.limit || '270' }} --sources="${{ github.event.inputs.sources || 'waitlist' }}" --interests="${{ github.event.inputs.interests || '' }}" --past-sessions=${{ github.event.inputs.past_sessions || '2' }} ${{ github.event.inputs.throttle && format('--throttle={0}', github.event.inputs.throttle) || '' }} ${{ github.event.inputs.dry_run == 'true' && '--dry-run' || '' }}
