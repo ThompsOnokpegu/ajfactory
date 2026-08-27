@@ -31,6 +31,34 @@ nothing gets sent.
 Every receiving node must use **Respond: When Last Node Finishes** — see
 [operations.md](operations.md#️-the-n8n-2xx-trap).
 
+### `APP_URL` - not a harmless standard key
+
+**It must be the exact public origin, including `https://`.** Signed URLs are built with
+`URL::signedRoute()`, which takes its host from the incoming request - but there is no
+request in a **console** run, so it falls back to `config('app.url')`. Anything scheduled
+(`installments:process` runs via GitHub Actions -> SSH -> artisan) therefore inherits
+`APP_URL`, and Laravel's default is `http://localhost`.
+
+Real incident: suspension emails carried
+`http://localhost/installment/117/pay?signature=...`. The signature is an HMAC over the
+**whole absolute URL**, and the route is `->middleware('signed')`, so such a link can never
+be repaired by rewriting the host - it returns 403 Invalid signature. The link has to be
+regenerated.
+
+Same trap with the scheme: if `APP_URL` is `http://` and the server redirects to `https://`,
+every signed link breaks with the identical 403, because the signature was computed for the
+`http` URL. Set the scheme you actually serve.
+
+```bash
+# after changing APP_URL - config is cached in production
+php artisan config:cache
+php artisan tinker --execute=\"echo config('app.url').PHP_EOL;\"
+```
+
+`installments:process` now refuses to send a pay link whose host is localhost and logs an
+error instead, leaving the student unstamped for the next run - see
+[operations.md](operations.md).
+
 ### Payments
 | Var | Notes |
 |---|---|

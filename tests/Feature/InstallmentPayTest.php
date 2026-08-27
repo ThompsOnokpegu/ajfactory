@@ -66,6 +66,12 @@ it('shows a cleared state and does not charge when nothing is due', function () 
 });
 
 it('scheduler sends a signed pay link, not a pre-made reference', function () {
+    // Model a configured production box. Without this the console URL generator
+    // falls back to APP_URL (http://localhost) and the command now refuses to send,
+    // because a signed link on the wrong host can never validate.
+    URL::forceRootUrl('https://ajbuildai.com');
+    URL::forceScheme('https');
+
     config(['services.n8n.installment_webhook' => 'https://example.test/inst']);
     Http::fake();
 
@@ -80,6 +86,9 @@ it('scheduler sends a signed pay link, not a pre-made reference', function () {
     expect($e->fresh()->second_payment_reference)->toBeNull(); // not pre-generated anymore
 
     Http::assertSent(fn ($req) => $req['event'] === 'installment_due'
-        && str_contains($req['pay_url'], '/installment/' . $e->id . '/pay')
+        && str_contains($req['pay_url'], 'https://ajbuildai.com/installment/' . $e->id . '/pay')
         && str_contains($req['pay_url'], 'signature='));
+
+    URL::forceRootUrl(null);
+    URL::forceScheme(null);
 });

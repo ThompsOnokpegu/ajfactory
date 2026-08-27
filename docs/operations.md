@@ -379,6 +379,44 @@ undoes what the old deadline already triggered: a student flipped to `link_sent`
 un-suspended — provided the new deadline plus grace hasn't already passed. Genuinely overdue
 students stay suspended.
 
+### Recovery: students were emailed a broken pay link
+
+Symptom: the pay link in the email points at `http://localhost/...`, or clicking it gives
+**403 Invalid signature**. Cause: `APP_URL` on the server (see
+[configuration.md](configuration.md)). Fix the env first, or every resend repeats the fault:
+
+```bash
+# 1. set APP_URL to the exact public https origin in the server .env, then:
+php artisan config:cache
+php artisan tinker --execute=\"echo config('app.url').PHP_EOL;\"
+```
+
+Anyone already emailed a dead link is stamped `link_sent`, so the scheduler will never
+contact them again - it only picks up rows still `pending`. Check who, then reset them:
+
+```bash
+# 2. who is affected?
+php artisan tinker --execute=\"echo \App\Models\Enrollment::where('plan_type','installment')->where('second_payment_status','link_sent')->where('balance_due','>',0)->count().PHP_EOL;\"
+
+# 3. put them back in the queue (also lifts a suspension raised over a link they never had)
+php artisan tinker --execute=\"\App\Models\Enrollment::where('plan_type','installment')->where('second_payment_status','link_sent')->where('balance_due','>',0)->update(['second_payment_status'=>'pending','installment_reminder_sent_at'=>null,'access_suspended'=>false]);\"
+
+# 4. re-send, now with a working link
+php artisan installments:process
+```
+
+Step 3 is safe while every link sent so far was broken - nobody can be legitimately overdue
+on a link they could not use. Once links genuinely work, don't blanket-reset: it would clear
+real suspensions too.
+
+**Why this can't recur silently.** `installments:process` now stamps `link_sent` only after
+n8n returns 2xx, refuses outright to send a localhost link, and suspends access only once the
+grace period has run **from when the link was sent** rather than from the due date - so a
+student can no longer be locked out over a message they never received. The command exits
+non-zero when any send fails, so a failing run shows up red in Actions.
+
+---
+
 `installments:process` runs daily at 09:00 and:
 1. sends the 2nd-payment link when `installment_due_days` elapses,
 2. suspends access `installment_grace_hours` after a missed due date.
