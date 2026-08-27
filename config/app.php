@@ -56,6 +56,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public Origin (console fallback)
+    |--------------------------------------------------------------------------
+    |
+    | Used when an absolute URL must be built from the CONSOLE - a scheduled
+    | command has no request, so Laravel falls back to 'url' above. Hardcoded
+    | default, like the Telegram links in config/accelerator.php, so a scheduled
+    | command can never email a http://localhost payment link just because the
+    | server .env was never edited. Applied in AppServiceProvider; a properly set
+    | APP_URL always wins.
+    |
+    */
+
+    'public_url' => env('APP_PUBLIC_URL') ?: 'https://ajbuildai.com',
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |

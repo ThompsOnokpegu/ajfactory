@@ -55,9 +55,12 @@ php artisan config:cache
 php artisan tinker --execute=\"echo config('app.url').PHP_EOL;\"
 ```
 
-`installments:process` now refuses to send a pay link whose host is localhost and logs an
-error instead, leaving the student unstamped for the next run - see
-[operations.md](operations.md).
+**There is a safety net, so this cannot silently recur.** `AppServiceProvider` forces the
+root URL to `app.public_url` (hardcoded `https://ajbuildai.com`, overridable with
+`APP_PUBLIC_URL`) whenever a console run finds `app.url` pointing at localhost - the same
+hardcoded-default trick the Telegram links use. A properly set `APP_URL` always wins.
+`installments:process` additionally refuses to send a localhost link at all, leaving the
+student unstamped for the next run - see [operations.md](operations.md).
 
 ### Payments
 | Var | Notes |

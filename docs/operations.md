@@ -379,41 +379,33 @@ undoes what the old deadline already triggered: a student flipped to `link_sent`
 un-suspended — provided the new deadline plus grace hasn't already passed. Genuinely overdue
 students stay suspended.
 
-### Recovery: students were emailed a broken pay link
+### Broken pay links (`http://localhost`, or 403 Invalid signature)
 
-Symptom: the pay link in the email points at `http://localhost/...`, or clicking it gives
-**403 Invalid signature**. Cause: `APP_URL` on the server (see
-[configuration.md](configuration.md)). Fix the env first, or every resend repeats the fault:
+**Already fixed in code - there is nothing to run.** Kept here because the symptom is
+confusing and the cause is not where you would look.
 
-```bash
-# 1. set APP_URL to the exact public https origin in the server .env, then:
-php artisan config:cache
-php artisan tinker --execute=\"echo config('app.url').PHP_EOL;\"
-```
+A signed URL takes its host from the incoming request, but a scheduled command has no
+request, so Laravel falls back to `config('app.url')`. The server carried Laravel's default
+`http://localhost`, so `installments:process` emailed pay links nobody could use. The
+signature is an HMAC over the **whole absolute URL**, so such a link cannot be repaired by
+rewriting the host - it 403s, and has to be regenerated.
 
-Anyone already emailed a dead link is stamped `link_sent`, so the scheduler will never
-contact them again - it only picks up rows still `pending`. Check who, then reset them:
+Three changes make it self-healing:
 
-```bash
-# 2. who is affected?
-php artisan tinker --execute=\"echo \App\Models\Enrollment::where('plan_type','installment')->where('second_payment_status','link_sent')->where('balance_due','>',0)->count().PHP_EOL;\"
+- `AppServiceProvider` forces the root URL to `app.public_url` (hardcoded
+  `https://ajbuildai.com`) whenever a console run finds `app.url` pointing at localhost, so
+  a correct link is generated **without the server `.env` being touched**. A properly set
+  `APP_URL` still wins.
+- Migration `2026_08_17_120000_requeue_broken_installment_pay_links` put everyone stamped
+  `link_sent` with an outstanding balance back to `pending` and lifted their suspension, so
+  the next scheduled run re-sends a working link. It ran on deploy.
+- `installments:process` refuses outright to send a localhost link, stamps only after n8n
+  returns 2xx, and exits non-zero on failure so a bad run shows red in Actions.
 
-# 3. put them back in the queue (also lifts a suspension raised over a link they never had)
-php artisan tinker --execute=\"\App\Models\Enrollment::where('plan_type','installment')->where('second_payment_status','link_sent')->where('balance_due','>',0)->update(['second_payment_status'=>'pending','installment_reminder_sent_at'=>null,'access_suspended'=>false]);\"
-
-# 4. re-send, now with a working link
-php artisan installments:process
-```
-
-Step 3 is safe while every link sent so far was broken - nobody can be legitimately overdue
-on a link they could not use. Once links genuinely work, don't blanket-reset: it would clear
-real suspensions too.
-
-**Why this can't recur silently.** `installments:process` now stamps `link_sent` only after
-n8n returns 2xx, refuses outright to send a localhost link, and suspends access only once the
-grace period has run **from when the link was sent** rather than from the due date - so a
-student can no longer be locked out over a message they never received. The command exits
-non-zero when any send fails, so a failing run shows up red in Actions.
+Setting `APP_URL` on the server is still worth doing (it fixes this at the source rather
+than relying on the fallback) - see [configuration.md](configuration.md). If you do, use the
+exact public origin **with `https://`**: an `http -> https` redirect breaks a signature just
+as thoroughly as the wrong host.
 
 ---
 

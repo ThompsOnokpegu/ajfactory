@@ -125,3 +125,14 @@ it('ignores a student who has already cleared the balance', function () {
     Http::assertNothingSent();
     expect($e->fresh()->second_payment_status)->toBe('paid');
 });
+
+it('has a real public origin to fall back on when APP_URL is local', function () {
+    // AppServiceProvider uses this whenever config('app.url') is localhost in a
+    // console run. If it were ever set to something local the original bug returns,
+    // silently, and only students would notice.
+    $public = (string) config('app.public_url');
+    $host = parse_url($public, PHP_URL_HOST);
+
+    expect($public)->toStartWith('https://');
+    expect(in_array($host, ['localhost', '127.0.0.1', '::1'], true))->toBeFalse();
+});
