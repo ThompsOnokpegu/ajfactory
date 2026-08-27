@@ -149,9 +149,15 @@ false positives.
 Cover the behaviour that matters operationally: that a failed send isn't recorded as sent,
 that gating actually gates, and that idempotent commands stay idempotent.
 
-`phpunit.xml` **pins the `N8N_*` webhook URLs** (alongside `DB_CONNECTION=sqlite` etc.) so
+`phpunit.xml` **pins the `N8N_*` webhook URLs and `BUNNY_LIBRARY_ID`** (alongside `DB_CONNECTION=sqlite` etc.) so
 the suite is self-contained. Don't remove them: the code skips a send when the webhook URL is
 unconfigured, so any `Http::assertSent`-style test would pass locally (dev `.env` has the URL)
 but fail on CI (which copies `.env.example`, where they're unset). Real incident — that's why
 they're pinned. Similarly, tests that assert a send must ensure the relevant webhook config is
 set (it is, via `phpunit.xml`), not rely on ambient `.env`.
+
+The same trap caught `BUNNY_LIBRARY_ID` on 17 Aug 2026: the written guide renders no
+player at all when the Bunny library is unconfigured, so `GuidesTest`'s embed assertion
+passed locally and failed on CI for four commits before anyone noticed. **Any env value the
+code silently no-ops on when unset belongs in `phpunit.xml`** - that silence is exactly what
+makes it a CI-only failure.

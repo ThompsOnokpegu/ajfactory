@@ -30,6 +30,11 @@
              developer's local .env. Without these, CI copies .env.example (no
              N8N_* keys) and every Http::assertSent-style test fails because the
              code skips the send when the URL is unconfigured. -->
+        <!-- Pinned for the same reason as the N8N_* URLs below: the code renders no
+             embed when the Bunny library is unconfigured, so a test asserting on the
+             player passes locally (dev .env has it) and fails on CI, which copies
+             .env.example where it is unset. Second time this trap has been sprung. -->
+        <env name="BUNNY_LIBRARY_ID" value="123456"/>
         <env name="N8N_STUDENT_WEBHOOK_URL" value="https://n8n.test/webhook/student"/>
         <env name="N8N_WEBHOOK_URL" value="https://n8n.test/webhook/general"/>
         <env name="N8N_ENROLLMENT_WEBHOOK" value="https://n8n.test/webhook/enrollment"/>
