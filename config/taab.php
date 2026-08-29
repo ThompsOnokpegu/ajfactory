@@ -23,20 +23,21 @@ return [
     | registration is tagged with. Set `date` to null to show "Date to be
     | announced".
     |
-    | Feeds Cohort 3: the TAAB59 checkout coupon runs to cart close on 14 Sep 2026,
-    | so this session sits inside that window on purpose.
+    | Feeds Cohort 3, and sits tight against it on purpose: the cohort starts the same
+    | day (12 Sep) and the cart closes 14 Sep, so attendees have a 2-day window and the
+    | TAAB59 coupon is still valid when they land on checkout. Nothing to extend.
     */
     'masterclass' => [
-        'date' => '2026-08-29',                 // Saturday 29 August 2026
+        'date' => '2026-09-12',                 // Saturday 12 September 2026
         'time' => '9:00 AM - 11:00 AM WAT',
         'location' => 'Live · Google Meet',
-        'registration_closes' => '2026-08-28',  // the Friday before
+        'registration_closes' => '2026-09-11',  // the Friday before
         'host' => 'AJ Thompson',
 
         // Real datetimes the reminder scheduler uses (display strings above are
         // for the page). Interpreted in `timezone`, since app default is UTC.
-        'starts_at' => '2026-08-29 09:00',
-        'ends_at' => '2026-08-29 11:00',
+        'starts_at' => '2026-09-12 09:00',
+        'ends_at' => '2026-09-12 11:00',
         'timezone' => 'Africa/Lagos',
 
         // Links sent in the reminders. These come from the SERVER .env, which a deploy
