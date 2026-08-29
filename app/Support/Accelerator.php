@@ -237,6 +237,22 @@ class Accelerator
             return round($amount * $pct / 100, 2);
         }
 
+        // flat: 'value' is the PRICE the student should end up paying, per currency -
+        // not a discount. Immune to the base price moving underneath it, which a fixed
+        // amount is not: early-bird ending or the 10th seat selling changes the base by
+        // 10,000, and a fixed coupon would silently charge the wrong total mid-promo.
+        if (($coupon['type'] ?? '') === 'flat') {
+            $value = $coupon['value'] ?? [];
+            $target = is_array($value) ? ($value[$currency] ?? null) : $value;
+
+            // No price set for this currency: charge full rather than invent one.
+            if ($target === null) {
+                return 0.0;
+            }
+
+            return round(max(0.0, $amount - max(0.0, (float) $target)), 2);
+        }
+
         // fixed: value is a per-currency map
         $value = $coupon['value'] ?? [];
         $fixed = is_array($value) ? (float) ($value[$currency] ?? 0) : (float) $value;

@@ -55,14 +55,17 @@ return [
     | Checkout coupons (server-side only — the discount is computed from here,
     | never trusted from the client). Keyed by the code the buyer types
     | (case-insensitive). Each:
-    |   'type'       => 'percent' | 'fixed'
+    |   'type'       => 'percent' | 'fixed' | 'flat'
     |   'value'      => percent: a number (e.g. 25 = 25% off)
-    |                   fixed:   ['NGN' => 10000, 'USD' => 8]  (per-currency)
+    |                   fixed:   ['NGN' => 10000, 'USD' => 8]  (discount, per-currency)
+    |                   flat:    ['NGN' => 50000, 'USD' => 36] (the PRICE PAID, per-currency)
+    |                   Use 'flat' for 'this costs X' promos - it holds that price even if
+    |                   the base moves (early-bird ending, seats selling), which 'fixed'
+    |                   does not. A currency with no entry gets no discount at all.
     |   'plans'      => which plans it applies to: ['full','installment']
     |   'expires_at' => optional Africa/Lagos cutoff; omit for no expiry
     |   'label'      => shown on the checkout when applied
     | Discount applies to the plan TOTAL at the current price (early-bird included).
-    | {{TODO: set the TAAB masterclass code + discount, then uncomment}}
     */
     'coupons' => [
         'TAAB59' => [
@@ -71,6 +74,15 @@ return [
             'plans' => ['full', 'installment'],
             'expires_at' => '2026-09-14 23:59:59',     // cart close (Mon 14 Sep, Africa/Lagos)
             'label' => 'TAAB masterclass discount',
+        ],
+        // Flat rate for TAAB attendees. 'flat' means 'value' is the PRICE PAID, not a
+        // discount, so it stays 50,000 whether or not early-bird is still running.
+        'TAAB50' => [
+            'type' => 'flat',
+            'value' => ['NGN' => 50000, 'USD' => 36], // ~N1,400/$ , matching config usd.*
+            'plans' => ['full'],                      // deliberately NOT installment
+            'expires_at' => '2026-08-29 23:59:59',    // midnight end of Sat 29 Aug, Africa/Lagos
+            'label' => 'TAAB masterclass offer',
         ],
     ],
 
