@@ -46,9 +46,18 @@ class PaystackWebhookController extends Controller
 
                     if ($verify->successful() && $verify->json('data.status') === 'success') {
 
+                        // Paystack reports the minor unit; every currency it settles
+                        // for us is 100 minor units to the major one.
                         $paystackAmount = $verify->json('data.amount') / 100;
+                        $paidCurrency = $verify->json('data.currency');
 
-                        if ((float)$paystackAmount === (float)$enrollment->amount) {
+                        // The CURRENCY has to match as well as the number. Checking the
+                        // amount alone was safe only while this path was Naira-only: once
+                        // several currencies route through Paystack, "50" paid in the
+                        // cheapest of them would satisfy a "50" priced in the dearest.
+                        $currencyOk = $paidCurrency === $enrollment->currency;
+
+                        if ($currencyOk && (float)$paystackAmount === (float)$enrollment->amount) {
 
                             // 1. Finalize Enrollment Status
                             $enrollment->update([
@@ -83,6 +92,7 @@ class PaystackWebhookController extends Controller
 
                         } else {
                             Log::error("Security Alert: Amount Mismatch for {$reference}");
+                            Log::error("Paystack mismatch for {$reference}: paid {$paystackAmount} {$paidCurrency}, expected {$enrollment->amount} {$enrollment->currency}");
                             $enrollment->update(['status' => 'amount_mismatch']);
                         }
                     }
@@ -119,8 +129,10 @@ class PaystackWebhookController extends Controller
         }
 
         $paidAmount = $verify->json('data.amount') / 100;
+        $paidCurrency = $verify->json('data.currency');
 
-        if ((float)$paidAmount === (float)$enrollment->balance_due) {
+        // Same rule as the first payment: currency must match, not just the number.
+        if ($paidCurrency === $enrollment->currency && (float)$paidAmount === (float)$enrollment->balance_due) {
             $enrollment->update([
                 'second_payment_status' => 'paid',
                 'balance_due' => 0,
@@ -129,7 +141,7 @@ class PaystackWebhookController extends Controller
 
             $this->triggerInstallmentCompleted($enrollment, $data);
         } else {
-            Log::error("Installment Amount Mismatch for {$reference}: paid {$paidAmount}, expected {$enrollment->balance_due}");
+            Log::error("Installment mismatch for {$reference}: paid {$paidAmount} {$paidCurrency}, expected {$enrollment->balance_due} {$enrollment->currency}");
         }
     }
 

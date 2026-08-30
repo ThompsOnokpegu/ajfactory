@@ -108,10 +108,40 @@ landing page and checkout must agree, and derived values belong in
 'installment_each'  => 42000,   // × 2
 'installment_count' => 2,
 'currency'          => 'NGN',
-'usd' => ['price_full' => 57, 'price_earlybird' => 50, 'installment_each' => 30],
 ```
-USD values are **fixed, not auto-converted** (implied ≈ ₦1,400/$). Update them by hand if
-the rate moves materially.
+The Naira prices above are the single source of truth for NGN - the landing page and the
+Requirements copy read `accelerator.price_full` directly.
+
+### Currencies
+
+Every other currency lives in `accelerator.currencies`, each with its own `symbol`,
+`provider` and three prices:
+
+```php
+'currencies' => [
+    'NGN' => ['symbol' => '₦', 'provider' => 'paystack'],   // prices at the top level
+    'USD' => ['symbol' => '$', 'provider' => 'flutterwave', 'price_full' => 57, ...],
+    'GHS' => ['symbol' => 'GH₵', 'provider' => 'flutterwave', 'price_full' => null, ...],
+],
+```
+
+Three rules, enforced in code rather than by convention:
+
+- **A currency is offered only when fully priced.** `Accelerator::enabledCurrencies()` drops
+  any currency missing a provider or one of the three prices, the checkout toggle renders
+  from that list, and `safeCurrency()` snaps an unpriced choice back to NGN. A
+  half-configured currency is therefore invisible rather than cheap, and filling in the
+  numbers is the only step needed to launch one.
+- **Prices are fixed, never auto-converted.** A live rate would move the sticker price
+  between page load and payment, and the webhook verifies the exact amount it asked for -
+  so a rate that shifted mid-checkout would bounce the payment as a mismatch.
+- **`provider` must be a currency that account can actually settle.** Paystack accounts are
+  country-scoped; Flutterwave collects multi-currency from one account. Getting this wrong
+  fails at the gateway, not in our code.
+
+Coupons are per-currency too. A currency with no entry gets **no discount** rather than an
+invented conversion, so add each new currency to any live coupon or it quietly sells at full
+price there.
 
 ### Cohort & scarcity
 ```php

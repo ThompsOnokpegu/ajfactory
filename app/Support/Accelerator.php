@@ -91,38 +91,101 @@ class Accelerator
         return Carbon::now('Africa/Lagos')->lt(Carbon::parse($endsAt, 'Africa/Lagos'));
     }
 
-    /**
-     * Price for the pay-in-full plan — early-bird price when active, else full.
-     *
-     * @param  string  $currency  'NGN' | 'USD'
-     */
-    public static function fullPrice(string $currency = 'NGN'): float
+    /** The whole currency table, as configured. */
+    public static function currencies(): array
     {
-        if ($currency === 'USD') {
-            return (float) (self::earlybirdActive()
-                ? config('accelerator.usd.price_earlybird')
-                : config('accelerator.usd.price_full'));
-        }
-
-        return (float) (self::earlybirdActive()
-            ? config('accelerator.price_earlybird')
-            : config('accelerator.price_full'));
+        return (array) config('accelerator.currencies', []);
     }
 
-    /** Sticker (non early-bird) full price — used to show the strike-through anchor. */
+    /**
+     * Currencies the checkout may actually offer: a provider, plus every price set.
+     *
+     * A currency missing a price is filtered out rather than defaulted, so a
+     * half-configured currency can never be sold at the wrong price - it simply does
+     * not appear until someone fills the numbers in.
+     *
+     * @return array<int, string>
+     */
+    public static function enabledCurrencies(): array
+    {
+        return collect(self::currencies())
+            ->filter(function (array $c, string $code) {
+                if (empty($c['provider'])) {
+                    return false;
+                }
+
+                // Naira prices live at the top level, not in the table.
+                if ($code === 'NGN') {
+                    return true;
+                }
+
+                foreach (['price_full', 'price_earlybird', 'installment_each'] as $key) {
+                    if (! is_numeric($c[$key] ?? null)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            })
+            ->keys()
+            ->all();
+    }
+
+    public static function isSupportedCurrency(?string $currency): bool
+    {
+        return in_array((string) $currency, self::enabledCurrencies(), true);
+    }
+
+    /** Falls back to the base currency, so a bad value can never reach a charge. */
+    public static function safeCurrency(?string $currency): string
+    {
+        return self::isSupportedCurrency($currency)
+            ? (string) $currency
+            : (string) config('accelerator.currency', 'NGN');
+    }
+
+    public static function currencySymbol(string $currency = 'NGN'): string
+    {
+        return (string) (config("accelerator.currencies.{$currency}.symbol") ?: $currency.' ');
+    }
+
+    /** Which gateway collects this currency. */
+    public static function paymentProvider(string $currency = 'NGN'): string
+    {
+        return (string) (config("accelerator.currencies.{$currency}.provider") ?: 'paystack');
+    }
+
+    /**
+     * One price lookup for every currency.
+     *
+     * NGN reads the top-level keys - the single source of truth the marketing copy
+     * also reads - and every other currency reads its own row in the table.
+     */
+    private static function price(string $currency, string $key): float
+    {
+        if ($currency === 'NGN') {
+            return (float) config("accelerator.{$key}");
+        }
+
+        return (float) config("accelerator.currencies.{$currency}.{$key}");
+    }
+
+    /** Price for the pay-in-full plan - early-bird price when active, else full. */
+    public static function fullPrice(string $currency = 'NGN'): float
+    {
+        return self::price($currency, self::earlybirdActive() ? 'price_earlybird' : 'price_full');
+    }
+
+    /** Sticker (non early-bird) full price - used to show the strike-through anchor. */
     public static function regularFullPrice(string $currency = 'NGN'): float
     {
-        return (float) ($currency === 'USD'
-            ? config('accelerator.usd.price_full')
-            : config('accelerator.price_full'));
+        return self::price($currency, 'price_full');
     }
 
     /** Amount charged per installment payment. */
     public static function installmentEach(string $currency = 'NGN'): float
     {
-        return (float) ($currency === 'USD'
-            ? config('accelerator.usd.installment_each')
-            : config('accelerator.installment_each'));
+        return self::price($currency, 'installment_each');
     }
 
     public static function installmentCount(): int

@@ -139,14 +139,62 @@ return [
     ],
 
     /*
-    | USD equivalents — powers the existing NGN/USD toggle (Flutterwave path).
-    | Fixed values (not auto-converted). Adjust here if the FX rate moves.
-    | Implied rate ≈ ₦1,400/$.
+    | Currencies the checkout can charge in.
+    |
+    | NAIRA PRICES LIVE AT THE TOP OF THIS FILE, not here — this table only carries
+    | NGN's symbol and provider, so there is exactly one source of truth for the Naira
+    | sticker price (the landing page and Requirements copy read it directly). Every
+    | other currency carries its own prices here.
+    |
+    | Prices are FIXED, never auto-converted. A live rate would change the sticker
+    | price between page load and payment, and the webhook verifies the exact amount
+    | it was told to charge — so a rate that moved mid-checkout would bounce the
+    | payment as a mismatch. Set these by hand; revisit when a rate really moves.
+    |
+    | A currency is only offered once it has ALL THREE prices and a provider;
+    | `Accelerator::enabledCurrencies()` filters out the rest. Leaving a price null
+    | hides the currency rather than selling it at the wrong price.
+    |
+    |   'symbol'   => rendered before every amount
+    |   'provider' => 'paystack' | 'flutterwave' — who collects it. Must be a currency
+    |                 that account is actually enabled to settle.
     */
-    'usd' => [
-        'price_full'       => 57,
-        'price_earlybird'  => 50,
-        'installment_each' => 30,
+    'currencies' => [
+        'NGN' => [
+            'symbol' => '₦',
+            'provider' => 'paystack',
+            // prices: price_full / price_earlybird / installment_each at the top of this file
+        ],
+        'USD' => [
+            'symbol' => '$',
+            'provider' => 'flutterwave',
+            'price_full' => 57,
+            'price_earlybird' => 50,
+            'installment_each' => 30,
+        ],
+        // {{TODO}} Fill these in and the currency appears at checkout on its own.
+        // Deliberately null: an invented price is worse than an absent currency.
+        'GHS' => [
+            'symbol' => 'GH₵',
+            'provider' => 'flutterwave',
+            'price_full' => null,
+            'price_earlybird' => null,
+            'installment_each' => null,
+        ],
+        'KES' => [
+            'symbol' => 'KSh',
+            'provider' => 'flutterwave',
+            'price_full' => null,
+            'price_earlybird' => null,
+            'installment_each' => null,
+        ],
+        'ZAR' => [
+            'symbol' => 'R',
+            'provider' => 'flutterwave',
+            'price_full' => null,
+            'price_earlybird' => null,
+            'installment_each' => null,
+        ],
     ],
 
     /*

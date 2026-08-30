@@ -12,7 +12,7 @@ new class extends Component {
 
     // Plan + currency
     public string $plan = 'full';      // full | installment
-    public string $currency = 'NGN';   // NGN | USD
+    public string $currency = 'NGN';   // any Accelerator::enabledCurrencies() code
 
     // Required "no-surprises" acknowledgement (gates the pay button)
     public bool $acknowledged = false;
@@ -84,6 +84,10 @@ new class extends Component {
 
     public function updatedCurrency()
     {
+        // Sanitise as soon as it changes, not just at charge time: an unpriced
+        // currency would otherwise render every amount as 0 until the user paid.
+        $this->currency = Accelerator::safeCurrency($this->currency);
+
         $this->recalculate();
     }
 
@@ -185,6 +189,11 @@ new class extends Component {
         // Final server-side price lock right before generating the charge
         $this->recalculate();
 
+        // Never charge in a currency that is not fully configured - a half-priced
+        // currency would otherwise reach a real gateway.
+        $this->currency = Accelerator::safeCurrency($this->currency);
+        $this->recalculate();
+
         try {
             $prefix = ($this->currency === 'NGN') ? 'ACC_' : 'INT_';
             $reference = $prefix . bin2hex(random_bytes(8));
@@ -206,10 +215,13 @@ new class extends Component {
                 'status'                => 'pending',
             ]);
 
-            if ($this->currency === 'NGN') {
+            if (Accelerator::paymentProvider($this->currency) === 'paystack') {
                 $this->dispatch('launch-paystack', [
                     'email' => $this->email,
-                    'amount' => $this->amountToday * 100, // kobo
+                    // Paystack takes the minor unit, and every currency it settles
+                    // (NGN/GHS/KES/ZAR/USD) is 100 minor units to the major one.
+                    'amount' => $this->amountToday * 100,
+                    'currency' => $this->currency,
                     'reference' => $reference,
                     'key' => config('services.paystack.public_key'),
                     'metadata' => ['full_name' => $this->full_name, 'plan' => $this->plan],
@@ -218,7 +230,7 @@ new class extends Component {
                 $this->dispatch('launch-flutterwave', [
                     'email' => $this->email,
                     'amount' => $this->amountToday,
-                    'currency' => 'USD',
+                    'currency' => $this->currency,
                     'reference' => $reference,
                     'key' => config('services.flutterwave.public_key'),
                     'name' => $this->full_name,
@@ -234,7 +246,8 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'symbol'      => $this->currency === 'NGN' ? '₦' : '$',
+            'symbol'      => Accelerator::currencySymbol($this->currency),
+            'currencies'  => Accelerator::enabledCurrencies(),
             'cap'         => (int) config('accelerator.cohort_cap'),
             'fullNow'     => Accelerator::fullPrice($this->currency),
             'fullRegular' => Accelerator::regularFullPrice($this->currency),
@@ -293,16 +306,18 @@ new class extends Component {
                 </div>
 
                 <!-- CURRENCY TOGGLE -->
-                <div class="inline-flex bg-zinc-900 rounded-lg p-1 border border-zinc-800 mb-8">
-                    <button type="button" wire:click="$set('currency', 'NGN')"
-                        class="px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all {{ $currency === 'NGN' ? 'bg-cyan-900/30 text-cyan-400 shadow-sm border border-cyan-500/20' : 'text-zinc-500 hover:text-zinc-300' }}">
-                        NGN (Local)
-                    </button>
-                    <button type="button" wire:click="$set('currency', 'USD')"
-                        class="px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all {{ $currency === 'USD' ? 'bg-cyan-900/30 text-cyan-400 shadow-sm border border-cyan-500/20' : 'text-zinc-500 hover:text-zinc-300' }}">
-                        USD (Global)
-                    </button>
+{{-- Rendered from Accelerator::enabledCurrencies(), so adding a priced currency
+                     to config puts it here automatically and an unpriced one never shows. --}}
+                @if(count($currencies) > 1)
+                <div class="inline-flex flex-wrap bg-zinc-900 rounded-lg p-1 border border-zinc-800 mb-8">
+                    @foreach($currencies as $code)
+                        <button type="button" wire:click="$set('currency', '{{ $code }}')"
+                            class="px-4 py-2 rounded text-[10px] font-black uppercase tracking-widest transition-all {{ $currency === $code ? 'bg-cyan-900/30 text-cyan-400 shadow-sm border border-cyan-500/20' : 'text-zinc-500 hover:text-zinc-300' }}">
+                            {{ $code }}
+                        </button>
+                    @endforeach
                 </div>
+                @endif
 
                 <form wire:submit.prevent="initiatePayment" class="space-y-6">
                     <div class="space-y-2">
@@ -435,7 +450,7 @@ new class extends Component {
                         <p class="text-[11px] text-zinc-500 leading-relaxed"><strong class="text-zinc-300">Finish, or we finish with you.</strong> If your stack isn't live by the end, you get free 1-on-1 sessions until it works.</p>
                         <div class="flex items-center gap-2 text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
                             <svg class="w-3.5 h-3.5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            Secure payment · {{ $currency === 'NGN' ? 'Paystack' : 'Flutterwave' }}
+                            Secure payment · {{ ucfirst(\App\Support\Accelerator::paymentProvider($currency)) }}
                         </div>
                     </div>
                 </div>
@@ -461,14 +476,15 @@ new class extends Component {
 
     <script>
         document.addEventListener('livewire:init', () => {
-            // PAYSTACK (NGN)
+            // PAYSTACK - currency comes from the server, never hardcoded here:
+            // the webhook verifies the charge against the currency it expected.
             Livewire.on('launch-paystack', (event) => {
                 const config = event[0];
                 const handler = PaystackPop.setup({
                     key: config.key,
                     email: config.email,
                     amount: config.amount,
-                    currency: "NGN",
+                    currency: config.currency,
                     ref: config.reference,
                     metadata: config.metadata,
                     callback: function(res) {
@@ -478,14 +494,14 @@ new class extends Component {
                 handler.openIframe();
             });
 
-            // FLUTTERWAVE (USD)
+            // FLUTTERWAVE - currency comes from the server, never hardcoded here.
             Livewire.on('launch-flutterwave', (event) => {
                 const config = event[0];
                 FlutterwaveCheckout({
                     public_key: config.key,
                     tx_ref: config.reference,
                     amount: config.amount,
-                    currency: "USD",
+                    currency: config.currency,
                     payment_options: "card,mobilemoney,ussd",
                     customer: {
                         email: config.email,
