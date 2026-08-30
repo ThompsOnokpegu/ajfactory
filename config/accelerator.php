@@ -70,7 +70,9 @@ return [
     'coupons' => [
         'TAAB59' => [
             'type' => 'fixed',
-            'value' => ['NGN' => 10000, 'USD' => 7], // ₦10,000 ≈ $7 at ~₦1,400/$
+            // Every live currency needs an entry: one that is missing gets NO discount
+            // rather than a converted one, which would quietly sell at full price there.
+            'value' => ['NGN' => 10000, 'USD' => 7, 'GHS' => 80, 'KES' => 1000, 'ZAR' => 120], // ₦10,000 ≈ $7; the rest are the $7 equivalent, rounded up
             'plans' => ['full', 'installment'],
             'expires_at' => '2026-09-14 23:59:59',     // cart close (Mon 14 Sep, Africa/Lagos)
             'label' => 'TAAB masterclass discount',
@@ -172,28 +174,31 @@ return [
             'price_earlybird' => 50,
             'installment_each' => 30,
         ],
-        // {{TODO}} Fill these in and the currency appears at checkout on its own.
-        // Deliberately null: an invented price is worse than an absent currency.
+        // Set 30 Aug 2026 as the USD price converted at that day's rate and rounded UP
+        // (GHS 11.2508, KES 129.456, ZAR 16.1117 per USD), so none sits below the dollar
+        // price. Rounding keeps the early-bird discount and the installment premium within
+        // half a point of the USD ratios. These do NOT track the rate - revisit them when
+        // one moves materially, the same as the USD figures.
         'GHS' => [
             'symbol' => 'GH₵',
             'provider' => 'flutterwave',
-            'price_full' => null,
-            'price_earlybird' => null,
-            'installment_each' => null,
+            'price_full' => 650,
+            'price_earlybird' => 570,
+            'installment_each' => 340,
         ],
         'KES' => [
             'symbol' => 'KSh',
             'provider' => 'flutterwave',
-            'price_full' => null,
-            'price_earlybird' => null,
-            'installment_each' => null,
+            'price_full' => 7400,
+            'price_earlybird' => 6500,
+            'installment_each' => 3900,
         ],
         'ZAR' => [
             'symbol' => 'R',
             'provider' => 'flutterwave',
-            'price_full' => null,
-            'price_earlybird' => null,
-            'installment_each' => null,
+            'price_full' => 920,
+            'price_earlybird' => 810,
+            'installment_each' => 490,
         ],
     ],
 
