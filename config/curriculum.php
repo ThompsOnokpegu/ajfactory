@@ -288,7 +288,7 @@ return [
             'release_at' => '2026-08-29 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Sat 29 Aug
+            'attendance_code' => 'QUARTZ-779', // ← announced at the END of the call (Sat 29 Aug). Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-08-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
