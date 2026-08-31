@@ -24,6 +24,9 @@
 |   ]
 |   A lesson can instead be a WRITTEN GUIDE: give it 'guide_url' => '/guides/…'
 |   and an empty video_id — the dashboard shows an "Open the guide" panel.
+|   That panel's wording defaults to a follow-along guide. A lesson that is
+|   something else overrides any of: 'guide_icon', 'guide_heading', 'guide_blurb',
+|   'guide_cta'. The capstone brief uses all four.
 |
 | Each module below currently carries its original single video as videos[0].
 | ADD the remaining videos per module using their real Bunny IDs — do NOT
@@ -125,7 +128,7 @@ return [
                 // so it stays put even though it now sits second. Ids are keys, not positions.
                 ['id' => 'module-03-v1', 'title' => 'LEGACY: API Calls With n8n', 'video_id' => 'e895c6bf-ff14-46f4-87b1-d62817bfb401', 'duration' => '28:38 Mins'],
                 // The capstone closes the module - a written brief, not a video.
-                ['id' => 'module-03-capstone', 'title' => 'Part 1 Capstone: The Quote Engine', 'video_id' => '', 'duration' => 'Capstone', 'guide_url' => '/guides/capstone-part1-quote-engine', 'description' => "Seven days, three workflows, graded out of 100. Build a quote engine for a commercial cleaning company: it reads an RFQ out of an email, prices it against a rate card, and lets the MD approve and send from her phone in one tap.
+                ['id' => 'module-03-capstone', 'title' => 'Part 1 Capstone: The Quote Engine', 'video_id' => '', 'duration' => 'Capstone', 'guide_url' => '/guides/capstone-part1-quote-engine', 'guide_icon' => '🏗️', 'guide_heading' => 'Capstone project brief', 'guide_blurb' => 'Your Part 1 build: three workflows over seven days, graded out of 100. Read the brief, then work the Build Order one stage at a time.', 'guide_cta' => 'Open the brief', 'description' => "Seven days, three workflows, graded out of 100. Build a quote engine for a commercial cleaning company: it reads an RFQ out of an email, prices it against a rate card, and lets the MD approve and send from her phone in one tap.
 
 Read sections 01 to 04 first, then work the Build Order one stage at a time. Every stage has a \"Done when\" test - do not start the next one until it passes."],
             ],

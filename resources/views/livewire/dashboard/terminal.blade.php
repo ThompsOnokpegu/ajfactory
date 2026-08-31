@@ -677,12 +677,14 @@ $dismissReview = function () {
                     @elseif(!empty($curVideo['guide_url']))
                         <!-- WRITTEN GUIDE LESSON -->
                         <div class="absolute inset-0 flex flex-col items-center justify-center text-center bg-zinc-950 p-6">
-                            <div class="text-4xl mb-3">📘</div>
-                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">Written step-by-step guide</h3>
-                            <p class="text-xs text-zinc-400 mt-2 max-w-sm leading-relaxed">This lesson is a hands-on guide you follow at your own pace — copy-paste, nothing skipped.</p>
+{{-- Defaults suit a follow-along guide. A lesson that is something else - the
+                                 capstone brief, say - overrides them in config/curriculum.php. --}}
+                            <div class="text-4xl mb-3">{{ $curVideo['guide_icon'] ?? '📘' }}</div>
+                            <h3 class="text-lg font-black text-white uppercase italic tracking-tighter">{{ $curVideo['guide_heading'] ?? 'Written step-by-step guide' }}</h3>
+                            <p class="text-xs text-zinc-400 mt-2 max-w-sm leading-relaxed">{{ $curVideo['guide_blurb'] ?? 'This lesson is a hands-on guide you follow at your own pace - copy-paste, nothing skipped.' }}</p>
                             <a href="{{ $curVideo['guide_url'] }}" target="_blank" rel="noopener"
                                class="inline-flex items-center gap-2 mt-5 px-6 py-3 rounded-xl bg-cyan-500 text-black font-black uppercase tracking-tighter text-sm hover:bg-white transition-all">
-                                Open the guide →
+                                {{ $curVideo['guide_cta'] ?? 'Open the guide' }} →
                             </a>
                         </div>
 
