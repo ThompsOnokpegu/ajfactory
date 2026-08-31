@@ -66,3 +66,22 @@ it('resolves every guide_url referenced by the curriculum', function () {
         $this->get($url)->assertOk();
     }
 });
+
+it('renders the capstone brief with the shared guide chrome', function () {
+    $this->get('/guides/capstone-part1-quote-engine')
+        ->assertOk()
+        ->assertSee('The Quote Engine', false)
+        ->assertSee('themetoggle', false)          // chrome-css
+        ->assertSee('IntersectionObserver', false); // chrome-js
+});
+
+it('reaches the capstone from the curriculum', function () {
+    // The lesson is what students actually click; a renamed route would strand it.
+    $lesson = collect(config('curriculum.core', []))
+        ->flatMap(fn ($m) => $m['videos'] ?? [])
+        ->firstWhere('id', 'module-03-capstone');
+
+    expect($lesson)->not->toBeNull('the capstone lesson is gone from the curriculum');
+
+    $this->get($lesson['guide_url'])->assertOk()->assertSee('Build order', false);
+});

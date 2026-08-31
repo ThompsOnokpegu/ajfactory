@@ -173,3 +173,36 @@ it('keeps every gated path listed in config', function () {
         );
     }
 });
+
+/*
+ * The capstone brief is course content rather than a sellable guide - there is no
+ * Resource row for it - so the only thing standing between it and the public is the
+ * middleware plus its entry in config/guides.php. Miss either and it ships wide open
+ * at a perfectly normal 200, which is exactly how the other two guides leaked.
+ */
+
+const CAPSTONE = '/guides/capstone-part1-quote-engine';
+
+/** Appears only in the real brief, never on the locked page. */
+function capstoneBodyMarker(): string
+{
+    return 'Needs Manual Pricing';
+}
+
+it('does not serve the capstone brief to the public', function () {
+    $this->get(CAPSTONE)->assertDontSee(capstoneBodyMarker(), false);
+});
+
+it('serves the capstone brief to an enrolled student', function () {
+    $this->actingAs(anEnrolledStudent());
+
+    $this->get(CAPSTONE)
+        ->assertOk()
+        ->assertSee(capstoneBodyMarker(), false);
+});
+
+it('lists the capstone path as gated', function () {
+    // The middleware only protects what config/guides.php names. A route can carry the
+    // middleware and still be public if someone forgets this line.
+    expect(config('guides.gated_paths'))->toContain(CAPSTONE);
+});

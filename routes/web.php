@@ -84,6 +84,11 @@ Route::view('/guides/n8n-on-google-cloud', 'guides.n8n-google-cloud')
 Route::view('/guides/n8n-on-hostinger', 'guides.n8n-hostinger')
     ->middleware('guide')->name('guides.n8n-hostinger');
 
+// Part 1 capstone brief. Course content rather than a sellable guide, so there is no
+// Resource row for it - the gate simply keeps it to enrolled students.
+Route::view('/guides/capstone-part1-quote-engine', 'guides.capstone-part1-quote-engine')
+    ->middleware('guide')->name('guides.capstone-quote-engine');
+
 // Paid resources — email-only, one-off purchase → gated access page.
 Route::get('/resources/{resource}/buy', [ResourceController::class, 'buy'])->name('resource.buy');
 Route::get('/resources/access/{purchase}', [ResourceController::class, 'access'])->name('resources.access');

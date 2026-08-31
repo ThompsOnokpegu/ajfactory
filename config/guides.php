@@ -24,6 +24,7 @@ return [
     'gated_paths' => [
         '/guides/n8n-on-google-cloud',
         '/guides/n8n-on-hostinger',
+        '/guides/capstone-part1-quote-engine',
     ],
 
     /*
