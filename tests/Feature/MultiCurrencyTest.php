@@ -1,7 +1,10 @@
 <?php
 
 use App\Support\Accelerator;
+use Carbon\Carbon;
 use Livewire\Volt\Volt;
+
+afterEach(fn () => Carbon::setTestNow());
 
 /*
  * Multi-currency checkout. The rule that matters: a currency is sellable only when
@@ -106,11 +109,24 @@ it('will not let the checkout sit on an unpriced currency', function () {
         ->and((float) $c->get('amountToday'))->toBeGreaterThan(0.0);
 });
 
-it('charges a Ghanaian buyer in cedis at the configured price', function () {
+it('charges a Ghanaian buyer the cedi early-bird price while it is running', function () {
+    // Pinned to a date inside the early-bird window. Without this the test quietly
+    // starts failing the day early-bird ends, which is exactly what happened on
+    // 31 Aug 2026 - it looked like a currency bug and was only a stale clock.
+    Carbon::setTestNow(Carbon::parse(config('accelerator.earlybird_ends_at'), 'Africa/Lagos')->subDay());
+
     $c = Volt::test('accelerator-checkout')->set('plan', 'full')->set('currency', 'GHS');
 
     expect($c->get('currency'))->toBe('GHS')
-        ->and((float) $c->get('amountToday'))->toBe(570.0); // early-bird is active
+        ->and((float) $c->get('amountToday'))->toBe(570.0);
+});
+
+it('charges a Ghanaian buyer the full cedi price once early-bird ends', function () {
+    Carbon::setTestNow(Carbon::parse(config('accelerator.earlybird_ends_at'), 'Africa/Lagos')->addDay());
+
+    $c = Volt::test('accelerator-checkout')->set('plan', 'full')->set('currency', 'GHS');
+
+    expect((float) $c->get('amountToday'))->toBe(650.0);
 });
 
 it('gives the TAAB59 discount in every offered currency', function () {

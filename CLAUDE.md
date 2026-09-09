@@ -113,6 +113,10 @@ These encode real incidents. Changing them will break something that took a whil
   public until 24 Aug 2026. `GuideAccessTest` guards it, and asserts on page *content*
   rather than status, because the locked page is deliberately a 200 sales page and
   `assertOk()` passes either way.
+  **Gating and selling are separate lists.** `gated_paths` hides a page from the public;
+  `purchasable_paths` is what money actually buys, and a buyer gets only those. Adding the
+  capstone brief to `gated_paths` alone made a guide sale hand over course content, because
+  any gated path used to unlock every gated path. Course material is gated, never sold.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 

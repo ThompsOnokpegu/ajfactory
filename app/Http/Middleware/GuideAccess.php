@@ -40,14 +40,14 @@ class GuideAccess
         // A buyer arriving from their access page. Store the token, then bounce to
         // the clean URL so it isn't copy-pasted around or leaked in a Referer header.
         if (is_string($token = $request->query('t')) && $token !== '') {
-            if ($this->purchaseUnlocks($token)) {
+            if ($this->purchaseUnlocks($token, $path)) {
                 $request->session()->put(config('guides.unlock_session_key'), $token);
             }
 
             return redirect()->to($path);
         }
 
-        if ($this->hasAccess($request)) {
+        if ($this->hasAccess($request, $path)) {
             return $next($request);
         }
 
@@ -58,7 +58,7 @@ class GuideAccess
         ]);
     }
 
-    private function hasAccess(Request $request): bool
+    private function hasAccess(Request $request, string $path): bool
     {
         $user = $request->user();
 
@@ -79,18 +79,29 @@ class GuideAccess
 
         $token = $request->session()->get(config('guides.unlock_session_key'));
 
-        return is_string($token) && $token !== '' && $this->purchaseUnlocks($token);
+        return is_string($token) && $token !== '' && $this->purchaseUnlocks($token, $path);
     }
 
     /**
-     * Does this access token belong to a settled purchase of a guide?
+     * Does this access token buy the way in to $path?
      *
-     * Any gated guide unlocks every gated guide - see config/guides.php. Status is
-     * re-checked on every request rather than trusted from the session, so a refund
-     * or a reversal takes effect immediately.
+     * Two conditions, and both matter. The purchase has to be OF something sellable,
+     * and $path has to BE something sellable - otherwise buying a guide would also
+     * hand over anything else that happens to be gated, which is what let a guide
+     * sale open the capstone brief. Buying either self-hosting route still unlocks
+     * both, deliberately: they are one product with a fallback (see config/guides.php).
+     *
+     * Status is re-checked per request rather than trusted from the session, so a
+     * refund or reversal takes effect immediately.
      */
-    private function purchaseUnlocks(string $token): bool
+    private function purchaseUnlocks(string $token, string $path): bool
     {
+        $purchasable = config('guides.purchasable_paths', []);
+
+        if (! in_array($path, $purchasable, true)) {
+            return false;
+        }
+
         $purchase = ResourcePurchase::with('resource')
             ->where('access_token', $token)
             ->first();
@@ -99,14 +110,14 @@ class GuideAccess
             return false;
         }
 
-        return in_array($purchase->resource?->url, config('guides.gated_paths', []), true);
+        return in_array($purchase->resource?->url, $purchasable, true);
     }
 
     /** The published, paid Resource that sells the guides, or null if none exists yet. */
     private function sellableGuide(): ?Resource
     {
         return Resource::where('is_published', true)
-            ->whereIn('url', config('guides.gated_paths', []))
+            ->whereIn('url', config('guides.purchasable_paths', []))
             ->where('price', '>', 0)
             ->orderBy('sort_order')
             ->first();

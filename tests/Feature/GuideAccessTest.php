@@ -206,3 +206,48 @@ it('lists the capstone path as gated', function () {
     // middleware and still be public if someone forgets this line.
     expect(config('guides.gated_paths'))->toContain(CAPSTONE);
 });
+
+/*
+ * Gating and selling are separate. Everything in gated_paths is hidden from the
+ * public, but only purchasable_paths is for sale - and a buyer gets exactly that.
+ *
+ * The capstone brief broke this when it was added to gated_paths on 9 Sep 2026: it
+ * inherited the "any gated guide unlocks every gated guide" rule, so a 15,000 naira
+ * guide sale also handed over Accelerator course material. Nothing errored.
+ */
+
+function paidGuideBuyer(): ResourcePurchase
+{
+    $resource = makeGuideResource();
+
+    return makeGuidePurchase($resource);
+}
+
+it('gives a guide buyer both self-hosting routes', function () {
+    $purchase = paidGuideBuyer();
+
+    $this->get(GUIDE.'?t='.$purchase->access_token);
+
+    $this->get(GUIDE)->assertSee(guideBodyMarker(), false);
+    $this->get(ALT_GUIDE)->assertSee('Hostinger', false);
+});
+
+it('does not let a guide purchase open the capstone brief', function () {
+    $purchase = paidGuideBuyer();
+
+    $this->get(GUIDE.'?t='.$purchase->access_token);
+
+    $this->get(CAPSTONE)->assertDontSee(capstoneBodyMarker(), false);
+});
+
+it('keeps every purchasable path gated, and course content out of the sale', function () {
+    $gated = config('guides.gated_paths');
+    $purchasable = config('guides.purchasable_paths');
+
+    // Anything for sale must also be gated, or it is being sold while public.
+    foreach ($purchasable as $path) {
+        expect($gated)->toContain($path);
+    }
+
+    expect($purchasable)->not->toContain(CAPSTONE);
+});

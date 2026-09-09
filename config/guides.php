@@ -28,6 +28,24 @@ return [
     ],
 
     /*
+    | Of the gated paths above, the ones a PURCHASE buys. Gating and selling are
+    | not the same thing: everything above is hidden from the public, but only
+    | these are for sale, and a buyer gets exactly these.
+    |
+    | Split out on 9 Sep 2026. Before that, any gated path unlocked every gated
+    | path - fine while the list was just the two self-hosting routes, and wrong
+    | the moment the capstone brief was added to keep it off the open web. A
+    | 15,000 naira guide sale was handing over Accelerator course content.
+    |
+    | Rule of thumb: a path belongs here only if someone could reasonably buy it
+    | on its own. Course material never does - it is gated, not sold.
+    */
+    'purchasable_paths' => [
+        '/guides/n8n-on-google-cloud',
+        '/guides/n8n-on-hostinger',
+    ],
+
+    /*
     | Session key holding the access token of a paid purchase, set when a buyer
     | arrives from their access page. Session-scoped on purpose: the token is the
     | buyer's own key (same one that gates /resources/access/{token}), so it should
