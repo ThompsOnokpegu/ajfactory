@@ -251,3 +251,66 @@ it('keeps every purchasable path gated, and course content out of the sale', fun
 
     expect($purchasable)->not->toContain(CAPSTONE);
 });
+
+/*
+ * The Resource `url` is free text typed into Admin, but the gated/purchasable lists
+ * are paths. An exact string comparison failed silently on an absolute url: the
+ * access page stopped appending the unlock token, so a paying buyer landed on the
+ * sales page holding a receipt, and no Buy button showed either because nothing
+ * looked sellable. That is what happened to the first real guide sale.
+ */
+
+it('unlocks the guide when the resource url was saved as an absolute address', function () {
+    $resource = Resource::create([
+        'title' => 'Self-host n8n',
+        'url' => 'https://ajbuildai.com'.GUIDE,   // how it was actually typed
+        'price' => 15000,
+        'is_published' => true,
+    ]);
+
+    $purchase = makeGuidePurchase($resource);
+
+    $this->get(GUIDE.'?t='.$purchase->access_token);
+
+    $this->get(GUIDE)->assertSee(guideBodyMarker(), false);
+});
+
+it('still offers the Buy button when the url was saved as an absolute address', function () {
+    Resource::create([
+        'title' => 'Self-host n8n',
+        'url' => 'https://ajbuildai.com'.GUIDE,
+        'price' => 15000,
+        'is_published' => true,
+    ]);
+
+    $this->get(GUIDE)->assertSee('Buy the guide', false);
+});
+
+it('tolerates a trailing slash on the stored url', function () {
+    $resource = Resource::create([
+        'title' => 'Self-host n8n',
+        'url' => GUIDE.'/',
+        'price' => 15000,
+        'is_published' => true,
+    ]);
+
+    $purchase = makeGuidePurchase($resource);
+    $this->get(GUIDE.'?t='.$purchase->access_token);
+
+    $this->get(GUIDE)->assertSee(guideBodyMarker(), false);
+});
+
+it('never treats an off-site link as one of our guides', function () {
+    // A path collision on someone else's domain must not unlock anything.
+    $resource = Resource::create([
+        'title' => 'Not ours',
+        'url' => 'https://example.com'.GUIDE,
+        'price' => 15000,
+        'is_published' => true,
+    ]);
+
+    $purchase = makeGuidePurchase($resource);
+    $this->get(GUIDE.'?t='.$purchase->access_token);
+
+    $this->get(GUIDE)->assertDontSee(guideBodyMarker(), false);
+});

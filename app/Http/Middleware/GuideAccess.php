@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\Enrollment;
 use App\Models\Resource;
 use App\Models\ResourcePurchase;
+use App\Support\Guides;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -96,9 +97,7 @@ class GuideAccess
      */
     private function purchaseUnlocks(string $token, string $path): bool
     {
-        $purchasable = config('guides.purchasable_paths', []);
-
-        if (! in_array($path, $purchasable, true)) {
+        if (! Guides::isPurchasable($path)) {
             return false;
         }
 
@@ -110,16 +109,19 @@ class GuideAccess
             return false;
         }
 
-        return in_array($purchase->resource?->url, $purchasable, true);
+        // Compared as a PATH, so an absolute url typed into Admin still matches.
+        return Guides::isPurchasable($purchase->resource?->url);
     }
 
     /** The published, paid Resource that sells the guides, or null if none exists yet. */
     private function sellableGuide(): ?Resource
     {
+        // Filtered in PHP rather than SQL: the stored url may be absolute, so it
+        // has to be normalised before it can be compared to a path.
         return Resource::where('is_published', true)
-            ->whereIn('url', config('guides.purchasable_paths', []))
             ->where('price', '>', 0)
             ->orderBy('sort_order')
-            ->first();
+            ->get()
+            ->first(fn (Resource $r) => Guides::isPurchasable($r->url));
     }
 }

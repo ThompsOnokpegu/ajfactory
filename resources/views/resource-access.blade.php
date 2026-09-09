@@ -25,8 +25,12 @@
                 // external link, so it needs the purchase token once to unlock it for
                 // this browser. GuideAccess stores it in the session and strips it back
                 // out of the URL, so it never sits in the address bar.
-                if ($resourceUrl && in_array($resourceUrl, config('guides.gated_paths', []), true)) {
-                    $resourceUrl .= '?t=' . $purchase->access_token;
+                //
+                // Matched on the PATH: an absolute url typed into Admin used to fail the
+                // comparison silently, sending a paying buyer to the sales page with no
+                // token attached. Guides::unlockUrl also rewrites it same-site.
+                if (\App\Support\Guides::isGated($resourceUrl)) {
+                    $resourceUrl = \App\Support\Guides::unlockUrl($resourceUrl, $purchase->access_token);
                 }
             @endphp
             @if($resourceUrl)
