@@ -78,12 +78,18 @@ return [
             'label' => 'TAAB masterclass discount',
         ],
         // Flat rate for TAAB attendees. 'flat' means 'value' is the PRICE PAID, not a
-        // discount, so it stays 50,000 whether or not early-bird is still running.
+        // discount, so it holds whatever the base price is doing.
+        //
+        // Non-Naira values are the USD flat converted at the 11 Sep 2026 rate and
+        // rounded UP (GHS 11.4170, KES 129.5046, ZAR 16.1853 per USD). Each lands at
+        // 63-65% of that currency's full price, so the offer is the same depth
+        // everywhere. A currency missing here would be sold at FULL price with the
+        // code apparently accepted - check this list whenever a currency is added.
         'TAAB50' => [
             'type' => 'flat',
-            'value' => ['NGN' => 50000, 'USD' => 36], // ~N1,400/$ , matching config usd.*
+            'value' => ['NGN' => 50000, 'USD' => 36, 'GHS' => 420, 'KES' => 4700, 'ZAR' => 590],
             'plans' => ['full'],                      // deliberately NOT installment
-            'expires_at' => '2026-08-29 23:59:59',    // midnight end of Sat 29 Aug, Africa/Lagos
+            'expires_at' => '2026-09-12 23:59:59',    // end of Sat 12 Sep, Africa/Lagos - masterclass day
             'label' => 'TAAB masterclass offer',
         ],
     ],
