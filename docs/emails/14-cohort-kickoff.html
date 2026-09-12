@@ -1,0 +1,95 @@
+<!-- Broadcast: cohort kickoff  |  Subject: Cohort 3 starts today - Module 01 is open
+
+  NOT event-driven. Nothing in the app fires this; it is a one-off broadcast to the
+  cohort on start day, sent by hand from n8n (Manual Trigger over the paid Cohort 3
+  enrolment list) or from your mail tool. Keep it here so it stays a mirror.
+
+  Merge tag: {{ $json.first_name || 'there' }}. If your list only has full_name,
+  derive first_name in a Set node first, or the greeting reads "Hi ,".
+
+  Facts below come from config - re-check them before reusing for Cohort 4:
+    cohort_starts_at              2026-09-12 (Sat)
+    live sessions                 live-11..live-16, Saturdays 19 Sep to 24 Oct, 09:00 WAT
+    guarantee_min_live_sessions   4 of those 6, plus every checkpoint approved
+    first module                  Module 01: Welcome to the Factory -> Project 1, Intake Funnel
+-->
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="color-scheme" content="dark">
+  <meta name="supported-color-schemes" content="dark">
+  <title>Cohort 3 starts today - AI Automation Accelerator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap');
+    :root { color-scheme: only dark; }
+    body { margin:0; padding:0; width:100% !important; background:#09090b; }
+    a { color:#22d3ee; }
+    @media (max-width:600px) {
+      .card { width:100% !important; border-radius:0 !important; }
+      .px { padding-left:22px !important; padding-right:22px !important; }
+      h1 { font-size:23px !important; line-height:1.22 !important; }
+    }
+  </style>
+</head>
+<body style="margin:0;padding:0;background:#09090b;">
+  <span style="display:none!important;visibility:hidden;opacity:0;color:transparent;height:0;width:0;overflow:hidden;mso-hide:all;">Module 01 is open in your dashboard. Here is your first week.</span>
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#09090b;">
+    <tr><td align="center" style="padding:28px 12px;">
+      <!--[if mso]><table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td style="padding:0;"><![endif]-->
+      <table role="presentation" class="card" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;background:#111114;border:1px solid rgba(255,255,255,0.08);border-radius:16px;overflow:hidden;">
+        <tr><td style="height:4px;background:#06b6d4;line-height:4px;font-size:0;">&nbsp;</td></tr>
+
+        <tr><td class="px" style="padding:28px 36px 4px;">
+          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:19px;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">AI Automation <span style="color:#06b6d4;">Accelerator</span></span>
+          <span style="font-family:'Space Grotesk',Arial,sans-serif;font-size:12px;color:#71717a;"> &middot; Cohort 3 &middot; Day 1</span>
+        </td></tr>
+
+        <tr><td class="px" style="padding:16px 36px 8px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;color:#e4e4e7;">
+          <h1 style="margin:0 0 14px;font-size:27px;line-height:1.2;font-weight:700;color:#ffffff;letter-spacing:-0.02em;">Welcome to Cohort 3</h1>
+
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">Hi {{ $json.first_name || 'there' }}, today is the day. Module 01 is open in your dashboard right now.</p>
+
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;background:#0b0b0e;border:1px solid rgba(6,182,212,0.28);border-radius:12px;">
+            <tr><td style="padding:16px 20px;font-family:'Space Grotesk',Arial,sans-serif;">
+              <p style="margin:0 0 6px;font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#71717a;">This week</p>
+              <p style="margin:0;font-size:15px;line-height:1.6;color:#e4e4e7;">Set up your accounts, then build <strong>Project 1: the Intake Funnel</strong>. Post a Loom or screenshot of it working in <strong>#wins</strong>. That is what unlocks Module 02.</p>
+            </td></tr>
+          </table>
+
+          <p style="margin:0 0 8px;font-size:15px;line-height:1.65;color:#e4e4e7;"><strong>How the next six weeks work</strong></p>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
+            <tr><td style="padding:0 0 10px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;line-height:1.6;color:#a1a1aa;"><span style="color:#06b6d4;font-weight:700;">Ship to unlock.</span> Each module opens when your proof for the previous one is approved. No skipping ahead, no falling behind unnoticed.</td></tr>
+            <tr><td style="padding:0 0 10px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;line-height:1.6;color:#a1a1aa;"><span style="color:#06b6d4;font-weight:700;">Live sessions.</span> Saturdays, 9:00 AM WAT, from 19 September. Six of them. The attendance code is announced at the end of each call.</td></tr>
+            <tr><td style="padding:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;line-height:1.6;color:#a1a1aa;"><span style="color:#06b6d4;font-weight:700;">Ask in the thread.</span> Every module has its own help thread on Telegram. Questions go there, proof goes in #wins, and nothing goes in DMs.</td></tr>
+          </table>
+        </td></tr>
+
+        <tr><td class="px" style="padding:0 36px 22px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+            <td align="center" style="background:#06b6d4;border-radius:10px;">
+              <a href="https://ajbuildai.com/login" style="display:inline-block;padding:14px 30px;font-family:'Space Grotesk',Arial,sans-serif;font-size:15px;font-weight:700;color:#000000;text-decoration:none;letter-spacing:-0.01em;">Open Module 01</a>
+            </td>
+          </tr></table>
+        </td></tr>
+
+        <tr><td class="px" style="padding:0 36px 30px;font-family:'Space Grotesk',Arial,Helvetica,sans-serif;">
+          <p style="margin:0 0 16px;font-size:15px;line-height:1.65;color:#a1a1aa;">Finish every checkpoint and attend 4 of the 6 live sessions, and the completion guarantee covers you. Do the work and you will finish with nine working automations.</p>
+          <p style="margin:0;font-size:13px;line-height:1.6;color:#71717a;">Can't log in? Reply to this email and a human will sort it.</p>
+        </td></tr>
+
+        <tr><td style="height:1px;background:rgba(255,255,255,0.08);line-height:1px;font-size:0;">&nbsp;</td></tr>
+        <tr><td class="px" style="padding:20px 36px 26px;">
+          <p style="margin:0;font-family:'Space Grotesk',Arial,sans-serif;font-size:11.5px;line-height:1.6;color:#52525b;">
+            AI Automation Accelerator &middot; Deepr Web Services &middot; You're receiving this because you enrolled in Cohort 3.<br>
+            <a href="https://ajbuildai.com" style="color:#52525b;text-decoration:underline;">ajbuildai.com</a> &middot; hello@ajbuildai.com
+          </p>
+        </td></tr>
+      </table>
+      <!--[if mso]></td></tr></table><![endif]-->
+    </td></tr>
+  </table>
+</body>
+</html>
