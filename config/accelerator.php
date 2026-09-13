@@ -89,7 +89,7 @@ return [
             'type' => 'flat',
             'value' => ['NGN' => 50000, 'USD' => 36, 'GHS' => 420, 'KES' => 4700, 'ZAR' => 590],
             'plans' => ['full'],                      // deliberately NOT installment
-            'expires_at' => '2026-09-12 23:59:59',    // end of Sat 12 Sep, Africa/Lagos - masterclass day
+            'expires_at' => '2026-09-14 23:59:59',    // extended 13 Sep from end of masterclass day (Sat 12 Sep) to cart close (Mon 14 Sep), Africa/Lagos
             'label' => 'TAAB masterclass offer',
         ],
     ],
