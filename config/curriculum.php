@@ -138,9 +138,14 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
             'title' => 'Module 05: Knowledge Base (RAG)',
             'release_at' => '2026-07-27 00:00:00',
             'has_blueprint' => true,
-            'description' => "Teaching the AI about your specific business data. We cover:\n\n• Understanding Retrieval-Augmented Generation (RAG).\n• Setting up a Pinecone Vector Database with Gemini Dimensions (768).\n• Building an Ingestion Pipeline to read PDFs and save them as vectors.",
+            'description' => "Teaching the AI about your specific business data, so it answers from your documents instead of guessing. We cover:\n\n• RAG Concepts - what Retrieval-Augmented Generation is and why a chatbot needs it.\n• Pinecone Index Creation - a vector database with the right dimensions for Gemini embeddings (768).\n• KB Embedding - the ingestion pipeline that reads your documents, chunks them, and stores them as vectors.\n• KB Retrieval - the chatbot that searches the knowledge base and answers from what it finds.\n\nThe original full-length 'Knowledge Base (RAG)' walkthrough is included as a legacy reference.",
             'videos' => [
-                ['id' => 'module-04-v1', 'title' => 'Knowledge Base (RAG)', 'video_id' => '01246ff7-d654-46c3-8c30-93ab2d894ff3', 'duration' => '19:33 Mins'],
+                ['id' => 'module-04-v2', 'title' => 'RAG Concepts', 'video_id' => 'f25fb2ea-02c5-4928-88c3-0652db9434ff', 'duration' => '01:54 Mins'],
+                ['id' => 'module-04-v3', 'title' => 'Pinecone Index Creation', 'video_id' => 'f8906653-3178-403a-a6e1-3346efb70358', 'duration' => '02:23 Mins'],
+                ['id' => 'module-04-v4', 'title' => 'KB Embedding', 'video_id' => 'fd766a91-95d2-4f23-99a0-0e31edc293b0', 'duration' => '11:00 Mins'],
+                ['id' => 'module-04-v5', 'title' => 'KB Retrieval - Chatbot', 'video_id' => 'fddab7d1-6cfa-4cf7-9edb-8d8e55f4220a', 'duration' => '15:11 Mins'],
+                // Kept so students who already completed it keep the tick (completed_lessons keys off the id).
+                ['id' => 'module-04-v1', 'title' => 'LEGACY: Knowledge Base (RAG)', 'video_id' => '01246ff7-d654-46c3-8c30-93ab2d894ff3', 'duration' => '19:33 Mins'],
             ],
         ],
         [
@@ -307,7 +312,7 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
             'release_at' => '2026-09-05 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set before Sat 5 Sep
+            'attendance_code' => 'AJ454-55', // ← announced at the END of the call (13 Sep). Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-09-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
