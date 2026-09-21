@@ -23,16 +23,16 @@ Read this before spending anything.
 
 | | **Google Cloud** (free) | **Hostinger** (this guide) |
 |---|---|---|
-| Hosting cost | **₦0/month** forever | Paid — from **$6.49/mo** (see Part 1) |
-| Sign-up | Needs a card **and** Google's verification, which is where a lot of people get stuck | A normal online checkout |
+| Hosting cost | **₦0/month** forever, after a one-time **$30** prepayment to Google | Paid — from **$6.49/mo** (see Part 1) |
+| Sign-up | Needs a bank card (Naira is fine), the $30 prepayment **and** Google's verification, which is where some people still get stuck | A normal online checkout |
 | Setup | ~45–60 min, copy-paste terminal commands | ~10–15 min, mostly clicking |
 | Server power | 1 GB RAM (tight — needs a swap-memory workaround) | 4 GB RAM on the entry plan |
 | HTTPS | You set it up (Caddy) | Automatic |
 | Domain | You buy one (~₦8–15k/yr) | Works instantly on a free Hostinger address; free domain for 1 year included |
 
-**Try [the Google Cloud guide](/guides/n8n-on-google-cloud) first** — it's free, and free
-is hard to beat. Come here if Google won't verify you, or if you'd rather pay to skip
-the terminal.
+**Try [the Google Cloud guide](/guides/n8n-on-google-cloud) first** — it's ₦0 a month after
+the one-time prepayment, and free-to-run is hard to beat. Come here if Google won't verify
+you, or if you'd rather pay to skip the terminal.
 
 > **Disclosure:** the Hostinger links below are referral links. It costs you nothing
 > extra, and it's the same host used in the Google Cloud guide for domains.

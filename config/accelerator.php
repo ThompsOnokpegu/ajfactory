@@ -15,9 +15,11 @@ return [
     */
 
     // --- Core NGN pricing ---
-    'price_full'        => 79000,   // Pay in full
-    'price_earlybird'   => 69000,   // Early-bird (first 10 seats OR first 72h)
-    'installment_each'  => 42000,   // ₦42,000 × 2
+    // Raised 21 Sep 2026 from 79,000 / 69,000 / 42,000 × 2. Early-bird keeps the flat
+    // ₦10,000 off; the installment plan keeps roughly the same ~6-7% premium for splitting.
+    'price_full'        => 120000,  // Pay in full
+    'price_earlybird'   => 110000,  // Early-bird (first 10 seats OR first 72h)
+    'installment_each'  => 64000,   // ₦64,000 × 2
     'installment_count' => 2,
     'currency'          => 'NGN',
 
@@ -173,38 +175,43 @@ return [
             'provider' => 'paystack',
             // prices: price_full / price_earlybird / installment_each at the top of this file
         ],
+        // Raised 21 Sep 2026 with the Naira price (was 57 / 50 / 30): each scaled by the
+        // same ratio as its NGN counterpart and rounded up, so USD still sits at roughly
+        // the ₦1,386/$ the original figures implied. No live rate was consulted.
         'USD' => [
             'symbol' => '$',
             'provider' => 'flutterwave',
-            'price_full' => 57,
-            'price_earlybird' => 50,
-            'installment_each' => 30,
+            'price_full' => 87,
+            'price_earlybird' => 80,
+            'installment_each' => 46,
         ],
-        // Set 30 Aug 2026 as the USD price converted at that day's rate and rounded UP
-        // (GHS 11.2508, KES 129.456, ZAR 16.1117 per USD), so none sits below the dollar
-        // price. Rounding keeps the early-bird discount and the installment premium within
-        // half a point of the USD ratios. These do NOT track the rate - revisit them when
-        // one moves materially, the same as the USD figures.
+        // The USD price converted at the 30 Aug 2026 rate and rounded UP (GHS 11.2508,
+        // KES 129.456, ZAR 16.1117 per USD), so none sits below the dollar price.
+        // Re-derived 21 Sep 2026 from the new USD figures at that same rate (was
+        // 650/570/340, 7400/6500/3900, 920/810/490). Rounding keeps the early-bird
+        // discount and the installment premium within a point of the USD ratios. These
+        // do NOT track the rate - revisit them when one moves materially, the same as
+        // the USD figures.
         'GHS' => [
             'symbol' => 'GH₵',
             'provider' => 'flutterwave',
-            'price_full' => 650,
-            'price_earlybird' => 570,
-            'installment_each' => 340,
+            'price_full' => 980,
+            'price_earlybird' => 910,
+            'installment_each' => 520,
         ],
         'KES' => [
             'symbol' => 'KSh',
             'provider' => 'flutterwave',
-            'price_full' => 7400,
-            'price_earlybird' => 6500,
-            'installment_each' => 3900,
+            'price_full' => 11300,
+            'price_earlybird' => 10400,
+            'installment_each' => 6000,
         ],
         'ZAR' => [
             'symbol' => 'R',
             'provider' => 'flutterwave',
-            'price_full' => 920,
-            'price_earlybird' => 810,
-            'installment_each' => 490,
+            'price_full' => 1410,
+            'price_earlybird' => 1290,
+            'installment_each' => 750,
         ],
     ],
 

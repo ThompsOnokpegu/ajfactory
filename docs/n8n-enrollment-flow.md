@@ -249,7 +249,7 @@ curl -X POST https://ai.deeprmarketing.com/webhook/installment_webhook \
         "full_name": "Test Student",
         "email": "you@example.com",
         "phone": "+2348000000000",
-        "amount": 42000,
+        "amount": 64000,
         "currency": "NGN",
         "pay_url": "https://ajbuildai.com/installment/pay/1?signature=test",
         "original_reference": "TEST_REF",

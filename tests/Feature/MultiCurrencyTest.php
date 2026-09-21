@@ -47,8 +47,10 @@ it('falls back to the base currency rather than charging an unknown one', functi
 });
 
 it('reads prices, symbol and provider per currency', function () {
-    expect(Accelerator::regularFullPrice('GHS'))->toBe(650.0)
-        ->and(Accelerator::installmentEach('KES'))->toBe(3900.0)
+    // Compared against config, not a literal: this checks the lookup reads the right
+    // row, and a price rise (21 Sep 2026) must not turn it into a false failure.
+    expect(Accelerator::regularFullPrice('GHS'))->toBe((float) config('accelerator.currencies.GHS.price_full'))
+        ->and(Accelerator::installmentEach('KES'))->toBe((float) config('accelerator.currencies.KES.installment_each'))
         ->and(Accelerator::currencySymbol('ZAR'))->toBe('R')
         ->and(Accelerator::paymentProvider('ZAR'))->toBe('flutterwave')
         ->and(Accelerator::paymentProvider('NGN'))->toBe('paystack');
@@ -118,7 +120,8 @@ it('charges a Ghanaian buyer the cedi early-bird price while it is running', fun
     $c = Volt::test('accelerator-checkout')->set('plan', 'full')->set('currency', 'GHS');
 
     expect($c->get('currency'))->toBe('GHS')
-        ->and((float) $c->get('amountToday'))->toBe(570.0);
+        ->and((float) $c->get('amountToday'))->toBe((float) config('accelerator.currencies.GHS.price_earlybird'))
+        ->and((float) $c->get('amountToday'))->toBeLessThan((float) config('accelerator.currencies.GHS.price_full'));
 });
 
 it('charges a Ghanaian buyer the full cedi price once early-bird ends', function () {
@@ -126,7 +129,7 @@ it('charges a Ghanaian buyer the full cedi price once early-bird ends', function
 
     $c = Volt::test('accelerator-checkout')->set('plan', 'full')->set('currency', 'GHS');
 
-    expect((float) $c->get('amountToday'))->toBe(650.0);
+    expect((float) $c->get('amountToday'))->toBe((float) config('accelerator.currencies.GHS.price_full'));
 });
 
 it('gives the TAAB59 discount in every offered currency', function () {

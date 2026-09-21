@@ -40,7 +40,7 @@
                         ['Gemini API Key', 'AI agent brain', '₦0', false],
                         ['Pinecone', 'AI knowledge base', '₦0', false],
                         ['Meta WhatsApp API', 'WhatsApp bot (optional)', '₦0', false],
-                        ['Google Cloud Hosting', 'self-hosted server', '₦0', false],
+                        ['Google Cloud Hosting', 'self-hosted server (₦0/mo to run)', '$30 one-time prepayment', true],
                         ['Domain name', 'your server address', 'from ~$10 / yr', true],
                         ['Vapi', 'AI receptionist (optional)', 'Free $10 credit', false],
                     ];
@@ -60,8 +60,8 @@
     <div class="mt-6 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
         <p class="text-sm text-zinc-300 leading-relaxed">
             <span class="font-black text-amber-400 uppercase tracking-wide text-xs">Bottom line:</span>
-            the only real cost is <strong class="text-white">one cheap domain (from ~$10/year).</strong>
-            Vapi even gives you a free $10 credit — enough to test through the whole course. The one exception: if you can't get an international card for free Google Cloud hosting, a small paid host runs ~$10/mo for about 3 months. Otherwise, no servers to rent and no surprise charges.
+            the only real costs are <strong class="text-white">a one-time $30 Google Cloud prepayment</strong> (Google now asks for it before it will run your free server - a Naira card is fine) and <strong class="text-white">one cheap domain (from ~$10/year).</strong>
+            Vapi even gives you a free $10 credit - enough to test through the whole course. Rather not prepay Google? A small paid host runs ~$10/mo for about 3 months instead. Otherwise, no servers to rent and no surprise charges.
         </p>
     </div>
 
@@ -73,7 +73,7 @@
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A computer + stable internet.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A smartphone.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A Google account.</span></li>
-                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A <strong class="text-zinc-300">real</strong> international/USD card (a virtual card won't pass) — for free Google Cloud verification and the optional Vapi credits. No card? A small paid host (~$10/mo for ~3 months) is the fallback.</span></li>
+                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A bank card - <strong class="text-zinc-300">a Naira card is fine</strong>, no USD card needed - for the one-time $30 Google Cloud prepayment. Rather not prepay? A small paid host (~$10/mo for ~3 months) is the fallback.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>~5–8 hours/week for 6 weeks.</span></li>
                 </ul>
             </div>

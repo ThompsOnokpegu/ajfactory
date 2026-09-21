@@ -43,6 +43,7 @@
         <div class="meta">
           <span class="chip">⏱ <b>45–60 min</b> first time</span>
           <span class="chip">💳 hosting <b>$0/mo</b></span>
+          <span class="chip">🧾 one-time <b>$30</b> Google prepayment</span>
           <span class="chip">🌐 domain ~<b>$6-11/yr</b></span>
           <span class="chip">🧑‍💻 <b>no coding</b></span>
         </div>
@@ -137,7 +138,7 @@ Google Cloud server  (free e2-micro)
         <ol class="steps">
           <li>Go to <a class="link" href="https://console.cloud.google.com" target="_blank" rel="noopener">console.cloud.google.com</a> and sign in.</li>
           <li>First time? Accept the terms and click <strong>Start free / Activate</strong>.</li>
-          <li>Enter your details and the <strong>card</strong> for verification. Choose <strong>Individual</strong>. Our server stays in the <strong>Always Free</strong> tier regardless of any trial credits.</li>
+          <li>Enter your details and a <strong>bank card</strong> - a Naira card is fine, no USD card needed. Google now asks for a <strong>one-time $30 prepayment</strong> to activate the account; pay it here. Choose <strong>Individual</strong>. Our server stays in the <strong>Always Free</strong> tier regardless, so there is no monthly bill after this.</li>
         </ol>
 
         <div class="call warn"><div class="h">⚠ stuck at verification?</div><p>This is where people get blocked — Google rejects some cards and won't always say why. Don't lose a week to it. There's a <a class="link" href="/guides/n8n-on-hostinger">one-click Hostinger route</a> that gets you the same private n8n with automatic HTTPS in about ten minutes. It costs money (this one is free hosting), but a working n8n beats a free one you can't create.</p></div>
@@ -398,6 +399,7 @@ EOF</code></pre></div>
         <div class="tablewrap"><table>
           <thead><tr><th>Item</th><th>Cost</th></tr></thead>
           <tbody>
+            <tr><td>Google Cloud account activation (one-time prepayment)</td><td><b>$30</b>, once</td></tr>
             <tr><td>Google Cloud server (e2-micro, free region)</td><td><b>$0 / month</b></td></tr>
             <tr><td>SSL certificate (Caddy + Let's Encrypt)</td><td><b>$0</b></td></tr>
             <tr><td>Domain name</td><td>~$6-11 / year</td></tr>

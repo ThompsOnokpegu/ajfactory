@@ -210,11 +210,11 @@ const questions = [
     { label: "3–6 months — I'm thinking medium-term", score: 9 },
     { label: 'No urgent financial pressure — I can build properly first', score: 10 },
   ]},
-  { dim: 2, dimName: 'Setup', id: 'hosting', text: "The owned-stack modules host on Google Cloud's always-free tier, which needs a one-time verification with a real international/USD card — a virtual card won't pass. The fallback is paid hosting at ~$10/mo for at least 3 months. Where do you stand?", options: [
-    { label: 'I have a real international/USD card ready to use', score: 10 },
-    { label: 'No card, but I can budget ~$30 (≈₦45k) for 3 months of paid hosting', score: 6 },
-    { label: 'Neither yet, but I could sort one out within a few weeks', score: 3 },
-    { label: "No USD card, and I can't cover the paid fallback", score: 0, blocks: true },
+  { dim: 2, dimName: 'Setup', id: 'hosting', text: "The owned-stack modules host on Google Cloud's always-free tier. Google now asks for a one-time $30 (≈₦45k) prepayment before it will run your server - a Naira card is fine, no USD card needed. The fallback is paid hosting at ~$10/mo for at least 3 months. Where do you stand?", options: [
+    { label: 'I can cover the one-time ~$30 (≈₦45k) Google Cloud prepayment now', score: 10 },
+    { label: "I'd rather put ~$30 (≈₦45k) into 3 months of paid hosting instead", score: 6 },
+    { label: 'Not yet, but I could set aside ~$30 within a few weeks', score: 3 },
+    { label: "I can't cover ~$30 for hosting either way right now", score: 0, blocks: true },
   ]},
   { dim: 2, dimName: 'Setup', text: 'Beyond tuition, you\'ll need ~one domain (₦8–15k/yr) and, optionally, ~$5–10 of voice credits. Can you cover these?', options: [
     { label: 'Yes, comfortably', score: 10 },
@@ -348,7 +348,7 @@ function computeResult() {
   let verdict = pct >= 70 ? verdicts.high : pct >= 45 ? verdicts.mid : verdicts.low;
 
   // Hosting soft-cap: you can't be "ready to start" with no way to stand up the
-  // owned stack. If the GCP/USD-card hurdle can't be cleared at all, cap at 🟡.
+  // owned stack. If the ~$30 hosting hurdle can't be cleared at all, cap at 🟡.
   const hostingBlocked = questions.some((q, i) =>
     q.id === 'hosting' && answers[i] !== null && q.options[answers[i]].blocks);
   const capped = hostingBlocked && verdict === verdicts.high;
@@ -360,8 +360,8 @@ function computeResult() {
   let verdictText = verdict.text;
   let steps = verdict.steps.slice();
   if (capped) {
-    verdictText += " One thing gates you first: the owned-stack modules need Google Cloud verification, and right now you have neither a USD card nor the paid-hosting fallback — that holds you at “almost ready” until it's sorted.";
-    steps = [{ text: "<strong>Sort your hosting path first</strong> — get access to a real international/USD card, or budget ~$30 for 3 months of paid hosting. Without it you can't complete the owned-stack half of the program." }, ...steps];
+    verdictText += " One thing gates you first: the owned-stack modules need a server, and right now you can cover neither the one-time ~$30 Google Cloud prepayment nor the paid-hosting fallback - that holds you at “almost ready” until it's sorted.";
+    steps = [{ text: "<strong>Sort your hosting path first</strong> - set aside ~$30 (≈₦45k) for the one-time Google Cloud prepayment (a Naira card is fine), or the same for 3 months of paid hosting. Without it you can't complete the owned-stack half of the program." }, ...steps];
   }
 
   const dimPct = {};

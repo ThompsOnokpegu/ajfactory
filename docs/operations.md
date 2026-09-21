@@ -336,8 +336,8 @@ Open/Paused toggle. Checkout then shows "Registration is paused" (distinct from 
 Admin → Enrollments → **Manual enrol**, or:
 
 ```bash
-php artisan enroll:user ada@example.com "Ada Builder"              # defaults: 79000 NGN
-php artisan enroll:user ada@example.com "Ada Builder" 42000 NGN --cohort=2
+php artisan enroll:user ada@example.com "Ada Builder"              # defaults: the configured NGN full price
+php artisan enroll:user ada@example.com "Ada Builder" 64000 NGN --cohort=3
 ```
 
 Both route through `StudentProvisioner`, so the student gets the identical welcome flow and

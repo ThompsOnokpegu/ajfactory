@@ -3,7 +3,8 @@
 This gets you a **private n8n running on your own web address** (like
 `https://n8n.yourdomain.com`), hosted on Google Cloud's **Always Free** server,
 with a proper **padlock (HTTPS)** — for **$0/month** in hosting. The only real
-cost is a domain name (~$6-11/year).
+costs are a one-time **$30 prepayment** Google asks for when you activate the account
+(a Naira card is fine) and a domain name (~$6-11/year).
 
 You do **not** need to know how to code. You'll copy and paste commands exactly as
 written. Every step is spelled out — nothing assumed, nothing skipped.
@@ -88,9 +89,10 @@ A domain is your web address. You can use any registrar; **Hostinger** is used h
 
 1. Go to **console.cloud.google.com** and sign in with your Google account.
 2. If it's your first time, accept the terms and click **Start free / Activate**.
-3. Enter your details and the **card** for verification. Choose **Individual** account
-   type. Google gives new users free credits too, but our server stays in the
-   **Always Free** tier regardless.
+3. Enter your details and a **bank card** - a Naira card is fine, no USD card needed.
+   Google now asks for a **one-time $30 prepayment** to activate the account; pay it
+   here. Choose **Individual** account type. Our server stays in the **Always Free**
+   tier regardless, so there is no monthly bill after this.
 
 > ⚠️ **Stuck at verification?** This is where people get blocked — Google rejects some
 > cards and won't always say why. Don't lose a week to it: the
@@ -478,6 +480,7 @@ is tiny.
 
 | Item | Cost |
 |---|---|
+| Google Cloud account activation (one-time prepayment) | **$30**, once |
 | Google Cloud server (e2-micro, free region) | **$0 / month** |
 | SSL certificate (Caddy + Let's Encrypt) | **$0** |
 | Domain name | ~$6-11 / year |

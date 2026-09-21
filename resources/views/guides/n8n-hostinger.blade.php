@@ -75,15 +75,15 @@ Your Hostinger VPS
         <div class="tablewrap"><table>
           <thead><tr><th></th><th>Google Cloud (free)</th><th>Hostinger (this guide)</th></tr></thead>
           <tbody>
-            <tr><td>Hosting cost</td><td><b>₦0/month</b> forever</td><td>Paid — from <b>$6.49/mo</b></td></tr>
-            <tr><td>Sign-up</td><td>Needs a card <strong>and</strong> Google's verification — where a lot of people get stuck</td><td>A normal online checkout</td></tr>
+            <tr><td>Hosting cost</td><td><b>₦0/month</b> forever, after a one-time <b>$30</b> prepayment to Google</td><td>Paid — from <b>$6.49/mo</b></td></tr>
+            <tr><td>Sign-up</td><td>Needs a bank card (Naira is fine), the $30 prepayment <strong>and</strong> Google's verification - where some people still get stuck</td><td>A normal online checkout</td></tr>
             <tr><td>Setup</td><td>~45–60 min, copy-paste terminal commands</td><td>~10–15 min, mostly clicking</td></tr>
             <tr><td>Server power</td><td>1 GB RAM (tight — needs a swap workaround)</td><td>4 GB RAM on the entry plan</td></tr>
             <tr><td>HTTPS</td><td>You set it up (Caddy)</td><td>Automatic</td></tr>
             <tr><td>Domain</td><td>You buy one (~₦8–15k/yr)</td><td>Free Hostinger address instantly; free domain for 1 year included</td></tr>
           </tbody>
         </table></div>
-        <div class="call note"><div class="h">↳ our advice</div><p>Try <a class="link" href="/guides/n8n-on-google-cloud">the Google Cloud guide</a> first — it's free, and free is hard to beat. Come here if Google won't verify you, or if you'd rather pay to skip the terminal.</p></div>
+        <div class="call note"><div class="h">↳ our advice</div><p>Try <a class="link" href="/guides/n8n-on-google-cloud">the Google Cloud guide</a> first — it's ₦0 a month after the one-time prepayment, and free-to-run is hard to beat. Come here if Google won't verify you, or if you'd rather pay to skip the terminal.</p></div>
         <div class="call"><div class="h">disclosure</div><p>The Hostinger links on this page are referral links. It costs you nothing extra, and it's the same host the Google Cloud guide uses for domains.</p></div>
       </section>
 

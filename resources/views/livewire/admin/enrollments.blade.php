@@ -5,6 +5,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use App\Models\Enrollment;
+use App\Support\Accelerator;
 use App\Support\StudentProvisioner;
 use Illuminate\Support\Facades\Http;
 
@@ -23,7 +24,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
     public string $meName = '';
     public string $meEmail = '';
     public string $meWhatsapp = '';
-    public string $meAmount = '79000';
+    public string $meAmount = '';   // set in mount() from config, never typed here
     public string $meCurrency = 'NGN';
     public string $mePlan = 'full';
     public int $meCohort = 2;
@@ -31,6 +32,8 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
     public function mount(): void
     {
         abort_unless(auth()->user()?->is_admin, 403);
+
+        $this->meAmount = (string) (int) Accelerator::regularFullPrice($this->meCurrency);
     }
 
     public function updating($name): void

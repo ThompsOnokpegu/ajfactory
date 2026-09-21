@@ -391,13 +391,13 @@
                 <div class="space-y-3" x-data="{ open: null }">
                     @foreach([
                         ['Do I need to know how to code?', "No. It's drag-and-drop automation. If you can follow step-by-step instructions, you can do this."],
-                        ['What will it cost beyond the ₦79,000?', 'About one cheap domain (from ~$10/yr). Vapi gives a free $10 credit for the optional voice module, and everything else runs on free tiers.'],
+                        ['What will it cost beyond the ₦'.number_format($regular).'?', 'A one-time $30 Google Cloud prepayment (Google now asks for it before it will run your free server - a Naira card is fine) and one cheap domain (from ~$10/yr). Vapi gives a free $10 credit for the optional voice module, and everything else runs on free tiers.'],
                         ['Do I need a registered business (CAC)?', 'No — not for any part of the program. The WhatsApp bot is built in test mode, so no business registration is required to build or complete it.'],
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
-                        ['Do I need an international card?', 'For free Google Cloud hosting, yes — a real international/USD card (a virtual card won\'t pass verification), also used for the optional Vapi credits. If you can\'t get one, the fallback is a small paid host at ~$10/mo for about 3 months.'],
+                        ['Do I need an international card?', 'Not any more. Google Cloud now asks for a one-time $30 prepayment instead, and a Naira card works for it. If you\'d rather not prepay, the fallback is a small paid host at ~$10/mo for about 3 months.'],
                         ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
                         ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
-                        ['Can I pay in installments?', 'Yes — ₦42,000 × 2.'],
+                        ['Can I pay in installments?', 'Yes - ₦'.number_format($instEach).' × '.$instCount.'.'],
                         ['What\'s the guarantee?', 'Do the work and if your stack still isn\'t live by the end, we coach you 1-on-1 until it is.'],
                     ] as $i => [$q, $a])
                         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">

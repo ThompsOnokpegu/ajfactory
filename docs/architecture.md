@@ -12,7 +12,7 @@ matters — it has been got wrong before.
 
 | | **TAAB Masterclass** | **AI Automation Accelerator** |
 |---|---|---|
-| Price | Free | ₦79,000 (early-bird ₦69,000, or ₦42,000 × 2) |
+| Price | Free | ₦120,000 (early-bird ₦110,000, or ₦64,000 × 2) |
 | Format | One live 2-hour session | 6-week cohort, self-paced + live clinics |
 | Purpose | **Clarity before committing** — gauge readiness, costs, skills, mindset | **Building** — 9 production automations + the playbook to sell them |
 | Brand | Dark + lime `#c8f064`, Syne / DM Sans | Dark + cyan `#06b6d4`, Space Grotesk |
@@ -318,10 +318,10 @@ Offsets are config, not code: `reminder_lead_hours`, `dayof_lead_hours`,
 percentage. Tiers: **≥70 ready · 45–69 almost · <45 not yet.**
 
 It's graded as an honest filter, not a funnel — questions test what the Accelerator
-*requires*, not what it *teaches*. One rule is encoded specially: if someone can neither get
-a real international/USD card for Google Cloud verification nor cover the ~$10/mo × 3 months
-paid-hosting fallback, their verdict is **capped at 🟡** regardless of score, because they
-cannot stand up their own stack.
+*requires*, not what it *teaches*. One rule is encoded specially: if someone can cover
+neither Google Cloud's one-time ~$30 account prepayment (a Naira card is fine - the USD-card
+requirement went away in Sep 2026) nor the ~$10/mo × 3 months paid-hosting fallback, their
+verdict is **capped at 🟡** regardless of score, because they cannot stand up their own stack.
 
 Completing the quiz gates the results behind an email capture, which POSTs the score,
 tier, per-dimension breakdown **and the rendered verdict + next-steps** to
@@ -347,7 +347,7 @@ drift — and it automatically includes the extra hosting step when the cap fire
 ```
 
 - **Pay in full** → `balance_due = 0`, immediate access.
-- **Installment (₦42,000 × 2)** → first payment now, `balance_due` tracked.
+- **Installment (₦64,000 × 2)** → first payment now, `balance_due` tracked.
   `installments:process` sends the 2nd-payment link on the due date
   (`installment_due_days`) and suspends access `installment_grace_hours` after it lapses.
   Payment happens on a **signed** `/installment/{enrollment}/pay` route.

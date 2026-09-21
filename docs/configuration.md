@@ -103,14 +103,16 @@ landing page and checkout must agree, and derived values belong in
 
 ### Pricing
 ```php
-'price_full'        => 79000,   // NGN
-'price_earlybird'   => 69000,
-'installment_each'  => 42000,   // × 2
+'price_full'        => 120000,  // NGN
+'price_earlybird'   => 110000,
+'installment_each'  => 64000,   // × 2
 'installment_count' => 2,
 'currency'          => 'NGN',
 ```
 The Naira prices above are the single source of truth for NGN - the landing page and the
-Requirements copy read `accelerator.price_full` directly.
+Requirements copy read `accelerator.price_full` directly. Raised on 21 Sep 2026 from
+₦79,000 / ₦69,000 / ₦42,000 × 2; the foreign-currency rows were scaled by the same ratio at
+the same time (no live rate consulted - see the comments in the config file).
 
 ### Currencies
 
@@ -120,7 +122,7 @@ Every other currency lives in `accelerator.currencies`, each with its own `symbo
 ```php
 'currencies' => [
     'NGN' => ['symbol' => '₦', 'provider' => 'paystack'],   // prices at the top level
-    'USD' => ['symbol' => '$', 'provider' => 'flutterwave', 'price_full' => 57, ...],
+    'USD' => ['symbol' => '$', 'provider' => 'flutterwave', 'price_full' => 87, ...],
     'GHS' => ['symbol' => 'GH₵', 'provider' => 'flutterwave', 'price_full' => null, ...],
 ],
 ```

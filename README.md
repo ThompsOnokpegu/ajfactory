@@ -117,7 +117,7 @@ docs/                   this documentation + email templates + n8n exports
 | `masterclass:enroll-waitlist` | Moves masterclass waitlisters into the current session's registrations and confirms them. `--dry-run` supported. |
 | `masterclass:reset-sends` | Clears send stamps so a touch can be re-sent after a failure. `--type`, `--except`, `--dry-run`. |
 | `installments:process` | Sends 2nd-payment links on the due date and suspends overdue balances. Scheduled daily 09:00. |
-| `enroll:user {email} {name} [amount] [currency] [--cohort=]` | Enrolls someone manually (offline/bank transfer) exactly as a verified payment would. Defaults to `79000 NGN`. |
+| `enroll:user {email} {name} [amount] [currency] [--cohort=]` | Enrolls someone manually (offline/bank transfer) exactly as a verified payment would. `amount` defaults to the configured pay-in-full price for the currency; `currency` defaults to NGN. |
 | `user:admin {email} [--revoke]` | Grants (or revokes) admin rights for an existing user. |
 
 ## Things that will bite you
