@@ -6,6 +6,16 @@
     <title>Checkout | AI Automation Accelerator</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    @include('partials.meta-pixel', [
+        'metaEvent' => 'InitiateCheckout',
+        'metaParams' => [
+            'value' => \App\Support\Accelerator::fullPrice('NGN'),
+            'currency' => 'NGN',
+            'content_name' => \App\Support\MetaConversions::CONTENT_NAME,
+            'content_ids' => ['accelerator'],
+            'content_type' => 'product',
+        ],
+    ])
 </head>
 <body class="bg-zinc-950 text-zinc-300 font-sans antialiased overflow-x-hidden">
     

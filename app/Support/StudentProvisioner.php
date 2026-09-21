@@ -55,6 +55,11 @@ class StudentProvisioner
         // Only hand out a temp password if we just created the account.
         $this->fireWelcome($enrollment, $created ? $tempPassword : null);
 
+        // Offline sale, so no browser session - goes to Meta as an "other" source
+        // Purchase. Still worth sending: it matches on email/phone and feeds the
+        // buyer signal Meta optimises on.
+        app(MetaConversions::class)->purchase($enrollment->fresh());
+
         return ['enrollment' => $enrollment, 'temp_password' => $created ? $tempPassword : null, 'created' => $created];
     }
 
@@ -97,6 +102,9 @@ class StudentProvisioner
         $enrollment = $enrollment->fresh();
 
         $this->fireWelcome($enrollment, $created ? $tempPassword : null);
+
+        // The row came through checkout, so it carries the buyer's meta_context.
+        app(MetaConversions::class)->purchase($enrollment);
 
         return ['enrollment' => $enrollment, 'temp_password' => $created ? $tempPassword : null, 'created' => $created];
     }

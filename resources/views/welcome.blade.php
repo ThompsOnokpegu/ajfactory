@@ -26,6 +26,7 @@
             .badge-pulse { animation: pulse-border 2s infinite; }
             @keyframes pulse-border { 0% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } 50% { border-color: rgba(6, 182, 212, 0.6); box-shadow: 0 0 20px 0 rgba(6, 182, 212, 0.1); } 100% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } }
         </style>
+        @include('partials.meta-pixel')
     </head>
     <body class="bg-zinc-950 text-zinc-300 font-sans antialiased selection:bg-cyan-500 selection:text-black">
 

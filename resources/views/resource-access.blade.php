@@ -8,6 +8,8 @@
     @if($purchase->status !== 'paid')
         <meta http-equiv="refresh" content="6">
     @endif
+    {{-- PageView only: a guide sale is deliberately NOT a Purchase (it would count like a course sale in the ads signal). --}}
+    @include('partials.meta-pixel')
 </head>
 <body class="bg-zinc-950 text-zinc-300 font-sans antialiased min-h-screen flex items-center justify-center p-6">
     <div class="w-full max-w-lg text-center">

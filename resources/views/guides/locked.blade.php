@@ -7,6 +7,8 @@
 <title>Self-hosting guide — AJBuildAI</title>
 
 @include('guides.partials.chrome-css')
+{{-- Public sales page only. The paid guides share chrome-css but are for logged-in students, so the pixel is NOT in that partial. --}}
+@include('partials.meta-pixel')
 </head>
 <body>
 

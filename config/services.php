@@ -34,7 +34,7 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
-    
+
     'n8n' => [
         'webhook_url' => env('N8N_WEBHOOK_URL'),
         'student_webhook_url' => env('N8N_STUDENT_WEBHOOK_URL'),
@@ -51,11 +51,24 @@ return [
         'api_key' => env('BUNNY_API_KEY'),
         'library_id' => env('BUNNY_LIBRARY_ID'),
     ],
-    
+
     'flutterwave' => [
         'public_key' => env('FLW_PUBLIC_KEY'),
         'secret_key' => env('FLW_SECRET_KEY'),
         'secret_hash' => env('FLUTTERWAVE_SECRET_HASH'),
+    ],
+
+    // Meta (Facebook) ads: browser pixel + Conversions API + customer-list audiences.
+    // Everything silently no-ops when unset (partial renders nothing, sends are
+    // skipped with a warning), so these are pinned in phpunit.xml. The two audience
+    // ids are NOT here - meta:sync-audiences creates them and keeps them in the
+    // Setting store, so no deploy or config:cache is needed for those.
+    'meta' => [
+        'pixel_id' => env('META_PIXEL_ID'),          // public - the only value that reaches Blade
+        'access_token' => env('META_ACCESS_TOKEN'),      // System User token, server-side only
+        'ad_account_id' => env('META_AD_ACCOUNT_ID'),     // digits only, no act_ prefix
+        'test_event_code' => env('META_TEST_EVENT_CODE'),   // set only while testing in Events Manager
+        'api_version' => env('META_API_VERSION', 'v25.0'),
     ],
 
 ];

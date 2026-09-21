@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Get {{ $resource->title }} — AJBuildAI</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.meta-pixel')
 </head>
 <body class="bg-zinc-950 text-zinc-300 font-sans antialiased min-h-screen flex items-center justify-center p-6">
 

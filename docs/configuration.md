@@ -71,6 +71,20 @@ student unstamped for the next run - see [operations.md](operations.md).
 Both webhooks verify server-side before granting access. Never grant on a client-side
 success callback.
 
+### Meta ads (pixel + Conversions API + audiences)
+| Var | Notes |
+|---|---|
+| `META_PIXEL_ID` | The dataset/pixel id from Events Manager. The only Meta value that reaches Blade. **Unset = the pixel partial renders nothing and every server-side Purchase is skipped with a warning.** |
+| `META_ACCESS_TOKEN` | System User token with `ads_management`, the pixel and the ad account assigned to it. Server-side only. Unset = Conversions API and audience sync both skip. |
+| `META_AD_ACCOUNT_ID` | Digits only, no `act_` prefix (Deepr Marketing is `498587071939022`). Unset = audience sync skips. |
+| `META_TEST_EVENT_CODE` | From Events Manager → Test events. Set it ONLY while verifying, then unset and `config:cache` again - while it is set every Purchase lands in the test tab, not the real dataset. |
+| `META_API_VERSION` | Graph API version, default `v25.0`. Meta retires versions roughly two years after release. |
+
+All five are read through `config('services.meta.*')`. The code silently no-ops on
+each of them when unset, which is exactly the CI trap described under **n8n webhooks**,
+so the first three are pinned in `phpunit.xml`. The two audience ids are deliberately
+NOT env - see **Runtime settings** below.
+
 ### TAAB masterclass
 | Var | Notes |
 |---|---|
@@ -91,7 +105,8 @@ success callback.
 ### Deployment secrets (GitHub repo secrets, not `.env`)
 `HOSTINGER_SSH_HOST` · `HOSTINGER_SSH_USER` · `HOSTINGER_SSH_PORT` · `HOSTINGER_SSH_KEY`
 
-Used by both `deploy.yml` and `scheduler.yml`.
+Used by `deploy.yml` and every scheduler-fallback workflow (`scheduler.yml`,
+`installments.yml`, `masterclass-announce.yml`, `meta-sync.yml`).
 
 ---
 
@@ -348,6 +363,8 @@ The `Setting` model is a key/value store for flags you flip while the app is liv
 | Key | Controls |
 |---|---|
 | `accelerator_registration_open` | Pauses/resumes checkout. Toggle from the admin overview; read via `Accelerator::registrationOpen()`. |
+| `meta_audience_buyers_id` | Id of the "Accelerator buyers" Custom Audience on the ad account. Written by `meta:sync-audiences` the first time it creates the audience; paste an existing audience id here to reuse one instead. |
+| `meta_audience_leads_id` | Same, for the "TAAB masterclass registrants" audience. |
 
 Use this pattern for anything an operator should change without a deploy.
 
@@ -360,10 +377,14 @@ Defined in `routes/console.php`:
 ```php
 Schedule::command('installments:process')->dailyAt('09:00')->timezone('Africa/Lagos');
 Schedule::command('masterclass:remind')->everyFifteenMinutes()->timezone('Africa/Lagos');
+Schedule::command('masterclass:announce')->dailyAt('10:00')->timezone('Africa/Lagos');
+Schedule::command('meta:retry-purchases')->dailyAt('04:00')->timezone('Africa/Lagos');
+Schedule::command('meta:sync-audiences')->dailyAt('04:10')->timezone('Africa/Lagos');
 ```
 
 **These definitions are aspirational on the current host.** Hostinger's cron doesn't run, so
-`masterclass:remind` is driven by `.github/workflows/scheduler.yml` calling it directly —
+each command is driven by its own GitHub Actions workflow calling it directly
+(`scheduler.yml`, `installments.yml`, `masterclass-announce.yml`, `meta-sync.yml`) —
 and GitHub drops most scheduled runs. Read
 [operations.md](operations.md#️-scheduling-reality--read-this-first) before relying on
 anything time-sensitive.

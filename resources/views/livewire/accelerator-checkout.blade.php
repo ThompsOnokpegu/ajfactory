@@ -3,6 +3,7 @@
 use Livewire\Volt\Component;
 use App\Models\Enrollment;
 use App\Support\Accelerator;
+use App\Support\MetaUserData;
 use Illuminate\Support\Facades\DB;
 
 new class extends Component {
@@ -213,6 +214,10 @@ new class extends Component {
                 'coupon_code'           => $this->coupon['code'] ?? null,
                 'discount_amount'       => $this->discount ?: null,
                 'status'                => 'pending',
+                // Browser signals for the Meta Purchase the webhook fires later. The
+                // webhook request comes from the gateway, so this is the only moment
+                // the buyer's own cookies/IP/UA are in hand.
+                'meta_context'          => MetaUserData::contextFromRequest(request()),
             ]);
 
             if (Accelerator::paymentProvider($this->currency) === 'paystack') {
@@ -221,6 +226,7 @@ new class extends Component {
                     // Paystack takes the minor unit, and every currency it settles
                     // (NGN/GHS/KES/ZAR/USD) is 100 minor units to the major one.
                     'amount' => $this->amountToday * 100,
+                    'display_amount' => $this->amountToday,   // major unit, for the pixel's AddPaymentInfo value
                     'currency' => $this->currency,
                     'reference' => $reference,
                     'key' => config('services.paystack.public_key'),
@@ -230,6 +236,7 @@ new class extends Component {
                 $this->dispatch('launch-flutterwave', [
                     'email' => $this->email,
                     'amount' => $this->amountToday,
+                    'display_amount' => $this->amountToday,
                     'currency' => $this->currency,
                     'reference' => $reference,
                     'key' => config('services.flutterwave.public_key'),
@@ -478,8 +485,20 @@ new class extends Component {
         document.addEventListener('livewire:init', () => {
             // PAYSTACK - currency comes from the server, never hardcoded here:
             // the webhook verifies the charge against the currency it expected.
+            // Meta: the buyer is now in the payment popup. Keyed on the reference so
+            // it lines up with the Purchase that follows.
+            const trackAddPaymentInfo = (config) => {
+                if (typeof fbq !== 'function') return;
+                fbq('track', 'AddPaymentInfo', {
+                    value: config.display_amount,
+                    currency: config.currency,
+                    content_name: 'AI Automation Accelerator',
+                }, { eventID: config.reference });
+            };
+
             Livewire.on('launch-paystack', (event) => {
                 const config = event[0];
+                trackAddPaymentInfo(config);
                 const handler = PaystackPop.setup({
                     key: config.key,
                     email: config.email,
@@ -497,6 +516,7 @@ new class extends Component {
             // FLUTTERWAVE - currency comes from the server, never hardcoded here.
             Livewire.on('launch-flutterwave', (event) => {
                 const config = event[0];
+                trackAddPaymentInfo(config);
                 FlutterwaveCheckout({
                     public_key: config.key,
                     tx_ref: config.reference,

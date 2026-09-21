@@ -466,6 +466,7 @@ if (form) {
       if (res.ok) {
         form.style.display = 'none';
         success.style.display = 'block';
+        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'taab_masterclass' });
       } else {
         btn.textContent = 'Check your details — try again';
         btn.disabled = false;
@@ -505,6 +506,7 @@ if (waitForm) {
       if (res.ok) {
         waitForm.style.display = 'none';
         waitSuccess.style.display = 'block';
+        if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'taab_waitlist' });
       } else {
         btn.textContent = 'Check your details — try again';
         btn.disabled = false;

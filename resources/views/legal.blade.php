@@ -12,6 +12,7 @@
         .legal-content p { @apply text-zinc-400 mb-4 leading-relaxed; }
         .legal-content ul { @apply list-disc list-inside text-zinc-400 mb-6 space-y-2; }
     </style>
+    @include('partials.meta-pixel')
 </head>
 <body class="bg-zinc-950 text-zinc-300 font-sans antialiased">
     
@@ -33,7 +34,7 @@
         <main class="flex-1 max-w-3xl mx-auto w-full py-20 px-6">
             <div class="mb-16">
                 <span class="inline-block px-2 py-1 bg-zinc-900 border border-zinc-800 text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-4">
-                    Effective_Date: January_2026
+                    Effective_Date: September_2026
                 </span>
                 <h1 class="text-5xl md:text-6xl font-black text-white uppercase italic tracking-tighter leading-none">
                     Legal_Core <br>
@@ -57,6 +58,7 @@
                     <p>We respect your data. Our identity protocols are designed to be transparent.</p>
                     <p><strong>Data Collection:</strong> We collect your name, email, and WhatsApp number specifically to provision your Member Terminal access and send system updates.</p>
                     <p><strong>Third Parties:</strong> Payment data is handled exclusively by Paystack and Flutterwave. We do not store your credit card or bank details on our local servers.</p>
+                    <p><strong>Advertising:</strong> We use the Meta Pixel and Meta's Conversions API on our public pages to measure which ads lead to sign-ups and purchases, and to show relevant ads on Facebook and Instagram to people who have visited this site. When you register for the masterclass or buy the Accelerator, we send Meta a hashed (one-way encoded) version of your email address, phone number and name, together with standard browser details, so Meta can match the activity to an ad and help us reach people like you. Meta receives only the hashed values, never the plain text. You can manage the ads you see in your Facebook Ad Preferences, block Meta's cookies in your browser, and email hello@ajbuildai.com to be removed from our advertising audiences.</p>
                 </section>
 
                 <section id="refunds">

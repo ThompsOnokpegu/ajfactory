@@ -74,7 +74,9 @@ new class extends Component {
     <!-- THE FORM -->
     <div class="bg-zinc-900/50 border border-zinc-800 p-4 rounded-xl max-w-lg mx-auto shadow-2xl shadow-cyan-900/20">
         @if($joined)
-            <div class="w-full py-4 text-center text-cyan-400 font-bold uppercase tracking-widest animate-pulse">
+            {{-- Livewire re-render, so Alpine's x-init fires the Meta Lead once this node appears. --}}
+            <div x-data x-init="if (typeof fbq === 'function') fbq('track', 'Lead', { content_name: 'accelerator_waitlist' })"
+                 class="w-full py-4 text-center text-cyan-400 font-bold uppercase tracking-widest animate-pulse">
                 You're on the list. Check your email.
             </div>
         @else

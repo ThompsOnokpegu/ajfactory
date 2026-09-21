@@ -6,6 +6,7 @@
     <title>Onboarding | AI Automation Accelerator</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    @include('partials.meta-pixel')
 </head>
 <body class="bg-zinc-950 text-zinc-300 font-sans antialiased overflow-x-hidden">
     

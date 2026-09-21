@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
 use App\Models\User;
+use App\Support\MetaConversions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -85,6 +86,14 @@ class FlutterwaveWebhookController extends Controller
 
                             // C. Trigger n8n Automation
                             $this->triggerAutomation($enrollment, $tempPassword);
+
+                            // D. Meta Purchase (server side), deduplicated against the
+                            //    browser event on /thank-you by event_id = reference.
+                            app(MetaConversions::class)->purchase($enrollment->fresh(), [
+                                'ip' => $verifiedData['ip'] ?? null,
+                                'phone' => $verifiedData['customer']['phone_number'] ?? null,
+                                'country' => $verifiedData['card']['country'] ?? null,
+                            ]);
 
                             Log::info("Flutterwave Payment Verified: {$reference}");
                         } else {

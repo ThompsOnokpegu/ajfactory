@@ -1,0 +1,38 @@
+name: Meta sync (scheduler fallback)
+
+# Hostinger's hPanel cron isn't executing for this account, so the Laravel
+# scheduler never ticks and the two meta:* commands (routes/console.php, 04:00 and
+# 04:10 WAT) never run. This SSHes in and runs them directly, like the installments
+# and masterclass workflows.
+#
+# Both commands are idempotent: meta:retry-purchases only resends Purchase events
+# that Meta never stamped as received (and Meta accepts events up to 7 days old, so
+# a missed day is absorbed); meta:sync-audiences re-uploads hashed customer lists
+# that Meta de-duplicates. GitHub's best-effort cron dropping a run is therefore
+# harmless. Overnight WAT so it never competes with daytime sends.
+
+on:
+  schedule:
+    - cron: '0 3 * * *'      # 03:00 UTC = 04:00 WAT
+  workflow_dispatch: {}      # manual "run now" from the Actions tab
+
+concurrency:
+  group: meta-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH in and run meta:retry-purchases + meta:sync-audiences
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HOSTINGER_SSH_HOST }}
+          username: ${{ secrets.HOSTINGER_SSH_USER }}
+          key: ${{ secrets.HOSTINGER_SSH_KEY }}
+          port: ${{ secrets.HOSTINGER_SSH_PORT }}
+          script: |
+            set -e
+            cd ~/domains/ajbuildai.com/public_html/laravel
+            php artisan meta:retry-purchases
+            php artisan meta:sync-audiences

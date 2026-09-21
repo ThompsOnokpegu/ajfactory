@@ -13,6 +13,8 @@
     <!-- ASSETS -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
+    {{-- Base pixel only; /thank-you fires its Purchase from the component via partials.meta-event. --}}
+    @include('partials.meta-pixel')
 
     <style>
         .bg-grid { background-image: linear-gradient(to right, #18181b 1px, transparent 1px), linear-gradient(to bottom, #18181b 1px, transparent 1px); background-size: 50px 50px; }

@@ -19,6 +19,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
+        @include('partials.meta-pixel')
     </head>
     <body class="bg-zinc-950 text-white font-sans antialiased overflow-x-hidden selection:bg-cyan-500 selection:text-black">
 

@@ -56,6 +56,11 @@ a `pending` row paid by transfer, or `manualEnrol()` for someone who never check
 `usesShipToUnlock()` returns `cohort >= 2` — Cohort 1 stays fully open so existing
 students are never retroactively locked out of modules they already had.
 
+Two Meta-ads columns ride along: `meta_context` (JSON `{fbp, fbc, ip, ua, captured_at}`,
+captured from the buyer's own request at checkout) and `meta_purchase_sent_at` (stamped
+only when Meta's Conversions API accepted the Purchase; null = still to send, which
+`meta:retry-purchases` keys off). See **Meta ads tracking** under section 3.
+
 ### `Resource` / `ResourcePurchase`
 `Resource` powers `/free` — a link the owner pastes (managed in Admin → Resources). A
 `price` makes it **paid**: its `url` is gated, and `/r/{id}` redirects to checkout instead of
@@ -233,6 +238,37 @@ enrolment behaves exactly like a verified card payment.
 Because temp passwords are hashed at creation, **the original cannot be replayed** — a
 re-send issues a new one and resets the account to it.
 
+### Meta ads tracking — `MetaUserData`, `MetaConversions`, `MetaAudiences`
+Three classes, one job each:
+
+- **`MetaUserData`** normalises and SHA-256-hashes a person the way Meta matches them
+  (email lowercased, phone as digits with country code, names as lowercase letters,
+  country as ISO-2 inferred from the currency paid in, then the dialling code). Both of
+  the others go through it, so Meta only ever receives hashes.
+- **`MetaConversions::purchase($enrollment)`** sends the server-side Purchase to the
+  Conversions API. Called from both payment webhooks and both `StudentProvisioner`
+  paths, right after the n8n trigger. **Its `event_id` is the payment reference, and the
+  browser Purchase on `/thank-you` uses the same value as its `eventID` - that pairing is
+  how Meta deduplicates the two into one sale.** Same contract as every n8n send: skip
+  with a warning when unconfigured, never throw, stamp only on genuine acceptance.
+- **`MetaAudiences`** builds the two customer lists (paid buyers; TAAB registrants),
+  creates each Custom Audience on the ad account the first time (id kept in `Setting`)
+  and uploads hashed rows in batches. Driven by `meta:sync-audiences`.
+
+The browser side is one partial, `partials/meta-pixel.blade.php`, included in the head
+of every public page (standalone pages do it themselves; the TAAB and student layouts
+cover theirs). It renders nothing when `META_PIXEL_ID` is unset and is deliberately
+absent from the dashboard, admin, auth and paid-guide chrome. Events: PageView
+everywhere, ViewContent on `/accelerator`, InitiateCheckout on `/checkout`,
+AddPaymentInfo when the payment popup opens, Purchase on `/thank-you` (localStorage-
+guarded so a refresh can't refire it), Lead on TAAB registration and the waitlists.
+Guide sales and the 2nd installment are **not** Purchases - either would count like a
+new course sale in the signal Meta optimises on.
+
+`_fbp`/`_fbc` reach the checkout only because `bootstrap/app.php` exempts them from
+cookie encryption; without that, `EncryptCookies` nulls both and every server event
+matches poorly. `MetaPixelTest` guards it.
+
 ---
 
 ## 4. Routes
@@ -273,7 +309,9 @@ enforced.
 `/api/webhooks/paystack` · `/api/webhooks/flutterwave` · `/api/webhooks/vapi`
 
 **Payment webhooks verify server-side before granting anything.** Client-side "payment
-succeeded" callbacks are never trusted.
+succeeded" callbacks are never trusted. After provisioning and the n8n trigger, both
+payment webhooks also fire the Meta Purchase (`MetaConversions`) - additive, and a
+failure there never fails the webhook.
 
 ---
 
@@ -342,6 +380,9 @@ drift — and it automatically includes the extra hosting step when the cap fire
           webhook, verified server-side
                     ▼
           StudentProvisioner: User + Enrollment + n8n enrollment_finalized
+                    │  + Meta Purchase via the Conversions API (event_id = reference)
+                    ▼
+          /thank-you — browser Purchase with the same eventID, so Meta keeps one
                     ▼
           /dashboard — ship-to-unlock
 ```

@@ -81,6 +81,22 @@ mount(function () {
                 </a>
             </div>
 
+            {{-- Browser Purchase. eventID = payment_reference = the Conversions API event_id,
+                 so Meta keeps one of the two. Guarded so a refresh can't fire it again. --}}
+            @include('partials.meta-event', [
+                'metaEvent' => 'Purchase',
+                'metaEventId' => $enrollment->payment_reference,
+                'metaOnce' => true,
+                'metaParams' => [
+                    'value' => (float) $enrollment->amount,
+                    'currency' => $enrollment->currency ?: 'NGN',
+                    'content_name' => \App\Support\MetaConversions::CONTENT_NAME,
+                    'content_ids' => ['accelerator-'.($enrollment->plan_type ?: 'full')],
+                    'content_type' => 'product',
+                    'num_items' => 1,
+                ],
+            ])
+
         @elseif($status === 'processing')
             <!-- PROCESSING STATE -->
             <div class="space-y-8 py-20">

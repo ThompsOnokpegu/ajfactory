@@ -28,3 +28,14 @@ Schedule::command('masterclass:remind')
 Schedule::command('masterclass:announce')
     ->dailyAt('10:00')
     ->timezone('Africa/Lagos');
+
+// Meta ads: resend any Purchase the Conversions API never accepted (7-day window),
+// then push buyers + TAAB registrants to the Custom Audiences. Both idempotent.
+// In production these run from .github/workflows/meta-sync.yml, not this scheduler.
+Schedule::command('meta:retry-purchases')
+    ->dailyAt('04:00')
+    ->timezone('Africa/Lagos');
+
+Schedule::command('meta:sync-audiences')
+    ->dailyAt('04:10')
+    ->timezone('Africa/Lagos');

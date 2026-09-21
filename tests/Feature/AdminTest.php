@@ -119,7 +119,9 @@ it('manually enrols a student, provisions the account, and fires the welcome', f
 
     expect(User::where('email', 'tunde@example.com')->exists())->toBeTrue();
     expect(Enrollment::where('email', 'tunde@example.com')->where('status', 'paid')->where('cohort', 2)->exists())->toBeTrue();
-    Http::assertSent(fn ($r) => $r['event'] === 'enrollment_finalized' && $r['gateway'] === 'manual');
+    // Guard by URL first: the same path now also posts to graph.facebook.com (Meta
+    // Purchase), and indexing that request's body for 'event' throws.
+    Http::assertSent(fn ($r) => str_contains($r->url(), 'example.test') && $r['event'] === 'enrollment_finalized' && $r['gateway'] === 'manual');
 });
 
 it('approves a pending offline installment payment: finalizes, schedules 2nd, provisions', function () {
@@ -140,7 +142,7 @@ it('approves a pending offline installment payment: finalizes, schedules 2nd, pr
         ->and((float) $e->balance_due)->toBe(42000.0)          // balance preserved
         ->and($e->second_payment_due_at)->not->toBeNull();      // 2nd payment scheduled
     expect(User::where('email', 'offline@example.com')->exists())->toBeTrue();
-    Http::assertSent(fn ($r) => $r['event'] === 'enrollment_finalized' && $r['email'] === 'offline@example.com');
+    Http::assertSent(fn ($r) => str_contains($r->url(), 'example.test') && $r['event'] === 'enrollment_finalized' && $r['email'] === 'offline@example.com');
 });
 
 it('does not reschedule or double-provision an already-paid enrollment', function () {

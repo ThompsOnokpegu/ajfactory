@@ -84,6 +84,12 @@ These encode real incidents. Changing them will break something that took a whil
   event names; a one-character mismatch fails every send at once.
 - **Stamp a send only on genuine success**, and never swallow a non-2xx. Failures must stay
   unstamped so the next run retries them — that's what makes recovery work at any headcount.
+- **The Meta Purchase is fired twice on purpose and keyed to dedupe.** The browser event on
+  `/thank-you` uses `eventID = payment_reference`; the Conversions API event from the
+  webhook uses `event_id = payment_reference`. Change one side and Meta counts every sale
+  twice. `_fbp`/`_fbc` are exempt from cookie encryption in `bootstrap/app.php` so the
+  checkout can store them - remove that and every server event silently matches worse.
+  Guide sales and the 2nd installment are deliberately NOT Purchases.
 - **Run `npm run build` and commit `public/build`** before pushing UI changes. Hostinger has
   no Node; production serves the committed bundle.
 - **Config is cached in production.** New `.env` values need `php artisan config:cache`.

@@ -64,6 +64,7 @@
       }
     </style>
     @stack('styles')
+    @include('partials.meta-pixel')
 </head>
 <body>
     <div style="position: relative; z-index: 1;">

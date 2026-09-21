@@ -28,6 +28,17 @@
             .badge-pulse { animation: pulse-border 2s infinite; }
             @keyframes pulse-border { 0% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } 50% { border-color: rgba(6, 182, 212, 0.6); box-shadow: 0 0 20px 0 rgba(6, 182, 212, 0.1); } 100% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } }
         </style>
+        {{-- Fully-qualified on purpose: the page's use-statements sit below the head. --}}
+        @include('partials.meta-pixel', [
+            'metaEvent' => 'ViewContent',
+            'metaParams' => [
+                'value' => \App\Support\Accelerator::regularFullPrice('NGN'),
+                'currency' => 'NGN',
+                'content_name' => \App\Support\MetaConversions::CONTENT_NAME,
+                'content_ids' => ['accelerator'],
+                'content_type' => 'product',
+            ],
+        ])
     </head>
     @php
         use App\Support\Accelerator;

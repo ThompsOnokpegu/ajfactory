@@ -11,6 +11,7 @@
         .bg-grid { background-image: linear-gradient(to right, #18181b 1px, transparent 1px), linear-gradient(to bottom, #18181b 1px, transparent 1px); background-size: 40px 40px; }
         .btn-hover-effect:hover { box-shadow: 0 0 20px rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.5); }
     </style>
+    @include('partials.meta-pixel')
 </head>
 @php
     use App\Support\Accelerator;

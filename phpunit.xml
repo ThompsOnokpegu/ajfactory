@@ -39,6 +39,12 @@
         <env name="N8N_WEBHOOK_URL" value="https://n8n.test/webhook/general"/>
         <env name="N8N_ENROLLMENT_WEBHOOK" value="https://n8n.test/webhook/enrollment"/>
         <env name="N8N_INSTALLMENT_WEBHOOK" value="https://n8n.test/webhook/installment"/>
+        <!-- Meta: the pixel partial renders nothing and every Conversions API /
+             audience send is skipped when these are unset, so the same CI trap
+             applies. META_TEST_EVENT_CODE is deliberately NOT pinned. -->
+        <env name="META_PIXEL_ID" value="123456789012345"/>
+        <env name="META_ACCESS_TOKEN" value="test-meta-token"/>
+        <env name="META_AD_ACCOUNT_ID" value="1234567890"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>

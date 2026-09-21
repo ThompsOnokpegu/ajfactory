@@ -15,6 +15,7 @@
         .bg-grid { background-image: linear-gradient(to right, #18181b 1px, transparent 1px), linear-gradient(to bottom, #18181b 1px, transparent 1px); background-size: 44px 44px; }
         .card-hover:hover { border-color: rgba(6,182,212,0.45); box-shadow: 0 0 24px rgba(6,182,212,0.10); }
     </style>
+    @include('partials.meta-pixel')
 </head>
 <body class="bg-zinc-950 text-white font-sans antialiased flex flex-col min-h-screen overflow-x-hidden">
 

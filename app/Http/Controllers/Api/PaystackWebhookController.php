@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Enrollment;
 use App\Models\User;
+use App\Support\MetaConversions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -89,6 +90,15 @@ class PaystackWebhookController extends Controller
 
                             // 3. Dispatch Fulfillment via n8n
                             $this->triggerAutomation($enrollment, $tempPassword);
+
+                            // 4. Meta Purchase (server side), deduplicated against the
+                            //    browser event on /thank-you by event_id = reference.
+                            //    A failure stays unstamped; meta:retry-purchases resends.
+                            app(MetaConversions::class)->purchase($enrollment->fresh(), [
+                                'ip' => $verify->json('data.ip_address'),
+                                'phone' => $verify->json('data.customer.phone'),
+                                'country' => $verify->json('data.authorization.country_code'),
+                            ]);
 
                         } else {
                             Log::error("Security Alert: Amount Mismatch for {$reference}");

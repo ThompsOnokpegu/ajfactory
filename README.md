@@ -98,6 +98,7 @@ app/
                         Lead, Resource, Setting, User
   Support/              Accelerator, Masterclass  (derived state — single source of truth)
                         StudentProvisioner        (account + enrollment + welcome flow)
+                        MetaUserData, MetaConversions, MetaAudiences  (Meta ads: hashing, CAPI, audiences)
 config/
   accelerator.php       pricing, cohort dates, seats — DO NOT hardcode these in Blade
   taab.php              masterclass session, reminder offsets, lead-magnet settings
@@ -119,6 +120,8 @@ docs/                   this documentation + email templates + n8n exports
 | `installments:process` | Sends 2nd-payment links on the due date and suspends overdue balances. Scheduled daily 09:00. |
 | `enroll:user {email} {name} [amount] [currency] [--cohort=]` | Enrolls someone manually (offline/bank transfer) exactly as a verified payment would. `amount` defaults to the configured pay-in-full price for the currency; `currency` defaults to NGN. |
 | `user:admin {email} [--revoke]` | Grants (or revokes) admin rights for an existing user. |
+| `meta:retry-purchases [--dry-run]` | Resends paid enrollments whose Purchase never reached Meta's Conversions API (7-day window). Daily via `meta-sync.yml`. |
+| `meta:sync-audiences [--dry-run] [--list=buyers,leads]` | Pushes hashed buyers + TAAB registrants to Meta Custom Audiences; creates them on first run. Daily via `meta-sync.yml`. |
 
 ## Things that will bite you
 

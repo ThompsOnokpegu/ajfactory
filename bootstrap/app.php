@@ -22,6 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'api/webhooks/vapi', // Exclude Vapi webhook route URI
             'api/webhooks/flutterwave', // Exclude Flutterwave webhook route URI
         ]);
+
+        // Meta's pixel writes _fbp/_fbc itself, unencrypted. EncryptCookies nulls any
+        // cookie it cannot decrypt, so without this exception the checkout would
+        // store null for both and every server-side Purchase would match poorly.
+        // MetaPixelTest guards it.
+        $middleware->encryptCookies(except: ['_fbp', '_fbc']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

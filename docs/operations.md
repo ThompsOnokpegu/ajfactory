@@ -23,6 +23,7 @@ provide):
 - `.github/workflows/scheduler.yml` — `masterclass:remind`, every 15 min.
 - `.github/workflows/installments.yml` — `installments:process`, 3×/day (09/15/21 WAT).
 - `.github/workflows/masterclass-announce.yml` — `masterclass:announce`, daily + manual.
+- `.github/workflows/meta-sync.yml` — `meta:retry-purchases` then `meta:sync-audiences`, daily (04:00 WAT) + manual.
 
 Each command is idempotent, so extra/duplicate ticks are safe.
 
@@ -38,6 +39,7 @@ Consequences you must plan around:
 | **Day-of nudge (T-2h)** | **2 hours** | **No — run it manually** |
 | Post-session follow-up | never closes | Yes, eventually |
 | `installments:process` | all day | Yes — runs 3×/day via `installments.yml` |
+| `meta:retry-purchases` / `meta:sync-audiences` | 7 days / never closes | Yes — a dropped day is absorbed |
 
 > The day-of nudge has silently failed twice. On session morning, run it by hand between
 > **07:00 and 08:30 WAT**. The commands are idempotent — a manual run and a scheduled run
@@ -533,6 +535,74 @@ Tuning lives in `config/reviews.php` (see [configuration.md](configuration.md)) 
 questions, change `snooze_days`, or set a stage's `enabled => false`. If response rate is low,
 reword the questions before adding more asks: `max_dismissals` exists so the app never nags,
 and raising it costs more goodwill than the extra responses are worth.
+
+---
+
+## Meta ads: pixel, Conversions API, audiences
+
+What the app does once configured (see [architecture.md](architecture.md#meta-ads-tracking--metauserdata-metaconversions-metaaudiences)):
+the pixel fires on every public page, both payment webhooks send a server-side Purchase,
+and two hashed customer lists are pushed to Custom Audiences daily. Everything is off
+until `META_PIXEL_ID` is set. Ad account: **Deepr Marketing `act_498587071939022`**,
+business **Deepr Ecommerce `412387622720655`**.
+
+### First-time setup
+
+1. **Create the pixel.** Events Manager → business Deepr Ecommerce → *Connect data
+   sources* → *Web* → name it for ajbuildai.com. Copy the **dataset (pixel) id**.
+2. **Assign it.** Business Settings → *Data sources* → *Datasets* → the new pixel →
+   *Assign partners / people*: add ad account `act_498587071939022` and the System User
+   (Manage). The System User's token needs `ads_management`, and the user must be on the
+   ad account too.
+3. **Verify the domain** (Business Settings → *Brand safety* → *Domains* → ajbuildai.com),
+   then in Events Manager → *Aggregated event measurement* put **Purchase** at the top.
+4. **Server `.env`:** `META_PIXEL_ID`, `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID=498587071939022`.
+   Then `php artisan config:cache` and confirm with
+   `php artisan tinker --execute="echo config('services.meta.pixel_id');"`.
+   (`deploy.sh` already ran the migration that added `enrollments.meta_context`.)
+5. **Prove the pair.** Events Manager → *Test events* → copy the code into
+   `META_TEST_EVENT_CODE`, `config:cache`, then make one real ₦ test purchase. In the test
+   tab you should see **Purchase from Browser and from Server with the same event id**,
+   marked *Deduplicated*. In the DB the enrollment's `meta_context.fbp` is non-null and
+   `meta_purchase_sent_at` is stamped. **Unset the test code and `config:cache` again** -
+   while it is set, real sales land in the test tab.
+6. **Accept the Custom Audience Terms** once for the ad account:
+   `https://business.facebook.com/ads/manage/customaudiences/tos/?act=498587071939022`.
+   Until this is done `meta:sync-audiences` fails with error 200 / subcode 1870090 and
+   prints that link.
+7. **Build the audiences.** `php artisan meta:sync-audiences --dry-run` to see the counts,
+   then without the flag. It creates "AJBuildAI - Accelerator buyers (app sync)" and
+   "AJBuildAI - TAAB masterclass registrants (app sync)" and stores their ids in the
+   `settings` table. Sizes appear in Ads Manager → *Audiences* within ~24 h. Run
+   `meta-sync.yml` once from the Actions tab to confirm the daily job is green.
+8. **Use them.** In Ads Manager create a **Lookalike (Nigeria, 1%)** from the buyers
+   audience for cold campaigns; a **Website** audience "visited `/accelerator` or
+   `/checkout` in the last 30 days, excluding Purchase" for retargeting; and use the TAAB
+   registrants audience for warm retargeting and as an exclusion on cold campaigns.
+
+### Day to day
+
+- **Sanity check the pixel** with the Meta Pixel Helper browser extension: `/accelerator`
+  → PageView + ViewContent; `/checkout` → InitiateCheckout, then AddPaymentInfo when the
+  payment popup opens; `/taab` → PageView, Lead after registering; `/builders` → Lead
+  after joining. There must be **no** pixel on `/dashboard`, `/admin`, `/resume` or inside
+  a paid guide.
+- `php artisan meta:retry-purchases --dry-run` lists any paid enrollment from the last 7
+  days Meta never accepted; without the flag it resends them. Older ones are reported and
+  skipped - those buyers still reach Meta through the audience.
+- Match quality lives in Events Manager → the dataset → *Event match quality*. If it is
+  low, check a recent `enrollments.meta_context` row: a null `fbp` means the cookie
+  exception in `bootstrap/app.php` was lost.
+
+### Troubleshooting
+
+| Symptom | Cause / fix |
+|---|---|
+| Purchase shows **twice** in Events Manager for one sale | The browser `eventID` and the server `event_id` differ. Both must be the payment reference - check `partials/meta-event` on `/thank-you` and `MetaConversions::purchaseEvent()`. |
+| `meta:sync-audiences` fails with "Custom Audience Terms" | Step 6 above. Nothing is stored until it succeeds, so just re-run. |
+| Server Purchases arrive but match poorly / `action_source: other` | `meta_context` is empty. Either the enrollment was created offline (expected) or `_fbp`/`_fbc` are being encrypted away - `MetaPixelTest` covers the exception. |
+| Everything silently stopped after a deploy | `config:cache` ran with a `.env` missing `META_*`. `php artisan tinker --execute="echo config('services.meta.pixel_id');"` |
+| Sales appearing under *Test events*, not the dataset | `META_TEST_EVENT_CODE` is still set. Unset it, `config:cache`. |
 
 ---
 
