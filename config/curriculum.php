@@ -153,9 +153,12 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
             'title' => 'Module 06: WhatsApp Automation',
             'release_at' => '2026-08-03 00:00:00',
             'has_blueprint' => true,
-            'description' => "Building a production-ready WhatsApp bot using Twilio. Topics include:\n\n• Buying a Real Number & Setting up a Sender Profile.\n• Understanding the Meta 24-Hour Session Window & Templates.\n• Configuring Production Webhooks to handle live traffic.",
+            'description' => "Putting your automation on WhatsApp itself, the channel your customers already use. This build goes through the WhatsApp Cloud API directly, with no third party in the middle. We cover:\n\n• The WhatsApp Cloud API - how a Meta developer app sits between the WhatsApp app and your n8n workflow, and what it does for you.\n• The 24-hour window - a customer message opens it, and what you are allowed to send changes the moment it closes.\n• Free-form messages vs pre-approved templates - which one you can send, and when.\n• Utility vs marketing templates - how the category you choose affects both approval and cost.\n• The new charging rule - what Meta bills you for now, and how that changes what an automation costs to run.\n• WhatsApp moving to usernames - what changes for your workflow when a phone number is no longer the handle.\n\nThe original full-length walkthrough, which used Twilio rather than the Cloud API, is included as a legacy reference.",
             'videos' => [
-                ['id' => 'module-05-v1', 'title' => 'WhatsApp Automation', 'video_id' => 'e3c1e139-b0d1-4c84-aa17-97c61710b526', 'duration' => '45:00'],
+                ['id' => 'module-05-v2', 'title' => 'WhatsApp Automation Concepts', 'video_id' => '2cc210d6-a48c-4098-9631-26844f6069bd', 'duration' => '09:39 Mins'],
+                ['id' => 'module-05-v3', 'title' => 'WhatsApp Automation Build', 'video_id' => '8c233147-6c9d-4e0e-bc07-36492b240a4b', 'duration' => '27:25 Mins'],
+                // Kept so students who already completed it keep the tick (completed_lessons keys off the id).
+                ['id' => 'module-05-v1', 'title' => 'LEGACY: WhatsApp Automation', 'video_id' => 'e3c1e139-b0d1-4c84-aa17-97c61710b526', 'duration' => '45:00'],
             ],
         ],
         [
