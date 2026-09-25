@@ -263,6 +263,16 @@ password), upserts the paid `Enrollment`, and fires the n8n welcome flow. Used b
 Paystack/Flutterwave webhooks, the admin manual-enrol form, and `enroll:user`, so an offline
 enrolment behaves exactly like a verified card payment.
 
+`manualEnrol()` picks its row through `rowForManualEnrol()`, **not** `updateOrCreate(['email'
+=> ...])`. That resolves through the same unfiltered `first()` and would write a paid-in-full
+payload over whichever row is oldest - a stale `pending` row, or a returning student's
+previous cohort. The rules: already paid into *this* cohort → reuse that row and refresh only
+`full_name`/`whatsapp`, never the payment reference, amount or `paid_at`; paid into a
+*different* cohort → leave it alone and mint a new row (`currentFor()` then picks the newer
+one); no paid row → reuse their latest unpaid checkout attempt. `ManualEnrolRowTest` covers
+each. Use `approve()` instead when the student's own checkout row should keep its plan and
+balance.
+
 `resendWelcome($enrollment, $issueNewPassword = true)` re-fires that flow for one student.
 Because temp passwords are hashed at creation, **the original cannot be replayed** — a
 re-send issues a new one and resets the account to it.

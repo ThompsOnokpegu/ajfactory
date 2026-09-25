@@ -18,6 +18,12 @@
         </include>
     </source>
     <php>
+        <!-- The suite outgrew PHP's default 128M: a full run died part way with
+             "Allowed memory size exhausted" while every file passed on its own,
+             which reads as a broken test rather than an exhausted runner. Pinned
+             here so a full run behaves the same on a dev box and on CI, whatever
+             the machine's php.ini says. -->
+        <ini name="memory_limit" value="1G"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>

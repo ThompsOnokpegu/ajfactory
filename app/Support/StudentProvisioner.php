@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Enrollment;
 use App\Models\User;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -32,25 +33,36 @@ class StudentProvisioner
         $created = $user->wasRecentlyCreated;
 
         $amount = (float) ($data['amount'] ?? 0);
+        $cohort = (int) ($data['cohort'] ?? config('accelerator.cohort_number', 2));
 
-        $enrollment = Enrollment::updateOrCreate(
-            ['email' => $email],
-            [
-                'full_name'             => $data['name'],
-                'whatsapp'              => $data['whatsapp'] ?? null,
-                'payment_reference'     => 'MAN_' . strtoupper(Str::random(8)),
-                'amount'                => $amount,
-                'amount_total'          => $amount,
-                'balance_due'           => 0,            // manual = paid in full
-                'plan_type'             => $data['plan_type'] ?? 'full',
-                'second_payment_status' => 'none',
-                'cohort'                => (int) ($data['cohort'] ?? config('accelerator.cohort_number', 2)),
-                'currency'              => $data['currency'] ?? 'NGN',
-                'status'                => 'paid',
-                'paid_at'               => now(),
-                'access_suspended'      => false,
-            ],
-        );
+        $enrollment = $this->rowForManualEnrol($email, $cohort);
+
+        $attributes = [
+            'email'                 => $email,
+            'full_name'             => $data['name'],
+            'whatsapp'              => $data['whatsapp'] ?? null,
+            'payment_reference'     => 'MAN_' . strtoupper(Str::random(8)),
+            'amount'                => $amount,
+            'amount_total'          => $amount,
+            'balance_due'           => 0,            // manual = paid in full
+            'plan_type'             => $data['plan_type'] ?? 'full',
+            'second_payment_status' => 'none',
+            'cohort'                => $cohort,
+            'currency'              => $data['currency'] ?? 'NGN',
+            'status'                => 'paid',
+            'paid_at'               => now(),
+            'access_suspended'      => false,
+        ];
+
+        // Re-running a manual enrol for a cohort the student is ALREADY paid into
+        // (a double-submitted form, usually). The row is a real payment record, so
+        // refresh only the details an admin might be correcting - never rewrite the
+        // reference, amount or paid_at over a payment that actually happened.
+        if ($enrollment->exists && $enrollment->status === 'paid') {
+            $attributes = Arr::only($attributes, ['full_name', 'whatsapp']);
+        }
+
+        $enrollment->fill($attributes)->save();
 
         // Only hand out a temp password if we just created the account.
         $this->fireWelcome($enrollment, $created ? $tempPassword : null);
@@ -61,6 +73,46 @@ class StudentProvisioner
         app(MetaConversions::class)->purchase($enrollment->fresh());
 
         return ['enrollment' => $enrollment, 'temp_password' => $created ? $tempPassword : null, 'created' => $created];
+    }
+
+    /**
+     * Which enrollment row should a manual enrolment write to?
+     *
+     * NOT `updateOrCreate(['email' => $email])`. That resolves through an unfiltered
+     * `first()`, so it grabs whichever row is oldest - which for anyone who abandoned
+     * a checkout is a stale `pending` row, and for a returning student is their
+     * PREVIOUS cohort. Writing this payload over either one is destructive: it
+     * rewrites the payment reference, amount and paid_at of a real payment, moves
+     * that row's cohort, and zeroes an installment balance that is still owed.
+     * Moving the cohort is the worse half - it drags a mid-course student onto
+     * another cohort's module-01 date floor.
+     *
+     * So:
+     *   - already paid into THIS cohort -> reuse that row (a re-run; the caller
+     *     keeps its payment fields intact rather than minting a duplicate),
+     *   - paid into a DIFFERENT cohort -> a previous enrolment. Leave it alone and
+     *     mint a new row; `Enrollment::currentFor()` will pick the newer one,
+     *   - no paid row at all -> reuse their latest unpaid checkout attempt. They've
+     *     now paid, so converting it is right, and it stops the abandoned-cart
+     *     segment chasing someone who already bought.
+     */
+    private function rowForManualEnrol(string $email, int $cohort): Enrollment
+    {
+        $paidThisCohort = Enrollment::where('email', $email)
+            ->where('status', 'paid')
+            ->where('cohort', $cohort)
+            ->orderByDesc('id')
+            ->first();
+
+        if ($paidThisCohort) {
+            return $paidThisCohort;
+        }
+
+        if (Enrollment::where('email', $email)->where('status', 'paid')->exists()) {
+            return new Enrollment();
+        }
+
+        return Enrollment::where('email', $email)->orderByDesc('id')->first() ?? new Enrollment();
     }
 
     /**

@@ -130,7 +130,10 @@ These encode real incidents. Changing them will break something that took a whil
   one. Access was granted on the paid row while the dashboard read and wrote progress against
   the pending one, so approved checkpoints attached to a row `/admin/progress` cannot see and
   students who had shipped several modules showed 0/9. `enrollments:reconcile` repairs split
-  rows; `EnrollmentResolutionTest` guards it.
+  rows; `EnrollmentResolutionTest` guards it. The same trap applies to writes:
+  `updateOrCreate(['email' => ...])` resolves the same way, which is why
+  `StudentProvisioner::manualEnrol` picks its row explicitly and never rewrites the payment
+  reference, amount or cohort of a row that is already paid.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 
