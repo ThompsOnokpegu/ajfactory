@@ -96,6 +96,18 @@ return [
         ],
     ],
 
+    /*
+    | Accounts that are not real students - the owner's own test enrollment, staff
+    | accounts. Excluded from the cohort leaderboard AND the admin progress screen,
+    | so they never take a rank, skew the counts, or appear to classmates.
+    |
+    | Matched case-insensitively on the enrollment email. Keep it here rather than
+    | hardcoded in App\Support\Progress so adding one is a config change.
+    */
+    'progress_excluded_emails' => [
+        'tommyriode@gmail.com',   // AJ's own account, used for testing the dashboard
+    ],
+
     // --- Scarcity / cohort ---
     'cohort_number'     => 3,     // stamped on new enrollments; >= 2 enables ship-to-unlock
     // Raised 25 -> 30 on 25 Aug 2026, deliberately BEFORE the Cohort 3 list campaign

@@ -258,6 +258,14 @@ charged `amount` is already the discounted figure the webhook verifies.
   `playbook_url` must be **unset** when there's no playbook: any non-empty value (including a
   `{{TODO}}` placeholder) renders a live button and ships students a dead link.
 
+### Progress & leaderboard
+- `accelerator.php` → `progress_excluded_emails` — accounts that are not real students (the
+  owner's own test enrollment, staff). Matched **case-insensitively** on the enrollment email
+  and dropped from `App\Support\Progress` entirely, so they appear on neither the student
+  leaderboard nor `/admin/progress`, and ranks stay contiguous rather than skipping a number.
+  Excluding from `forCohort()` rather than only from the board is deliberate: a test account
+  that still counted toward the ranks would push every real student down one.
+
 ### Curriculum ordering (`config/curriculum.php`)
 Students see modules in **array order**; ship-to-unlock chains each module to the previous
 one in that array. The number in `title` is display text and nothing reads it.

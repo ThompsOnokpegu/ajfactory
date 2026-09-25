@@ -6,6 +6,7 @@ use App\Models\Checkpoint;
 use App\Models\Enrollment;
 use App\Models\LiveAttendance;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Per-student progress and the cohort leaderboard.
@@ -61,6 +62,9 @@ class Progress
      * (behind on an installment) DO appear - they're still enrolled, and quietly deleting
      * someone from the board over a late payment is a worse message than the payment nudge.
      *
+     * Accounts listed in `accelerator.progress_excluded_emails` are dropped entirely -
+     * the owner's own test enrollment would otherwise take a rank in front of students.
+     *
      * @return Collection<int, array{enrollment_id:int, name:string, display_name:string, approved:int, live:int, lessons:int, last_approved_at:?\Illuminate\Support\Carbon, rank:int}>
      */
     public static function forCohort(int $cohort): Collection
@@ -70,6 +74,9 @@ class Progress
         $enrollments = Enrollment::query()
             ->where('cohort', $cohort)
             ->where('status', 'paid')
+            ->when(self::excludedEmails() !== [], fn ($q) => $q->whereNotIn(
+                DB::raw('LOWER(email)'), self::excludedEmails()
+            ))
             ->get(['id', 'full_name', 'email', 'cohort', 'completed_lessons']);
 
         if ($enrollments->isEmpty()) {
@@ -154,6 +161,22 @@ class Progress
             'you'   => $enrollmentId ? $rows->firstWhere('enrollment_id', $enrollmentId) : null,
             'total' => $rows->count(),
         ];
+    }
+
+    /**
+     * Emails that are not real students (the owner's test account, staff), lowercased.
+     * Excluded from every ranked view so they never take a rank or skew a count.
+     *
+     * @return array<int, string>
+     */
+    public static function excludedEmails(): array
+    {
+        return collect(config('accelerator.progress_excluded_emails', []))
+            ->map(fn ($e) => mb_strtolower(trim((string) $e)))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
