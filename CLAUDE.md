@@ -123,6 +123,14 @@ These encode real incidents. Changing them will break something that took a whil
   `purchasable_paths` is what money actually buys, and a buyer gets only those. Adding the
   capstone brief to `gated_paths` alone made a guide sale hand over course content, because
   any gated path used to unlock every gated path. Course material is gated, never sold.
+- **Resolve a signed-in student with `Enrollment::currentFor($email)`, never
+  `where('email', ...)->first()`.** Checkout writes a new `pending` enrollment row on every
+  attempt and only the row matching the payment reference is flipped to `paid`, so a student
+  who abandoned one checkout owns an older pending row. An unfiltered `first()` returns that
+  one. Access was granted on the paid row while the dashboard read and wrote progress against
+  the pending one, so approved checkpoints attached to a row `/admin/progress` cannot see and
+  students who had shipped several modules showed 0/9. `enrollments:reconcile` repairs split
+  rows; `EnrollmentResolutionTest` guards it.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 

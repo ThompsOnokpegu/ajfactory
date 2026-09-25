@@ -61,6 +61,19 @@ captured from the buyer's own request at checkout) and `meta_purchase_sent_at` (
 only when Meta's Conversions API accepted the Purchase; null = still to send, which
 `meta:retry-purchases` keys off). See **Meta ads tracking** under section 3.
 
+**A student can hold several enrollment rows, and only one of them is current.** Checkout
+writes a fresh `pending` row on every attempt; the webhook flips only the row matching that
+payment reference to `paid`. Always resolve a signed-in student with
+**`Enrollment::currentFor($email)`** (paid, most recently paid first) - never
+`Enrollment::where('email', ...)->first()`, which returns whichever row is oldest and is
+usually an abandoned checkout.
+
+That mismatch was a real bug: access was granted on the paid row while the dashboard read and
+wrote progress against the pending one, so approved checkpoints landed on a row
+`/admin/progress` could not see and students who had shipped several modules showed 0/9.
+`enrollments:reconcile` repairs rows written before the fix; `EnrollmentResolutionTest`
+guards both halves.
+
 ### `Resource` / `ResourcePurchase`
 `Resource` powers `/free` — a link the owner pastes (managed in Admin → Resources). A
 `price` makes it **paid**: its `url` is gated, and `/r/{id}` redirects to checkout instead of

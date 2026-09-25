@@ -68,9 +68,7 @@ class GuideAccess
         }
 
         if ($user) {
-            $enrollment = Enrollment::where('email', $user->email)
-                ->where('status', 'paid')
-                ->first();
+            $enrollment = Enrollment::currentFor($user->email);
 
             // Mirrors CheckEnrollment: paid, and not paused for an overdue balance.
             if ($enrollment && ! $enrollment->access_suspended) {

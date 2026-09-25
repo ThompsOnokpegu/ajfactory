@@ -20,9 +20,9 @@ class CheckEnrollment
             return $next($request);
         }
 
-        $enrollment = Enrollment::where('email', auth()->user()->email)
-            ->where('status', 'paid')
-            ->first();
+        // Same resolver as the dashboard, so the row that grants access is the row
+        // progress is read from. They used to disagree - see Enrollment::currentFor.
+        $enrollment = Enrollment::currentFor(auth()->user()->email);
 
         if (!$enrollment) {
             return redirect('/checkout')->with('error', 'Please complete your enrollment to access the terminal.');

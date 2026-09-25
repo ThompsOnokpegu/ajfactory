@@ -95,7 +95,7 @@ $resolveReviewPrompt = function () {
         return;
     }
 
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
     if (! $enrollment) {
         return;
     }
@@ -128,7 +128,7 @@ $resolveReviewPrompt = function () {
 
 // Load this student's progress + checkpoint state from the DB.
 $loadProgress = function () {
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
 
     $this->completedLessons = is_array($enrollment?->completed_lessons) ? $enrollment->completed_lessons : [];
     $this->shipToUnlock = $enrollment ? $enrollment->usesShipToUnlock() : false;
@@ -333,7 +333,7 @@ $selectVideo = function ($sIndex, $mIndex, $vIndex) {
 $toggleComplete = function ($videoId) {
     if ($this->isLocked) return;
 
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
     if (!$enrollment) return;
 
     $completed = collect($this->completedLessons);
@@ -360,7 +360,7 @@ $submitCheckpoint = function () {
 
     $this->validate(['proofUrl' => 'required|url|max:2048']);
 
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
     if (!$enrollment) return;
 
     Checkpoint::updateOrCreate(
@@ -381,7 +381,7 @@ $submitCheckpoint = function () {
  * stamp and raises a fresh notice on its own.
  */
 $dismissReviewNotices = function () {
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
     if (! $enrollment) return;
 
     $enrollment->checkpoints()->unseenReview()->update(['student_seen_at' => now()]);
@@ -423,7 +423,7 @@ $markAttendance = function () {
         return;
     }
 
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
     if (!$enrollment) return;
 
     LiveAttendance::firstOrCreate(
@@ -466,7 +466,7 @@ $submitReview = function () {
 
     $this->validate($rules, $messages);
 
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
     if (! $enrollment) return;
 
     // Store only the keys this stage actually asked about.
@@ -506,7 +506,7 @@ $dismissReview = function () {
     $stage = $this->reviewPrompt;
     if (! $stage) return;
 
-    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
     if (! $enrollment) return;
 
     $row = StudentReview::firstOrNew([

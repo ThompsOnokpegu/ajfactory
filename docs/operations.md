@@ -476,6 +476,42 @@ patterns worth acting on -
 - **High lesson count, zero approvals** — they're watching, not building. Lesson ticks are
   self-marked, so that gap is the whole signal.
 
+### A student's progress reads 0 when they have clearly shipped
+
+Their progress is attached to the wrong enrollment row.
+
+Checkout writes a **new `pending` enrollment on every attempt**, and the webhook flips only
+the row matching that payment reference to `paid`. So a student who abandoned one checkout
+before completing it owns two rows, and the older one is `pending`. The dashboard used to
+resolve the student with an unfiltered `->first()`, which returns that older row - so their
+checkpoints, lesson ticks and live attendance were written against a row `/admin/progress`
+(paid rows only) cannot see.
+
+`Enrollment::currentFor()` fixed the read path. To repair rows already written:
+
+```bash
+php artisan enrollments:reconcile --dry-run    # show what would move
+php artisan enrollments:reconcile              # apply
+php artisan enrollments:reconcile --email=someone@example.com   # one student
+```
+
+It moves checkpoints, live attendance and lesson ticks onto the student's current paid row,
+keeping the better checkpoint when both rows hold one for the same module (approved beats
+submitted beats rejected). It is idempotent, and it **never deletes an enrollment row** -
+pending rows are the abandoned-cart segment the launch playbook sells to.
+
+To see who is affected before running anything:
+
+```sql
+SELECT e.email, COUNT(DISTINCT e.id) rows_held,
+       SUM(e.status = 'paid') paid_rows,
+       (SELECT COUNT(*) FROM checkpoints c
+         WHERE c.enrollment_id IN (SELECT id FROM enrollments x WHERE x.email = e.email AND x.status <> 'paid')) orphaned_checkpoints
+FROM enrollments e
+GROUP BY e.email
+HAVING rows_held > 1 AND orphaned_checkpoints > 0;
+```
+
 ### Selling a written guide
 
 The guides are gated by default and free to Accelerator students. To sell one to
@@ -680,6 +716,7 @@ The user must already exist.
 | Nobody is being asked for a review | Checkpoints not approved yet (that's the trigger), stage `after_module` id doesn't match `curriculum.php`, or the cohort is legacy Cohort 1 |
 | Student says they weren't told their proof was approved | They dismissed the banner, or it was approved before this feature shipped (the migration marked those seen). The status is still on the module's checkpoint panel |
 | Leaderboard looks empty or wrong | It's Cohort 2+ only, and counts **approved core** checkpoints — a cohort where nothing has been approved yet shows everyone on zero |
+| A student shows 0 shipped but has clearly shipped | Progress attached to an older `pending` enrollment row — run `enrollments:reconcile` (see above) |
 | Waitlisters got nothing | They're `students`, not registrations — invite them with `masterclass:announce` (they register themselves) |
 | Follow-up can't reach last edition | `taab.masterclass.date` already moved on |
 | Student can't log in after paying | Re-send welcome from admin (issues a new temp password) |

@@ -62,6 +62,37 @@ class Enrollment extends Model
         'meta_purchase_sent_at' => 'datetime',
     ];
 
+    /**
+     * THE enrollment row for a signed-in student. Use this everywhere - never
+     * `Enrollment::where('email', ...)->first()`.
+     *
+     * A student accumulates rows: checkout writes a fresh `pending` row on every
+     * attempt and only the one matching the payment reference is flipped to `paid`,
+     * so anyone who abandoned a checkout once has an old pending row sitting in
+     * front of their real one. An unfiltered `first()` returns that old row.
+     *
+     * That is exactly what went wrong: access was granted on the paid row (see
+     * CheckEnrollment) while the dashboard read and wrote progress against the
+     * pending one, so approved checkpoints were attached to a row the admin
+     * progress screen - which counts paid rows only - could not see. Students who
+     * had shipped several modules showed 0/9.
+     *
+     * Paid only, most recently paid first, so a returning student who re-enrolled
+     * lands on their CURRENT cohort rather than the one they finished.
+     */
+    public static function currentFor(?string $email): ?self
+    {
+        if (! $email) {
+            return null;
+        }
+
+        return static::where('email', $email)
+            ->where('status', 'paid')
+            ->orderByDesc('paid_at')
+            ->orderByDesc('id')
+            ->first();
+    }
+
     public function checkpoints(): HasMany
     {
         return $this->hasMany(Checkpoint::class);
