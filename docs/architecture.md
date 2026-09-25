@@ -117,6 +117,22 @@ mid-course Cohort 2 student was instantly locked out of module 01, approved chec
 all. `ShipToUnlockTest` covers both directions - the current cohort still gets its floor, and
 an earlier cohort never does.
 
+**`student_seen_at` — telling the student, without them asking.** A checkpoint counts as
+unseen news when `reviewed_at IS NOT NULL AND (student_seen_at IS NULL OR student_seen_at <
+reviewed_at)`. The dashboard raises a banner for every such row (`Checkpoint::scopeUnseenReview`),
+and dismissing stamps `student_seen_at = now()`.
+
+It compares two timestamps rather than setting a boolean because a checkpoint gets reviewed
+more than once: reject → resubmit → approve pushes `reviewed_at` past the old stamp, so the
+approval announces itself even though the student had already dismissed the rejection. A
+boolean would need clearing by hand at every re-review, and the one that got missed would be
+silent.
+
+Before this existed, the only signal was the status inside that module's panel, so students
+asked in Telegram whether they'd been approved. The migration backfills `student_seen_at =
+reviewed_at` for every existing row — without it, every Cohort 2 and 3 student would log in
+after the deploy to a pile of banners for approvals they were told about weeks ago.
+
 ### `Student` — the lead table
 Every lead lands here regardless of source, deduplicated by email. Two fields carry the
 segmentation:
@@ -238,6 +254,29 @@ enrolment behaves exactly like a verified card payment.
 Because temp passwords are hashed at creation, **the original cannot be replayed** — a
 re-send issues a new one and resets the account to it.
 
+### `App\Support\Progress`
+Per-student progress and the cohort leaderboard, read by both the student dashboard and
+`/admin/progress` so the two can never disagree about who is ahead.
+
+`forCohort($n)` returns every **paid** enrollment in that cohort, ranked:
+
+1. most **approved core checkpoints** — how far they've actually shipped,
+2. most **live sessions attended** — tiebreak on showing up,
+3. **earliest last approval** — of two students on the same count, whoever got there first
+   ranks higher, so the board rewards pace rather than just arrival.
+
+Only verified work is ranked. `completed_lessons` is displayed (it's useful to spot someone
+watching but not building) but never ranked, because those ticks are self-marked — a student
+can click the whole course in a minute.
+
+Two exclusions are deliberate: `status = 'paid'` keeps abandoned checkouts off a board their
+cohort can see, and suspended students (behind on an installment) **stay on** it — dropping
+someone over a late payment says something worse than the payment reminder does.
+
+`leaderboardFor($cohort, $enrollmentId, $topN)` returns `top`, the viewer's own `you` row
+(null when they aren't a paid member of that cohort), and the cohort `total`. `displayName()`
+renders "Chidi Okonkwo" as "Chidi O." — the dashboard never publishes full names or emails.
+
 ### Meta ads tracking — `MetaUserData`, `MetaConversions`, `MetaAudiences`
 Three classes, one job each:
 
@@ -300,6 +339,8 @@ installment balance is overdue** (`access_suspended`) — that's how the install
 enforced.
 
 ### Admin — `auth` + `admin`
+`/admin/progress` — per-student progress for a cohort, ranked (see `App\Support\Progress`).
+
 `/admin` (overview) · `/enrollments` · `/checkpoints` · `/masterclass` · `/leads` ·
 `/resources`, plus CSV exports for masterclass and leads.
 

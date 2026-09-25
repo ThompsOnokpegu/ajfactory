@@ -31,6 +31,8 @@ state([
     'telegramUrl' => '',           // group-level fallback link
     'telegramThreads' => [],       // module_id => per-module #help thread (questions)
     'telegramWinsUrl' => '',       // #wins thread — where build proof / checkpoints go
+    'reviewNotices' => [],         // checkpoints reviewed since the student last acknowledged them
+    'leaderboard' => ['top' => [], 'you' => null, 'total' => 0], // cohort board, Cohort 2+ only
     'liveAttendance' => [],        // session_key[] the student has marked attendance for
     'attendanceCode' => '',        // bound to the live-attendance form
     'balanceNotice' => null,       // installment balance reminder shown from 3 days before due
@@ -138,7 +140,57 @@ $loadProgress = function () {
     ])->all();
     $this->approvedModuleIds = $cps->where('status', 'approved')->pluck('module_id')->all();
 
+    /*
+     * Review notices - the whole point of this panel is that a student should never
+     * have to ask in Telegram whether their proof was approved. Anything reviewed
+     * since they last acknowledged it shows as a banner at the top of the dashboard.
+     * Rejections matter as much as approvals: that's the student who is sitting still
+     * because nobody told them to resubmit.
+     */
+    $moduleTitles = collect(config('curriculum.core', []))
+        ->merge(config('curriculum.live', []))
+        ->mapWithKeys(fn ($m) => [$m['id'] => $m['title']])
+        ->all();
+
+    $this->reviewNotices = $cps
+        ->filter(fn ($c) => $c->isUnseenReview())
+        ->sortBy('reviewed_at')
+        ->map(fn ($c) => [
+            'module_id' => $c->module_id,
+            'title'     => $moduleTitles[$c->module_id] ?? $c->module_id,
+            'status'    => $c->status,
+            'note'      => $c->note,
+        ])
+        ->values()
+        ->all();
+
     $this->liveAttendance = $enrollment ? $enrollment->liveAttendances()->pluck('session_key')->all() : [];
+
+    /*
+     * Cohort leaderboard. Cohort 2+ only: Cohort 1 is legacy/open with no checkpoints,
+     * so there is nothing to rank and a board of zeroes helps nobody.
+     *
+     * Flattened to scalars on purpose - Livewire serializes this state to the browser,
+     * so it carries display names and counts and nothing else. No emails, no row ids.
+     */
+    $this->leaderboard = ['top' => [], 'you' => null, 'total' => 0];
+    if ($enrollment && $this->shipToUnlock) {
+        $board = \App\Support\Progress::leaderboardFor((int) $enrollment->cohort, $enrollment->id);
+
+        $row = fn (array $r) => [
+            'rank'     => $r['rank'],
+            'name'     => $r['display_name'],
+            'approved' => $r['approved'],
+            'live'     => $r['live'],
+            'is_you'   => $r['enrollment_id'] === $enrollment->id,
+        ];
+
+        $this->leaderboard = [
+            'top'   => $board['top']->map($row)->values()->all(),
+            'you'   => $board['you'] ? $row($board['you']) : null,
+            'total' => $board['total'],
+        ];
+    }
 
     // Installment balance reminder — surfaces from 3 days before the due date,
     // while the student still has access (suspended students never reach here).
@@ -319,6 +371,36 @@ $submitCheckpoint = function () {
     $this->loadProgress();
     $this->rebuildGate();
     $this->applyActiveLock();
+};
+
+/*
+ * Acknowledge every outstanding review notice.
+ *
+ * Stamps student_seen_at = now() so the banner clears and stays cleared. A LATER
+ * review of the same checkpoint (resubmit -> approve) pushes reviewed_at past this
+ * stamp and raises a fresh notice on its own.
+ */
+$dismissReviewNotices = function () {
+    $enrollment = Enrollment::where('email', auth()->user()->email)->first();
+    if (! $enrollment) return;
+
+    $enrollment->checkpoints()->unseenReview()->update(['student_seen_at' => now()]);
+
+    $this->reviewNotices = [];
+};
+
+// Jump to the module a notice refers to, and clear the notices on the way.
+$openReviewNotice = function ($moduleId) {
+    $this->dismissReviewNotices();
+
+    foreach ($this->curriculum as $sIndex => $section) {
+        foreach ($section['modules'] as $mIndex => $module) {
+            if (($module['id'] ?? null) === $moduleId) {
+                $this->selectVideo($sIndex, $mIndex, 0);
+                return;
+            }
+        }
+    }
 };
 
 // Live sessions: mark attendance by entering the code AJ announces at the end of
@@ -651,6 +733,9 @@ $dismissReview = function () {
                     </div>
                 @endif
 
+                {{-- CHECKPOINT REVIEW NOTICES: "your proof was approved / needs another look" --}}
+                @include('livewire.dashboard.partials.review-notices')
+
                 <!-- DYNAMIC PLAYER AREA -->
                 <div class="relative w-full bg-black border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl"
                      style="padding-bottom: 56.25%;"
@@ -814,6 +899,9 @@ $dismissReview = function () {
                         @endif
                     </div>
                 </div>
+
+                {{-- COHORT LEADERBOARD --}}
+                @include('livewire.dashboard.partials.leaderboard')
 
                 {{-- SNIPPETS: prompts / code shared for this module --}}
                 @include('livewire.dashboard.partials.snippets')

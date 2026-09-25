@@ -455,6 +455,27 @@ code `PLAYBOOK`, which anyone could have guessed straight into the completion gu
 [configuration.md](configuration.md). Sessions that ran before a cohort started, or that had
 no `attendance_code`, can never be credited, and there's no retroactive fix.
 
+### Reviewing proof (and what the student sees)
+
+Approve or reject at `/admin/checkpoints`. Either way the student gets a banner at the top of
+their dashboard next time they open it — "Checkpoint approved, the next module is unlocked",
+or "needs another look" with your rejection note. **Write the rejection note as if they will
+read it on its own, because that is exactly what happens.**
+
+You do not need to tell them on Telegram. That was the old workflow, and it's the reason this
+exists: before the banner, the only signal was a status buried in that module's panel, so
+students asked in the group instead.
+
+The banner clears when they dismiss it. A later review of the same checkpoint (they resubmit,
+you approve) raises a fresh one on its own.
+
+`/admin/progress` is the companion view: who has shipped what, ranked, per cohort. Two
+patterns worth acting on -
+
+- **`0/N` shipped, several weeks in** — they've stalled. That's the call to make.
+- **High lesson count, zero approvals** — they're watching, not building. Lesson ticks are
+  self-marked, so that gap is the whole signal.
+
 ### Selling a written guide
 
 The guides are gated by default and free to Accelerator students. To sell one to
@@ -635,7 +656,8 @@ before committing it.
 |---|---|
 | **Overview** | KPIs + the registration Open/Paused switch |
 | **Enrollments** | All students. Approve a pending offline payment, suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol; per-student live-attendance count |
-| **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module |
+| **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module. The student is told on their dashboard automatically; you don't need to message them |
+| **Progress** | Per-student progress for a cohort, ranked the same way students see it: approved checkpoints, then live sessions attended. Spot who has stalled (`0/N` shipped) and who is watching without building (high lessons, zero approvals) |
 | **Reviews** | Staged in-course feedback. **Quotable** = consented + happy, safe for marketing (credit line shown per row). **Needs a call** = rated ≤ 3, reach out, never publish |
 | **Snippets** | Prompts / code / JSON students copy from their dashboard. Pin one to a module, or leave the module blank to show it on every module. New snippets publish immediately; **Publish** toggles a draft. Editing never silently republishes a draft |
 | **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |
@@ -656,6 +678,8 @@ The user must already exist.
 | All sends fail with HTTP 500 | n8n Switch matches no branch — check the exact `type` string |
 | A touch never fired at all | GitHub Actions cron gap — just run the command manually |
 | Nobody is being asked for a review | Checkpoints not approved yet (that's the trigger), stage `after_module` id doesn't match `curriculum.php`, or the cohort is legacy Cohort 1 |
+| Student says they weren't told their proof was approved | They dismissed the banner, or it was approved before this feature shipped (the migration marked those seen). The status is still on the module's checkpoint panel |
+| Leaderboard looks empty or wrong | It's Cohort 2+ only, and counts **approved core** checkpoints — a cohort where nothing has been approved yet shows everyone on zero |
 | Waitlisters got nothing | They're `students`, not registrations — invite them with `masterclass:announce` (they register themselves) |
 | Follow-up can't reach last edition | `taab.masterclass.date` already moved on |
 | Student can't log in after paying | Re-send welcome from admin (issues a new temp password) |
