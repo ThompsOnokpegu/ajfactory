@@ -247,7 +247,7 @@
                 </div>
             </section>
 
-            {{-- 3.5 PROOF — live since 25 Aug 2026 (three real Cohort 2 reviews in
+            {{-- 3.5 PROOF — live since 25 Aug 2026 (six real reviews, Cohorts 2 and 3, in
                  config('accelerator.testimonials')). The @else branch below is a graceful
                  empty state, so this block is safe to leave enabled even if the array is
                  ever emptied — it degrades to a CTA rather than to fabricated proof. --}}

@@ -276,5 +276,46 @@ return [
             'photo' => '',
             'is_published' => true,
         ],
+        [
+            // Cohort 3, first-win stage. Answers the objection this audience actually
+            // has - "can I, a beginner, do this at all?" - and answers it with the
+            // moment the doubt broke. From her "what were you unsure about" answer,
+            // whole and unedited.
+            'name' => 'Tolulope O Ogunsola',
+            'role' => 'Cohort 3',
+            'quote' => "I wasn't completely sure I could do it at first, but after going through the first module and seeing how simplified and practical AJ made the course, it sparked a strong desire in me to see it through to the end.",
+            'photo' => '',
+            'is_published' => true,
+        ],
+        [
+            // CREDIT IS ANONYMOUS BY HER CHOICE. The admin review shows her credit line
+            // as "Accelerator student, Cohort 3", so her name must not appear here -
+            // she consented to the quote, not to the byline.
+            //
+            // Chosen because it defends ship-to-unlock from the student side. "Figure it
+            // out yourself, ask when stuck" is the part of the method that could read as
+            // friction on a sales page; a student calling it a great way to learn
+            // answers that before it's asked. Trailing "Thank you." dropped - it's
+            // addressed to AJ, not to a reader.
+            'name' => 'Accelerator student',
+            'role' => 'Cohort 3',
+            'quote' => 'The learning method. Figuring it out ourselves and asking questions when we get stuck. I must say, it is a great way of learning.',
+            'photo' => '',
+            'is_published' => true,
+        ],
+        [
+            // The "is this just another YouTube tutorial?" objection, asked and answered
+            // in his own words. Left in his own plain phrasing like James A. above -
+            // only the two standalone "i"s were capitalised, nothing reworded.
+            //
+            // NOT his Module 1 answer, which says he could already build the intake
+            // funnel before joining. True, and fine in a review, but as public proof it
+            // reads as "module 1 taught me nothing new".
+            'name' => 'Soremekun',
+            'role' => 'Cohort 3',
+            'quote' => 'Would it be different from every other tutorial I have watched online and yeah I have gotten my answers... It is different.',
+            'photo' => '',
+            'is_published' => true,
+        ],
     ],
 ];
