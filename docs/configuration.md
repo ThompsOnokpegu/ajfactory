@@ -76,7 +76,7 @@ success callback.
 |---|---|
 | `META_PIXEL_ID` | The dataset/pixel id from Events Manager. The only Meta value that reaches Blade. **Unset = the pixel partial renders nothing and every server-side Purchase is skipped with a warning.** |
 | `META_ACCESS_TOKEN` | System User token with `ads_management`, the pixel and the ad account assigned to it. Server-side only. Unset = Conversions API and audience sync both skip. |
-| `META_AD_ACCOUNT_ID` | Digits only, no `act_` prefix (Deepr Marketing is `498587071939022`). Unset = audience sync skips. |
+| `META_AD_ACCOUNT_ID` | Digits only, no `act_` prefix (Deepr is `644708242748910`). Unset = audience sync skips. |
 | `META_TEST_EVENT_CODE` | From Events Manager → Test events. Set it ONLY while verifying, then unset and `config:cache` again - while it is set every Purchase lands in the test tab, not the real dataset. |
 | `META_API_VERSION` | Graph API version, default `v25.0`. Meta retires versions roughly two years after release. |
 

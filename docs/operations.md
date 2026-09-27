@@ -600,20 +600,26 @@ and raising it costs more goodwill than the extra responses are worth.
 What the app does once configured (see [architecture.md](architecture.md#meta-ads-tracking--metauserdata-metaconversions-metaaudiences)):
 the pixel fires on every public page, both payment webhooks send a server-side Purchase,
 and two hashed customer lists are pushed to Custom Audiences daily. Everything is off
-until `META_PIXEL_ID` is set. Ad account: **Deepr Marketing `act_498587071939022`**,
+until `META_PIXEL_ID` is set. Ad account: **Deepr `act_644708242748910`**,
 business **Deepr Ecommerce `412387622720655`**.
+
+> The pixel, the Conversions API and the audience sync all work on an account with no
+> billing set up - only *running* ads needs a payment method. As of 27 Sep 2026 this
+> account has none, so add one before trying to publish a campaign. Note also that the
+> Custom Audience Terms (step 6) are accepted **per ad account**: moving to a different
+> account means accepting them again there.
 
 ### First-time setup
 
 1. **Create the pixel.** Events Manager → business Deepr Ecommerce → *Connect data
    sources* → *Web* → name it for ajbuildai.com. Copy the **dataset (pixel) id**.
 2. **Assign it.** Business Settings → *Data sources* → *Datasets* → the new pixel →
-   *Assign partners / people*: add ad account `act_498587071939022` and the System User
+   *Assign partners / people*: add ad account `act_644708242748910` and the System User
    (Manage). The System User's token needs `ads_management`, and the user must be on the
    ad account too.
 3. **Verify the domain** (Business Settings → *Brand safety* → *Domains* → ajbuildai.com),
    then in Events Manager → *Aggregated event measurement* put **Purchase** at the top.
-4. **Server `.env`:** `META_PIXEL_ID`, `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID=498587071939022`.
+4. **Server `.env`:** `META_PIXEL_ID`, `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID=644708242748910`.
    Then `php artisan config:cache` and confirm with
    `php artisan tinker --execute="echo config('services.meta.pixel_id');"`.
    (`deploy.sh` already ran the migration that added `enrollments.meta_context`.)
@@ -624,7 +630,7 @@ business **Deepr Ecommerce `412387622720655`**.
    `meta_purchase_sent_at` is stamped. **Unset the test code and `config:cache` again** -
    while it is set, real sales land in the test tab.
 6. **Accept the Custom Audience Terms** once for the ad account:
-   `https://business.facebook.com/ads/manage/customaudiences/tos/?act=498587071939022`.
+   `https://business.facebook.com/ads/manage/customaudiences/tos/?act=644708242748910`.
    Until this is done `meta:sync-audiences` fails with error 200 / subcode 1870090 and
    prints that link.
 7. **Build the audiences.** `php artisan meta:sync-audiences --dry-run` to see the counts,
