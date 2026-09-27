@@ -94,6 +94,25 @@ return [
             'expires_at' => '2026-09-14 23:59:59',    // extended 13 Sep from end of masterclass day (Sat 12 Sep) to cart close (Mon 14 Sep), Africa/Lagos
             'label' => 'TAAB masterclass offer',
         ],
+
+        // ---------------------------------------------------------------------
+        // TEMPORARY - Meta Conversions API dedup test. DELETE AFTER USE.
+        // Added 27 Sep 2026 so one live checkout can prove the browser Purchase and
+        // the server Purchase arrive under a single event id, without putting a full
+        // ticket through the gateway.
+        //
+        // NGN ONLY ON PURPOSE: a 'flat' coupon with no entry for a currency gives no
+        // discount at all (see Accelerator::couponDiscount), so if this code leaks to
+        // a USD/GHS/KES/ZAR buyer they pay FULL price rather than the equivalent of
+        // $1. The short expiry means it self-disables even if nobody removes it.
+        'MTEST9F42K' => [
+            'type' => 'flat',
+            'value' => ['NGN' => 1000],
+            'plans' => ['full'],                      // never installment
+            'expires_at' => '2026-09-28 23:59:59',    // Africa/Lagos - end of Mon 28 Sep
+            'label' => 'Internal test',
+        ],
+        // ---------------------------------------------------------------------
     ],
 
     /*
