@@ -370,7 +370,7 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
             'release_at' => '2026-09-26 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set a FRESH code before Sat 26 Sep
+            'attendance_code' => 'MARLIN-834', // ← announced at the END of the call. Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-12-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
