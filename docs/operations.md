@@ -23,7 +23,7 @@ provide):
 - `.github/workflows/scheduler.yml` — `masterclass:remind`, every 15 min.
 - `.github/workflows/installments.yml` — `installments:process`, 3×/day (09/15/21 WAT).
 - `.github/workflows/masterclass-announce.yml` — `masterclass:announce`, daily + manual.
-- `.github/workflows/meta-sync.yml` — `meta:retry-purchases` then `meta:sync-audiences`, daily (04:00 WAT) + manual.
+- `.github/workflows/meta-sync.yml` — `meta:retry-purchases` then `meta:sync-audiences`, daily + manual. Asks for 04:00 WAT; **observed firing ~09:00-09:50 WAT** every day 23-27 Sep 2026. GitHub defers on-the-hour crons hard. Harmless for these two (7-day window / no window), but don't plan around 04:00.
 
 Each command is idempotent, so extra/duplicate ticks are safe.
 
@@ -639,8 +639,9 @@ business **Deepr Ecommerce `412387622720655`**.
 7. **Build the audiences.** `php artisan meta:sync-audiences --dry-run` to see the counts,
    then without the flag. It creates "AJBuildAI - Accelerator buyers (app sync)" and
    "AJBuildAI - TAAB masterclass registrants (app sync)" and stores their ids in the
-   `settings` table. Sizes appear in Ads Manager → *Audiences* within ~24 h. Run
-   `meta-sync.yml` once from the Actions tab to confirm the daily job is green.
+   `settings` table. Sizes appear in Ads Manager → *Audiences* within ~24 h. To confirm the
+   daily job actually works, read the next scheduled `meta-sync.yml` run's **log** for the
+   upload counts - a green run on its own means nothing (see troubleshooting).
 8. **Use them.** In Ads Manager create a **Lookalike (Nigeria, 1%)** from the buyers
    audience for cold campaigns; a **Website** audience "visited `/accelerator` or
    `/checkout` in the last 30 days, excluding Purchase" for retargeting; and use the TAAB
@@ -679,6 +680,8 @@ business **Deepr Ecommerce `412387622720655`**.
 | Server Purchases arrive but match poorly / `action_source: other` | `meta_context` is empty. Either the enrollment was created offline (expected) or `_fbp`/`_fbc` are being encrypted away - `MetaPixelTest` covers the exception. |
 | Everything silently stopped after a deploy | `config:cache` ran with a `.env` missing `META_*`. `php artisan tinker --execute="echo config('services.meta.pixel_id');"` |
 | Sales appearing under *Test events*, not the dataset | `META_TEST_EVENT_CODE` is still set. Unset it, `config:cache`. |
+| `meta-sync.yml` is **green** but no audience appeared | A green run proves nothing: both commands exit `SUCCESS` with "Meta is not configured - nothing to do" when the env is unset, by design. Read the run log (`gh run view <id> --log`) for that line before believing a run did work. Five consecutive green runs (23-27 Sep 2026) were all no-ops this way. |
+| Browser and server Purchase never appear together, so dedup can't be seen | `META_TEST_EVENT_CODE` was set. It is a **Conversions API parameter only** - the browser pixel does not carry it, so the browser event goes to the live dataset while the server event goes to the Test Events tab and the two never meet. Test dedup with the code **unset**. To re-test without a second purchase: null `meta_purchase_sent_at` on the enrollment and run `meta:retry-purchases` - the resend reuses the same `event_id`. |
 
 ---
 
