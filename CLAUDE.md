@@ -134,6 +134,15 @@ These encode real incidents. Changing them will break something that took a whil
   `updateOrCreate(['email' => ...])` resolves the same way, which is why
   `StudentProvisioner::manualEnrol` picks its row explicitly and never rewrites the payment
   reference, amount or cohort of a row that is already paid.
+- **A certificate code is issued once and never regenerated.** `enrollments.certificate_code`
+  goes on CVs, into screenshots and onto a public `/verify` page, so re-minting it silently
+  invalidates every copy already in the world. `Certificate::issueFor()` is idempotent for
+  this reason - keep it that way, and keep `/verify` reachable for as long as certificates
+  exist. The certificate also says **"Certificate of Completion"** and carries the line
+  **"not an accredited qualification"**: Deepr is not an awarding body, and implying
+  otherwise is the one way this creates a real problem. `CertificateTest` asserts it.
+  `certificate_name` is student-declared and must never overwrite `full_name`, which is the
+  name they paid under.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 

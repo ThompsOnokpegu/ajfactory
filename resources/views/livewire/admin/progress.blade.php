@@ -105,6 +105,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Progress'])] class extends
                         <th class="px-4 py-3 whitespace-nowrap">Live</th>
                         <th class="px-4 py-3 whitespace-nowrap">Lessons</th>
                         <th class="px-4 py-3 whitespace-nowrap">Last approval</th>
+                        <th class="px-4 py-3 whitespace-nowrap">Certificate</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-900">
@@ -134,10 +135,21 @@ new #[Layout('components.layouts.admin', ['title' => 'Progress'])] class extends
                             <td class="px-4 py-3 whitespace-nowrap text-[11px] text-zinc-600">
                                 {{ $r['last_approved_at'] ? $r['last_approved_at']->diffForHumans() : '-' }}
                             </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                @if($r['certificate_code'])
+                                    <span class="text-[10px] font-mono text-cyan-400">{{ $r['certificate_code'] }}</span>
+                                    {{-- The name they chose to be printed, when it isn't the one they enrolled with. --}}
+                                    @if($r['certificate_name'] !== $r['name'])
+                                        <span class="block text-[10px] text-zinc-500">as "{{ $r['certificate_name'] }}"</span>
+                                    @endif
+                                @else
+                                    <span class="text-[11px] text-zinc-700">-</span>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="px-4 py-12 text-center text-sm text-zinc-500">
+                            <td colspan="7" class="px-4 py-12 text-center text-sm text-zinc-500">
                                 No paid students in this cohort{{ $search ? ' matching that search' : '' }}.
                             </td>
                         </tr>

@@ -37,6 +37,9 @@ class Enrollment extends Model
         'paystack_payload',
         'paid_at',
         'completed_lessons',
+        'certificate_name',
+        'certificate_code',
+        'certificate_issued_at',
         'meta_context',           // {fbp, fbc, ip, ua, captured_at} from the checkout request
         'meta_purchase_sent_at',  // stamped only when the Meta Conversions API accepted the Purchase
     ];
@@ -58,6 +61,7 @@ class Enrollment extends Model
         'access_suspended' => 'boolean',
         'cohort' => 'integer',
         'completed_lessons' => 'array',
+        'certificate_issued_at' => 'datetime',
         'meta_context' => 'array',
         'meta_purchase_sent_at' => 'datetime',
     ];

@@ -33,6 +33,9 @@ state([
     'telegramWinsUrl' => '',       // #wins thread — where build proof / checkpoints go
     'reviewNotices' => [],         // checkpoints reviewed since the student last acknowledged them
     'leaderboard' => ['top' => [], 'you' => null, 'total' => 0], // cohort board, Cohort 2+ only
+    'certificate' => null,         // ['earned','code','issued_at','approved','total'] or null
+    'certificateName' => '',       // bound to the "how my name should read" field
+    'certificateSaved' => false,   // shows the saved confirmation
     'liveAttendance' => [],        // session_key[] the student has marked attendance for
     'attendanceCode' => '',        // bound to the live-attendance form
     'balanceNotice' => null,       // installment balance reminder shown from 3 days before due
@@ -165,6 +168,35 @@ $loadProgress = function () {
         ->all();
 
     $this->liveAttendance = $enrollment ? $enrollment->liveAttendances()->pluck('session_key')->all() : [];
+
+    /*
+     * Certificate of completion. Issued the moment the last core checkpoint is
+     * approved - there is no separate job to run, so the student never waits on one.
+     * issueFor() is idempotent and keeps the original code and date.
+     */
+    $this->certificate = null;
+    if ($enrollment && $this->shipToUnlock) {
+        $core = \App\Support\Progress::coreModuleIds();
+        $earned = \App\Support\Certificate::isEarnedBy($enrollment);
+
+        if ($earned && ! $enrollment->certificate_issued_at) {
+            $enrollment = \App\Support\Certificate::issueFor($enrollment);
+        }
+
+        $this->certificate = [
+            'earned'    => $earned,
+            'code'      => $enrollment->certificate_code,
+            'issued_at' => optional($enrollment->certificate_issued_at)->format('j F Y'),
+            'approved'  => count(array_intersect($core, $this->approvedModuleIds)),
+            'total'     => count($core),
+        ];
+
+        // Only seed from the DB when the student isn't mid-edit, or typing would be
+        // overwritten every time loadProgress runs.
+        if (! $this->certificateSaved && $this->certificateName === '') {
+            $this->certificateName = \App\Support\Certificate::nameFor($enrollment);
+        }
+    }
 
     /*
      * Cohort leaderboard. Cohort 2+ only: Cohort 1 is legacy/open with no checkpoints,
@@ -371,6 +403,28 @@ $submitCheckpoint = function () {
     $this->loadProgress();
     $this->rebuildGate();
     $this->applyActiveLock();
+};
+
+/*
+ * Save how the student's name should read on their certificate.
+ *
+ * Stored separately from full_name, which is the name they PAID under and is matched
+ * against payment records - this field must never overwrite it. Validated to a
+ * conservative character set so the printed line stays a name rather than a
+ * self-awarded title, since the verification page is public.
+ */
+$saveCertificateName = function () {
+    $enrollment = Enrollment::currentFor(auth()->user()->email);
+    if (! $enrollment) return;
+
+    $this->validate(
+        ['certificateName' => \App\Support\Certificate::NAME_RULE],
+        ['certificateName.regex' => 'Letters, spaces, hyphens, apostrophes and full stops only.'],
+    );
+
+    $enrollment->update(['certificate_name' => trim($this->certificateName) ?: null]);
+
+    $this->certificateSaved = true;
 };
 
 /*
@@ -899,6 +953,9 @@ $dismissReview = function () {
                         @endif
                     </div>
                 </div>
+
+                {{-- CERTIFICATE OF COMPLETION --}}
+                @include('livewire.dashboard.partials.certificate')
 
                 {{-- COHORT LEADERBOARD --}}
                 @include('livewire.dashboard.partials.leaderboard')

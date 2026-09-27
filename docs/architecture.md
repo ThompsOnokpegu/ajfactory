@@ -146,6 +146,40 @@ asked in Telegram whether they'd been approved. The migration backfills `student
 reviewed_at` for every existing row — without it, every Cohort 2 and 3 student would log in
 after the deploy to a pile of banners for approvals they were told about weeks ago.
 
+### Certificate of completion
+Three columns on `enrollments`, not a table - one certificate per enrollment, so a table
+would only add a join.
+
+- `certificate_name` - how the student wants to be credited. Null means "use `full_name`".
+  **It never overwrites `full_name`**, which is the name they paid under and is matched
+  against payment records.
+- `certificate_code` - the public verification code (`AJ-` + 8 chars). Issued once and
+  **never regenerated**: it goes on CVs and into screenshots, so it has to keep resolving.
+  The alphabet excludes vowels (it can't spell anything) and `0/O/1/I/L` (the pairs people
+  mistype reading a code off a phone, which is how it will be shared).
+- `certificate_issued_at` - when they crossed the bar, and the flag for "issued".
+
+**The bar is every core checkpoint approved** - see `App\Support\Certificate`. Deliberately
+*not* the completion guarantee, which also wants 4 of 6 live sessions: that threshold
+protects a refund promise, and withholding a certificate from someone who shipped all nine
+workflows but missed live calls would be arbitrary. Cohort 1 can never earn one - it predates
+ship-to-unlock, so there are no checkpoints to pass and nothing to attest.
+
+Issuing happens on dashboard load (`Certificate::issueFor` is idempotent), so no job has to
+run for a student to get theirs. `certificates:issue` does it in bulk for the case where
+waiting for a login is wrong - announcing the certificate to past cohorts who earned it
+before it existed.
+
+`/certificate` renders the printable page for the holder (403, not a redirect, if unearned,
+so a shared link can't hand over someone else's). `/verify/{code?}` is **public and
+unauthenticated** - an unverifiable certificate is a JPEG, and a client checking a code must
+not need an account. The verify page shows the credited name, cohort, date and modules, and
+deliberately no email or student id, so it stays a verification tool rather than a directory.
+
+Because `certificate_name` is student-declared, verification attests the **completion, not
+the identity** - the same as most course credentials. Admin sees the code and the chosen name
+on `/admin/progress`.
+
 ### `Student` — the lead table
 Every lead lands here regardless of source, deduplicated by email. Two fields carry the
 segmentation:

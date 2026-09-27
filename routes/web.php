@@ -127,11 +127,49 @@ Route::get('/home', function () {
     return redirect()->route('dashboard');
 })->middleware(['auth'])->name('home');
 
+/*
+| Public certificate verification. Deliberately unauthenticated: a client or employer
+| checking a code must not need an account, and an unverifiable certificate is a JPEG.
+| Shows the credited name, cohort, date and modules - never an email or a student id,
+| so it stays a verification tool rather than a directory of students.
+*/
+Route::get('/verify/{code?}', function (?string $code = null) {
+    $code = $code ?? request('code');
+    $enrollment = $code ? \App\Support\Certificate::verify($code) : null;
+
+    return view('certificate-verify', [
+        'code'       => $code ? strtoupper(trim($code)) : null,
+        'enrollment' => $enrollment,
+        'name'       => $enrollment ? \App\Support\Certificate::nameFor($enrollment) : null,
+        'issuedAt'   => $enrollment ? optional($enrollment->certificate_issued_at)->format('j F Y') : null,
+        'modules'    => $enrollment ? \App\Support\Certificate::moduleTitles() : [],
+    ]);
+})->name('certificate.verify.form');
+
 // 2. Protected Member Terminal
 Route::middleware(['auth', CheckEnrollment::class])->group(function () {
 
     // The Main Member Dashboard
     Volt::route('/dashboard', 'dashboard.terminal')->name('dashboard');
+
+    // Certificate of completion. Earned by getting every core module's checkpoint
+    // approved; issued automatically when the dashboard next loads. 403 rather than a
+    // redirect if not earned, so a shared link can't hand someone else's certificate over.
+    Route::get('/certificate', function () {
+        $enrollment = \App\Models\Enrollment::currentFor(auth()->user()->email);
+
+        abort_unless($enrollment && \App\Support\Certificate::isEarnedBy($enrollment), 403);
+
+        $enrollment = \App\Support\Certificate::issueFor($enrollment);
+
+        return view('certificate', [
+            'name'     => \App\Support\Certificate::nameFor($enrollment),
+            'code'     => $enrollment->certificate_code,
+            'issuedAt' => optional($enrollment->certificate_issued_at)->format('j F Y'),
+            'cohort'   => $enrollment->cohort,
+            'modules'  => \App\Support\Certificate::moduleTitles(),
+        ]);
+    })->name('certificate');
 
     // Secure Snapshot Vault Downloads
     Route::get('/vault/download/{lessonId}', [VaultController::class, 'download'])

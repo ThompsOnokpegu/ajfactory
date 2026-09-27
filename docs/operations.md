@@ -512,6 +512,36 @@ GROUP BY e.email
 HAVING rows_held > 1 AND orphaned_checkpoints > 0;
 ```
 
+### Certificates of completion
+
+Earned by getting **every core module's checkpoint approved**. Not the completion guarantee -
+live attendance is not part of it. Issued automatically the next time the student opens their
+dashboard, so there is nothing to run day to day and nobody has to ask you for one.
+
+Announcing it to a cohort that already finished (they earned it before it existed):
+
+```bash
+php artisan certificates:issue --dry-run          # who qualifies
+php artisan certificates:issue --cohort=2         # issue to one cohort
+php artisan certificates:issue                    # everyone eligible
+```
+
+Idempotent - an issued certificate keeps its original code and date, because that code is on
+CVs and in screenshots. Issue first, then announce, so the mail lands on a certificate that
+already exists.
+
+Students set how their name is printed on their own dashboard. That field never touches
+`full_name`, so payment records stay intact. `/admin/progress` shows each holder's code and,
+when it differs from the name they enrolled with, the name they chose.
+
+**The wording is deliberate.** It says "Certificate of Completion" and carries the line
+"not an accredited qualification". Deepr Web Services is not an awarding body; implying
+otherwise is the one way this creates a real problem. `CertificateTest` asserts the
+disclaimer is present.
+
+Verification is public at `/verify` (or `/verify/{code}`). It has to stay reachable for as
+long as certificates exist - a dead verify URL turns every certificate back into a JPEG.
+
 ### Selling a written guide
 
 The guides are gated by default and free to Accelerator students. To sell one to
@@ -715,7 +745,7 @@ before committing it.
 | **Overview** | KPIs + the registration Open/Paused switch |
 | **Enrollments** | All students. Approve a pending offline payment, suspend/reinstate, re-send welcome, re-send pay link, mark balance paid, change cohort, manual enrol; per-student live-attendance count |
 | **Checkpoints** | Approve/reject ship-to-unlock proof submissions — this is what opens the next module. The student is told on their dashboard automatically; you don't need to message them. Pending is never truncated; the reviewed history below it is searchable and filterable by decision, module and cohort. **A decision can be reversed from there** — that re-stamps `reviewed_at`, so the student gets a fresh notice about the change |
-| **Progress** | Per-student progress for a cohort, ranked the same way students see it: approved checkpoints, then live sessions attended. Spot who has stalled (`0/N` shipped) and who is watching without building (high lessons, zero approvals) |
+| **Progress** | Per-student progress for a cohort, ranked the same way students see it: approved checkpoints, then live sessions attended. Spot who has stalled (`0/N` shipped) and who is watching without building (high lessons, zero approvals). Also shows each certificate code and the name the student chose to have printed |
 | **Reviews** | Staged in-course feedback. **Quotable** = consented + happy, safe for marketing (credit line shown per row). **Needs a call** = rated ≤ 3, reach out, never publish |
 | **Snippets** | Prompts / code / JSON students copy from their dashboard. Pin one to a module, or leave the module blank to show it on every module. New snippets publish immediately; **Publish** toggles a draft. Editing never silently republishes a draft |
 | **Masterclass** | Registrations for the current session + send status pills; mark Attended/No-show per row; CSV export |

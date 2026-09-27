@@ -77,7 +77,8 @@ class Progress
             ->when(self::excludedEmails() !== [], fn ($q) => $q->whereNotIn(
                 DB::raw('LOWER(email)'), self::excludedEmails()
             ))
-            ->get(['id', 'full_name', 'email', 'cohort', 'completed_lessons']);
+            ->get(['id', 'full_name', 'email', 'cohort', 'completed_lessons',
+                   'certificate_name', 'certificate_code', 'certificate_issued_at']);
 
         if ($enrollments->isEmpty()) {
             return collect();
@@ -116,6 +117,10 @@ class Progress
                     'live'             => (int) ($attendance[$e->id]->live ?? 0),
                     'lessons'          => is_array($e->completed_lessons) ? count($e->completed_lessons) : 0,
                     'last_approved_at' => $lastApproved ? \Illuminate\Support\Carbon::parse($lastApproved) : null,
+                    // Certificate state, so the admin screen can show who holds one and
+                    // under what name without a second query per row.
+                    'certificate_code' => $e->certificate_code,
+                    'certificate_name' => Certificate::nameFor($e),
                 ];
             })
             ->sort(function (array $a, array $b) {
