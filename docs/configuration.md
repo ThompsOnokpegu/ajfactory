@@ -247,7 +247,8 @@ charged `amount` is already the discounted figure the webhook verifies.
   absence failed the guarantee for everyone. `LiveAttendanceTest` now guards the threshold.
   **Re-count on every cohort launch.** Cohort 3 (starts Sat 12 Sep 2026) would have opened with
   *zero* attendable sessions — the archive stopped at `live-10` on the start date itself — so
-  `live-11`..`live-16` (Saturdays 19 Sep to 24 Oct 2026) were added to give the threshold of 4
+  `live-11`..`live-16` (weekly, 19 Sep to 24 Oct 2026 - Saturdays except `live-12`, which ran
+  on Sunday 27 Sep) were added to give the threshold of 4
   a six-session pool. Sessions carried over from the previous cohort never count.
 - Per **live** session in `curriculum.php`: `attendance_code` (the code AJ announces at the
   **end** of the call — set a fresh one each session, never type it in chat; it's read

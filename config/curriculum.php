@@ -336,7 +336,10 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
 
         /*
         |----------------------------------------------------------------------
-        | COHORT 3 RUN — every SATURDAY 9AM WAT from 19 Sep 2026 (6 sessions).
+        | COHORT 3 RUN — weekly 9AM WAT from 19 Sep 2026 (6 sessions).
+        |----------------------------------------------------------------------
+        | Saturdays, except live-12 which ran on Sunday 27 Sep. Read each
+        | session's release_at rather than assuming the day.
         |----------------------------------------------------------------------
         | These are the ONLY sessions a Cohort 3 student can be credited for:
         | attendance requires the session to run AFTER their cohort start
@@ -367,7 +370,8 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
         [
             'id' => 'live-12',
             'title' => 'Live Session #12: Build & Q&A',
-            'release_at' => '2026-09-26 09:00:00',
+            // Ran on SUNDAY, not the usual Saturday - the session slipped a day.
+            'release_at' => '2026-09-27 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
             'attendance_code' => 'MARLIN-834', // ← announced at the END of the call. Rotate every session.

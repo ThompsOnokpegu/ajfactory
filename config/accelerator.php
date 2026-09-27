@@ -47,7 +47,8 @@ return [
     // participation.
     //
     // For Cohort 3 (starts Sat 12 Sep 2026) the attendable set is live-11..live-16,
-    // the six Saturdays from 19 Sep to 24 Oct 2026. live-01..live-09 all ran before the
+    // six weekly sessions from 19 Sep to 24 Oct 2026 (Saturdays, except live-12 which
+    // ran on Sunday 27 Sep). live-01..live-09 all ran before the
     // start; live-10 is Cohort 2's closing session on the morning of the start day and
     // carries no attendance_code, so it credits nobody either. If you shift the cohort
     // start, RE-COUNT the sessions that fall after it before trusting this number.
