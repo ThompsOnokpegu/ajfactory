@@ -617,8 +617,11 @@ business **Deepr Ecommerce `412387622720655`**.
    *Assign partners / people*: add ad account `act_644708242748910` and the System User
    (Manage). The System User's token needs `ads_management`, and the user must be on the
    ad account too.
-3. **Verify the domain** (Business Settings → *Brand safety* → *Domains* → ajbuildai.com),
-   then in Events Manager → *Aggregated event measurement* put **Purchase** at the top.
+3. **Verify the domain**: Business Settings → *Brand safety* → *Domains* → ajbuildai.com,
+   then a DNS TXT record on the domain (hPanel → Domains → DNS). Do **not** go looking for
+   *Aggregated Event Measurement* / *Configure Web Events* at this point - see step 9; it
+   cannot be configured until the domain is verified AND events have arrived, and on most
+   accounts Meta now ranks the events itself.
 4. **Server `.env`:** `META_PIXEL_ID`, `META_ACCESS_TOKEN`, `META_AD_ACCOUNT_ID=644708242748910`.
    Then `php artisan config:cache` and confirm with
    `php artisan tinker --execute="echo config('services.meta.pixel_id');"`.
@@ -642,6 +645,16 @@ business **Deepr Ecommerce `412387622720655`**.
    audience for cold campaigns; a **Website** audience "visited `/accelerator` or
    `/checkout` in the last 30 days, excluding Purchase" for retargeting; and use the TAAB
    registrants audience for warm retargeting and as an exclusion on cold campaigns.
+9. **Last, and only if Meta offers it: event priority (Aggregated Event Measurement).**
+   This ranks which single event counts for an iOS user who opted out of tracking, so
+   **Purchase must be first**. It is genuinely unavailable until the domain is verified
+   *and* the dataset has received events - Meta builds the ranking list from events it has
+   actually seen - so there is nothing to click before step 5. Meta has also automated this
+   for most accounts and picks a sensible order itself. When it does exist it is under
+   Events Manager → the dataset → *Settings*, or Business Settings → *Brand safety* →
+   *Domains* → ajbuildai.com; older accounts have a top-level *Aggregated Event
+   Measurement* tab. Wanted order: Purchase, AddPaymentInfo, InitiateCheckout, Lead,
+   ViewContent. If you cannot find it at all, it is auto-managed - leave it.
 
 ### Day to day
 
