@@ -256,7 +256,11 @@ it('serves the certificate page to a student who earned it', function () {
         ->assertOk()
         ->assertSee('Certificate of Completion')
         ->assertSee('Chidi O. Okonkwo')
-        ->assertSee('Module 01: Build 1')
+        // The module list deliberately does NOT appear here - it lives on the verify
+        // page, so the certificate reads as a credential rather than a syllabus.
+        ->assertDontSee('Module 01: Build 1')
+        ->assertSee('Issued by: Deepr Web Services')
+        ->assertSee('Verify:')
         // Says plainly what it is not. Deepr is not an awarding body, and implying
         // otherwise is the one way a certificate creates a real problem.
         ->assertSee('not an accredited qualification')
@@ -282,8 +286,11 @@ it('verifies a genuine code publicly, with no login', function () {
 
     $this->get("/verify/{$code}")
         ->assertOk()
-        ->assertSee('Genuine certificate')
+        ->assertSee('Verified credential')
         ->assertSee('Chidi Okonkwo')
+        // The detail the certificate omits lives here - that split is the whole design.
+        ->assertSee('Module 01: Build 1')
+        ->assertSee('Deepr Web Services')
         ->assertDontSee($e->email);      // a verification tool, not a student directory
 });
 
@@ -293,7 +300,7 @@ it('matches a code case-insensitively', function () {
     certApproveAll($e);
     $code = Certificate::issueFor($e->fresh())->certificate_code;
 
-    $this->get('/verify/' . strtolower($code))->assertOk()->assertSee('Genuine certificate');
+    $this->get('/verify/' . strtolower($code))->assertOk()->assertSee('Verified credential');
 });
 
 it('reports no match for an unknown code', function () {

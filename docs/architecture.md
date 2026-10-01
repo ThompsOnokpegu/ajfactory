@@ -176,6 +176,15 @@ unauthenticated** - an unverifiable certificate is a JPEG, and a client checking
 not need an account. The verify page shows the credited name, cohort, date and modules, and
 deliberately no email or student id, so it stays a verification tool rather than a directory.
 
+The certificate is **light, not the dark Accelerator look**, and carries no module list. Both
+follow the issued-credential convention (the WorldQuant/Credly reference the design was built
+against): a certificate reads as a document rather than a web page, prints without eating a
+cartridge, and sits beside other credentials in a CV. The modules live on the verify page
+instead - clean credential, detail one click behind it - which is also what makes the
+verification link worth following. The seal is
+`resources/views/partials/certificate-seal.blade.php`, inline SVG so it prints and
+screenshots without loading an image.
+
 Because `certificate_name` is student-declared, verification attests the **completion, not
 the identity** - the same as most course credentials. Admin sees the code and the chosen name
 on `/admin/progress`.
