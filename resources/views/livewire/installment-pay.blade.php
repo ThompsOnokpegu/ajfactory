@@ -59,7 +59,7 @@ new #[Layout('components.layouts.student')] class extends Component {
     {
         return [
             'payable' => $this->isPayable(),
-            'symbol' => ($this->enrollment->currency ?: 'NGN') === 'NGN' ? '₦' : '$',
+            'symbol' => \App\Support\Accelerator::currencySymbol($this->enrollment->currency ?: 'NGN'),
             'balance' => (float) $this->enrollment->balance_due,
         ];
     }
@@ -95,7 +95,7 @@ new #[Layout('components.layouts.student')] class extends Component {
                     </button>
 
                     <p class="text-center text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-                        Secure payment · {{ ($enrollment->currency ?: 'NGN') === 'NGN' ? 'Paystack' : 'Flutterwave' }}
+                        Secure payment · {{ ucfirst(\App\Support\Accelerator::paymentProvider($enrollment->currency ?: 'NGN')) }}
                     </p>
                 </div>
             </div>

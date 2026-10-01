@@ -139,7 +139,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Overview'])] class extends
             </div>
             <div class="divide-y divide-zinc-900">
                 @forelse($recentEnrollments as $e)
-                    @php $sym = ($e->currency ?: 'NGN') === 'NGN' ? '₦' : '$'; @endphp
+                    @php $sym = \App\Support\Accelerator::currencySymbol($e->currency ?: 'NGN'); @endphp
                     <div class="flex items-center gap-3 px-5 py-3">
                         <x-admin.avatar :name="$e->full_name" />
                         <div class="min-w-0 flex-1">

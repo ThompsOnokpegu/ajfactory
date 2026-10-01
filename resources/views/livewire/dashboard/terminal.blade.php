@@ -237,7 +237,7 @@ $loadProgress = function () {
         if (now()->gte($due->copy()->subDays(3))) {
             $this->balanceNotice = [
                 'amount'  => (float) $enrollment->balance_due,
-                'symbol'  => ($enrollment->currency ?: 'NGN') === 'NGN' ? '₦' : '$',
+                'symbol'  => \App\Support\Accelerator::currencySymbol($enrollment->currency ?: 'NGN'),
                 'overdue' => now()->gt($due),
                 'due'     => $due->diffForHumans(),
                 'pay_url' => URL::signedRoute('installment.pay', ['enrollment' => $enrollment->id]),

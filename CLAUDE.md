@@ -143,6 +143,13 @@ These encode real incidents. Changing them will break something that took a whil
   otherwise is the one way this creates a real problem. `CertificateTest` asserts it.
   `certificate_name` is student-declared and must never overwrite `full_name`, which is the
   name they paid under.
+- **Never render money with a two-way currency ternary.** Use
+  `Accelerator::currencySymbol($currency)` and `Accelerator::paymentProvider($currency)`,
+  which read the configured table. Five screens carried
+  `$currency === 'NGN' ? '₦' : '$'` from when only two currencies existed, so after GHS/KES/ZAR
+  went live a GH₵820 sale rendered as "$820" - on the admin screens payments are reconciled
+  from, and on the student's own balance notice. The manual-enrol form had the same split and
+  could not record a sale in any other currency at all. `CurrencyDisplayTest` guards it.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 

@@ -6,6 +6,7 @@ use Livewire\Attributes\Url;
 use Livewire\WithPagination;
 use App\Models\Enrollment;
 use App\Support\Accelerator;
+use Illuminate\Validation\Rule;
 use App\Support\StudentProvisioner;
 use Illuminate\Support\Facades\Http;
 
@@ -140,7 +141,9 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
             'meEmail' => 'required|email|max:255',
             'meWhatsapp' => 'nullable|string|max:40',
             'meAmount' => 'required|numeric|min:0',
-            'meCurrency' => 'required|in:NGN,USD',
+            // Whatever the checkout can actually charge - hardcoding NGN,USD here meant a
+            // manual enrolment could not record a cedi or shilling sale at all.
+            'meCurrency' => ['required', Rule::in(Accelerator::enabledCurrencies())],
             'mePlan' => 'required|in:full,installment',
             'meCohort' => 'required|integer|min:1|max:9',
         ]);
@@ -216,7 +219,9 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
                 <div><label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Amount</label>
                     <input wire:model="meAmount" type="number" class="mt-1 w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-lg text-sm focus:border-cyan-500 focus:ring-0"></div>
                 <div><label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Currency</label>
-                    <select wire:model="meCurrency" class="mt-1 w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-lg text-sm focus:border-cyan-500 focus:ring-0"><option>NGN</option><option>USD</option></select></div>
+                    <select wire:model="meCurrency" class="mt-1 w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-lg text-sm focus:border-cyan-500 focus:ring-0">
+                        @foreach(Accelerator::enabledCurrencies() as $cur)<option value="{{ $cur }}">{{ $cur }}</option>@endforeach
+                    </select></div>
                 <div class="grid grid-cols-2 gap-2">
                     <div><label class="text-[10px] font-black uppercase text-zinc-600 tracking-widest">Plan</label>
                         <select wire:model="mePlan" class="mt-1 w-full bg-zinc-950 border border-zinc-800 text-white p-3 rounded-lg text-sm focus:border-cyan-500 focus:ring-0"><option value="full">full</option><option value="installment">installment</option></select></div>
@@ -249,7 +254,7 @@ new #[Layout('components.layouts.admin', ['title' => 'Enrollments'])] class exte
     <!-- List -->
     <div class="rounded-2xl border border-zinc-800 divide-y divide-zinc-900 overflow-hidden">
         @forelse($enrollments as $e)
-            @php $sym = ($e->currency ?: 'NGN') === 'NGN' ? '₦' : '$'; $hasBalance = $e->plan_type === 'installment' && (float)$e->balance_due > 0; @endphp
+            @php $sym = Accelerator::currencySymbol($e->currency ?: 'NGN'); $hasBalance = $e->plan_type === 'installment' && (float)$e->balance_due > 0; @endphp
             <div wire:key="enr-{{ $e->id }}" x-data="{ menu: false, detail: false }" class="bg-zinc-900/30">
                 <div class="flex items-start gap-3 px-4 sm:px-5 py-3.5">
                     <x-admin.avatar :name="$e->full_name" />
