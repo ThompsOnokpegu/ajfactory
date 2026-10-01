@@ -71,28 +71,29 @@ return [
     | Discount applies to the plan TOTAL at the current price (early-bird included).
     */
     'coupons' => [
-        'TAAB59' => [
-            'type' => 'fixed',
-            // Every live currency needs an entry: one that is missing gets NO discount
-            // rather than a converted one, which would quietly sell at full price there.
-            'value' => ['NGN' => 10000, 'USD' => 7, 'GHS' => 80, 'KES' => 1000, 'ZAR' => 120], // ₦10,000 ≈ $7; the rest are the $7 equivalent, rounded up
-            'plans' => ['full', 'installment'],
-            'expires_at' => '2026-09-14 23:59:59',     // cart close (Mon 14 Sep, Africa/Lagos)
-            'label' => 'TAAB masterclass discount',
-        ],
-        // Flat rate for TAAB attendees. 'flat' means 'value' is the PRICE PAID, not a
-        // discount, so it holds whatever the base price is doing.
-        //
-        // Non-Naira values are the USD flat converted at the 11 Sep 2026 rate and
-        // rounded UP (GHS 11.4170, KES 129.5046, ZAR 16.1853 per USD). Each lands at
-        // 63-65% of that currency's full price, so the offer is the same depth
-        // everywhere. A currency missing here would be sold at FULL price with the
-        // code apparently accepted - check this list whenever a currency is added.
-        'TAAB50' => [
+        /*
+        | TAAB100 - the flat rate for TAAB masterclass attendees.
+        |
+        | 'flat' means 'value' is the PRICE PAID, not a discount, so it holds at 100,000
+        | whether or not early-bird is running. That is the point of using flat here: the
+        | base price moves on its own (early-bird ends on a date OR when the 10th seat
+        | sells) and a fixed-amount coupon would silently charge the wrong total when it did.
+        |
+        | Non-Naira values are each currency's OWN full price times the same 100/120
+        | ratio, rounded up - not an FX conversion. No live rate was consulted, matching
+        | how the currency table itself is maintained. Each lands at 83-84% of that
+        | currency's full price, so the offer is the same depth everywhere rather than
+        | whatever a rate happened to produce. It also stays below each early-bird price.
+        |
+        | A currency missing here would be sold at FULL price with the code apparently
+        | accepted - check this list whenever a currency is added. FlatCouponTest guards it.
+        |
+        | NOTE: no `expires_at`. This code runs until one is set or it is removed.
+        */
+        'TAAB100' => [
             'type' => 'flat',
-            'value' => ['NGN' => 50000, 'USD' => 36, 'GHS' => 420, 'KES' => 4700, 'ZAR' => 590],
-            'plans' => ['full'],                      // deliberately NOT installment
-            'expires_at' => '2026-09-14 23:59:59',    // extended 13 Sep from end of masterclass day (Sat 12 Sep) to cart close (Mon 14 Sep), Africa/Lagos
+            'value' => ['NGN' => 100000, 'USD' => 73, 'GHS' => 820, 'KES' => 9500, 'ZAR' => 1180],
+            'plans' => ['full'],   // deliberately NOT installment - a flat total can't describe a 2-payment plan
             'label' => 'TAAB masterclass offer',
         ],
     ],

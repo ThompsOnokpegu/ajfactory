@@ -235,6 +235,23 @@ The discount applies to the plan **total** at the current price (early-bird incl
 applied code + discount are recorded on the enrollment (`coupon_code`, `discount_amount`); the
 charged `amount` is already the discounted figure the webhook verifies.
 
+**`type => 'flat'`** is the third kind: `value` is then the **price paid**, not a discount, so
+it holds whatever the base is doing. Use it for "this costs X" promos - a `fixed` amount would
+silently charge the wrong total the moment early-bird ended or the 10th seat sold.
+
+**Every offered currency needs its own entry.** A currency missing from `value` gets **no
+discount at all**, so the code is accepted and the buyer is charged full price - worse than the
+code not existing. `FlatCouponTest` and `MultiCurrencyTest` both guard this, the latter across
+every configured coupon rather than one named code.
+
+Non-Naira values are set **by hand, as a proportion of each currency's own full price**, not by
+FX conversion - the same way the currency table itself is maintained. That keeps the offer the
+same depth everywhere instead of whatever a rate happened to produce, and needs no live rate.
+
+`expires_at` is optional and **omitting it means the code never expires**. `FlatCouponTest`
+asserts the no-expiry state explicitly rather than skipping it, so an open-ended discount is
+something someone sees in a diff.
+
 ### Live-session attendance & completion guarantee
 - `accelerator.php` → `guarantee_min_live_sessions` — how many weekly live sessions a student
   must attend (on top of finishing all module checkpoints) to satisfy the completion

@@ -132,13 +132,19 @@ it('charges a Ghanaian buyer the full cedi price once early-bird ends', function
     expect((float) $c->get('amountToday'))->toBe((float) config('accelerator.currencies.GHS.price_full'));
 });
 
-it('gives the TAAB59 discount in every offered currency', function () {
+it('prices every configured coupon in every offered currency', function () {
     // A currency missing from a coupon gets NO discount - it would silently sell at
-    // full price there, which is worse than the coupon not existing.
-    $coupon = config('accelerator.coupons.TAAB59');
+    // full price there, which is worse than the coupon not existing. Written against
+    // whatever is configured rather than one named code, so adding or renaming a
+    // coupon cannot quietly drop a currency.
+    $coupons = config('accelerator.coupons', []);
 
-    foreach (Accelerator::enabledCurrencies() as $code) {
-        expect($coupon['value'][$code] ?? null)
-            ->toBeNumeric("TAAB59 has no value for {$code}");
+    expect($coupons)->not->toBeEmpty('no coupons configured - delete this test if that is intended');
+
+    foreach ($coupons as $code => $coupon) {
+        foreach (Accelerator::enabledCurrencies() as $currency) {
+            expect($coupon['value'][$currency] ?? null)
+                ->toBeNumeric("{$code} has no value for {$currency}");
+        }
     }
 });
