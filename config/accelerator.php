@@ -346,5 +346,25 @@ return [
             'photo' => '',
             'is_published' => true,
         ],
+        [
+            // Rated 4/5, not 5 - still flagged Quotable in admin (consented and happy),
+            // and a page of nothing but perfect scores reads worse than one with a real
+            // spread. Her own words, so the enthusiasm is hers rather than ours.
+            //
+            // From her Module 1 answer: the most concrete first win on the page - she
+            // names the actual chain she built, n8n to Telegram to a mail that landed.
+            // Only 'N8N' and 'telegram' were corrected to their proper casing.
+            //
+            // NOT her "what were you unsure about" answer, which is the better story -
+            // whether she could do it with no physical class, an objection nothing else
+            // here answers. It opens "If I could do it without a physical class", which
+            // only parses as a reply to the question, and stitching the question into
+            // the quote would be writing a sentence she never said.
+            'name' => 'Abigail Ijomah',
+            'role' => 'Cohort 3',
+            'quote' => 'Working on n8n and being able to connect to Telegram and finding welcome mail in my inbox. So amazing 🤩',
+            'photo' => '',
+            'is_published' => true,
+        ],
     ],
 ];
