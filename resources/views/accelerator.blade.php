@@ -128,10 +128,12 @@
 
                 @if(!$soldOut && $regOpen)
                     <p class="mt-4 text-sm text-zinc-400 max-w-xl mx-auto">
+                        {{-- "Self-paced" on its own reads as "you're on your own", which is the
+                             opposite of how this runs. Always pair it with the support. --}}
                         @if($hasStarted)
-                            {{ $cohortLabel }} is already running - but it's <span class="text-white font-semibold">self-paced</span>, so you can join now and catch up at your own speed.
+                            {{ $cohortLabel }} is already running - join now and catch up at your own pace. You won't be doing it alone: <span class="text-white font-semibold">daily help in the Telegram threads</span> and <span class="text-white font-semibold">weekly live Build &amp; Debug clinics</span>.
                         @else
-                            {{ $cohortLabel }} is <span class="text-white font-semibold">self-paced</span>, so you set the pace from day one.
+                            You set the pace, with <span class="text-white font-semibold">daily help in the Telegram threads</span> and <span class="text-white font-semibold">weekly live Build &amp; Debug clinics</span> whenever you get stuck.
                         @endif
                     </p>
                 @endif
@@ -329,7 +331,7 @@
                     @else
                         <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.</p>
                         @if($regOpen)
-                            <p class="mt-2 text-sm font-bold text-amber-400">Enrolment is open@if($hasStarted) - the cohort is live and self-paced, so you can still catch up@endif.</p>
+                            <p class="mt-2 text-sm font-bold text-amber-400">Enrolment is open@if($hasStarted) - the cohort is live, and you catch up with daily Telegram support and weekly live clinics@endif.</p>
                         @endif
                     @endif
                 </div>

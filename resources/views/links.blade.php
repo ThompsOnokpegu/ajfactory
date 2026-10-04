@@ -41,8 +41,8 @@
     // close is enforced from config rather than marketed as a deadline.
     $acceleratorMeta = match (true) {
         Accelerator::isSoldOut()  => $cohortLabel . ' is full - join the waitlist',
-        Accelerator::hasStarted() => $cohortLabel . ' running · self-paced, join anytime',
-        default                   => $cohortLabel . ' · enrolment open',
+        Accelerator::hasStarted() => $cohortLabel . ' running · daily support + live clinics',
+        default                   => $cohortLabel . ' · daily support + live clinics',
     };
     $acceleratorPrice = '₦' . number_format(Accelerator::fullPrice('NGN'));
 @endphp

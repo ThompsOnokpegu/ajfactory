@@ -326,5 +326,25 @@ return [
             'photo' => '',
             'is_published' => true,
         ],
+        [
+            // The only quote on this page from someone who had ALREADY PAID for an
+            // automation course elsewhere, which is why it earns its place: it answers
+            // "I've done one of these before" and "I could just learn it on YouTube" in
+            // the same breath, and from a buyer rather than a beginner. Janet's quote
+            // above covers the YouTube objection, but from someone with nothing to
+            // compare against - this one has.
+            //
+            // From his "what were you unsure about" answer. Opening "Tbh," trimmed and
+            // one middle passage cut (marked with the ellipsis); 'wasnt' and 'Youtube'
+            // corrected, nothing reworded.
+            //
+            // NOT his Module 1 answer - "Module 1 was a breeze for me" is fine in a
+            // review and poor as public proof.
+            'name' => 'Damilola A.',
+            'role' => 'Cohort 3',
+            'quote' => "I had taken an automation course before. Somehow I wasn't satisfied and I wanted to learn more and learn fast... I knew a couple of things that I could really get better at with a few YouTube videos but I was happy to pay for the knowledge and speed.",
+            'photo' => '',
+            'is_published' => true,
+        ],
     ],
 ];
