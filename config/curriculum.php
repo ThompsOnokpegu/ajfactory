@@ -383,10 +383,11 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
         [
             'id' => 'live-13',
             'title' => 'Live Session #13: Build & Q&A',
-            'release_at' => '2026-10-03 09:00:00',
+            // Ran on SUNDAY, not the usual Saturday - second session running a day late.
+            'release_at' => '2026-10-04 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set a FRESH code before Sat 3 Oct
+            'attendance_code' => 'TRAWLER-572', // ← announced at the END of the call. Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-13-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
