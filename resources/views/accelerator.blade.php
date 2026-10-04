@@ -56,9 +56,9 @@
         $instEach    = Accelerator::installmentEach('NGN');
         $instCount   = Accelerator::installmentCount();
         $startsAt    = Accelerator::cohortStartsAt();
-        $startLabel  = $startsAt ? $startsAt->format('l jS F') : '{{TODO: cohort start date}}';
         $closesAt    = Accelerator::cartClosesAt();
-        $closesLabel = $closesAt ? $closesAt->format('l jS F') : null;
+        // No $startLabel / $closesLabel on purpose. Both dates are real and enforced -
+        // $regOpen below still reads the cart close - but neither is shown as copy.
         // Registration still open? (cohort has started but the cart hasn't closed)
         $regOpen     = $closesAt ? \Illuminate\Support\Carbon::now('Africa/Lagos')->lt($closesAt) : true;
         $primaryCta  = $soldOut ? '/builders' : '/checkout?plan=full';
@@ -114,8 +114,10 @@
                     @if($soldOut)
                         <span class="text-amber-400">Cohort full - join the waitlist</span>
                     @else
-                        @if($regOpen && $closesLabel)
-                            <span class="text-amber-400 font-bold">⏳ Enrolment closes {{ $closesLabel }}</span>
+                        {{-- No closing date in the copy: the cart close is real and enforced
+                             from config, but it is deliberately not marketed as a deadline. --}}
+                        @if($regOpen)
+                            <span class="text-amber-400 font-bold">Enrolment open</span>
                             <span class="text-zinc-700">·</span>
                         @endif
                         <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
@@ -127,9 +129,9 @@
                 @if(!$soldOut && $regOpen)
                     <p class="mt-4 text-sm text-zinc-400 max-w-xl mx-auto">
                         @if($hasStarted)
-                            {{ $cohortLabel }} has already started - but it's <span class="text-white font-semibold">self-paced</span>, so you can still join and catch up. Doors close <span class="text-amber-400 font-semibold">{{ $closesLabel }}</span>.
+                            {{ $cohortLabel }} is already running - but it's <span class="text-white font-semibold">self-paced</span>, so you can join now and catch up at your own speed.
                         @else
-                            {{ $cohortLabel }} starts <span class="text-white font-semibold">{{ $startLabel }}</span>. It's <span class="text-white font-semibold">self-paced</span>, so you set the pace from day one. Doors close <span class="text-amber-400 font-semibold">{{ $closesLabel }}</span>.
+                            {{ $cohortLabel }} is <span class="text-white font-semibold">self-paced</span>, so you set the pace from day one.
                         @endif
                     </p>
                 @endif
@@ -325,9 +327,9 @@
                     @if($soldOut)
                         <p class="text-amber-400 font-bold">This cohort is full. Join the waitlist for the next one.</p>
                     @else
-                        <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.@if($earlybird) <span class="text-cyan-400">Early-bird pricing is live.</span>@endif</p>
-                        @if($regOpen && $closesLabel)
-                            <p class="mt-2 text-sm font-bold text-amber-400">⏳ Enrolment closes {{ $closesLabel }}@if($hasStarted) - cohort is already live and self-paced, so you can still catch up.@else - cohort starts {{ $startLabel }}.@endif</p>
+                        <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.</p>
+                        @if($regOpen)
+                            <p class="mt-2 text-sm font-bold text-amber-400">Enrolment is open@if($hasStarted) - the cohort is live and self-paced, so you can still catch up@endif.</p>
                         @endif
                     @endif
                 </div>
@@ -434,8 +436,8 @@
                     @if($soldOut)
                         <span class="text-amber-400">Waitlist open</span>
                     @else
-                        @if($regOpen && $closesLabel)
-                            <span class="text-amber-400 font-bold">⏳ Closes {{ $closesLabel }}</span>
+                        @if($regOpen)
+                            <span class="text-amber-400 font-bold">Enrolment open</span>
                             <span class="text-zinc-700">·</span>
                         @endif
                         <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>

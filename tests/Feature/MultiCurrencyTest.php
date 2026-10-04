@@ -115,6 +115,11 @@ it('charges a Ghanaian buyer the cedi early-bird price while it is running', fun
     // Pinned to a date inside the early-bird window. Without this the test quietly
     // starts failing the day early-bird ends, which is exactly what happened on
     // 31 Aug 2026 - it looked like a currency bug and was only a stale clock.
+    //
+    // earlybird_seats is also set here rather than inherited: it is 0 in live config
+    // (that is how early-bird is switched OFF), and this test is about the PRICING
+    // mechanism, which has to keep working for the cohort that next turns it back on.
+    config(['accelerator.earlybird_seats' => 10]);
     Carbon::setTestNow(Carbon::parse(config('accelerator.earlybird_ends_at'), 'Africa/Lagos')->subDay());
 
     $c = Volt::test('accelerator-checkout')->set('plan', 'full')->set('currency', 'GHS');

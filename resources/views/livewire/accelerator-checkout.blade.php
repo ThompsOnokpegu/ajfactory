@@ -36,7 +36,6 @@ new class extends Component {
     public bool $registrationOpen = true;
     public int $seatsLeft = 0;
     public bool $earlybird = false;
-    public ?string $closesLabel = null;
 
     public bool $isReturning = false;
     public string $statusMessage = '';
@@ -67,9 +66,6 @@ new class extends Component {
         $this->registrationOpen = Accelerator::registrationOpen();
         $this->seatsLeft        = Accelerator::seatsLeft();
         $this->earlybird        = Accelerator::earlybirdActive();
-        $closesAt               = Accelerator::cartClosesAt();
-        $this->closesLabel      = ($closesAt && \Illuminate\Support\Carbon::now('Africa/Lagos')->lt($closesAt))
-            ? $closesAt->format('l jS F') : null;
     }
 
     public function updatedPlan()
@@ -290,11 +286,8 @@ new class extends Component {
                 <div class="mb-8">
                     <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Join {{ $cohortPadded }}.</h1>
                     <p class="text-[11px] font-mono uppercase tracking-widest {{ $earlybird ? 'text-cyan-400' : 'text-zinc-500' }}">
-                        {{ $seatsLeft }} of {{ $cap }} seats left @if($earlybird) · early-bird active @endif
+                        {{ $seatsLeft }} of {{ $cap }} seats left
                     </p>
-                    @if($closesLabel)
-                        <p class="mt-1 text-[11px] font-mono font-bold uppercase tracking-widest text-amber-400">⏳ Enrolment closes {{ $closesLabel }}</p>
-                    @endif
                 </div>
 
                 <!-- PLAN SELECTION -->

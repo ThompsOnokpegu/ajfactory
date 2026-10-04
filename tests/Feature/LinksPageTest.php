@@ -71,25 +71,31 @@ it('takes the masterclass date from config, not the markup', function () {
     Carbon::setTestNow();
 });
 
-it('takes the cohort and its start date from config', function () {
+it('takes the cohort from config and keeps its dates out of the copy', function () {
+    // The cohort label is still config-driven, but no Accelerator date is advertised:
+    // enrolment stays open while the cohort runs and the cart close is enforced from
+    // config rather than marketed as a deadline.
     config([
         'accelerator.cohort_number' => 9,
         'accelerator.cohort_starts_at' => '2027-01-15',
-    ]);
-
-    $this->get('/links')->assertSee('Cohort 9 starts Fri 15 Jan', false);
-});
-
-it('says so plainly when a date has not been set', function () {
-    // Better an honest "to be announced" than a blank, or worse, a stale date left
-    // behind from the previous edition.
-    config([
-        'taab.masterclass.date' => null,
-        'taab.masterclass.starts_at' => null,
-        'accelerator.cohort_starts_at' => null,
+        'accelerator.cart_closes_at' => '2027-02-20 23:59:59',
     ]);
 
     $this->get('/links')
-        ->assertSee('Next date to be announced', false)
-        ->assertSee('start date to be announced', false);
+        ->assertSee('Cohort 9', false)
+        ->assertDontSee('15 Jan', false)
+        ->assertDontSee('20 Feb', false)
+        ->assertDontSee('doors close', false);
+});
+
+it('says so plainly when the masterclass date has not been set', function () {
+    // Better an honest "to be announced" than a blank, or worse, a stale date left
+    // behind from the previous edition. Applies to TAAB, which does advertise its
+    // date; the Accelerator line carries no date to go stale in the first place.
+    config([
+        'taab.masterclass.date' => null,
+        'taab.masterclass.starts_at' => null,
+    ]);
+
+    $this->get('/links')->assertSee('Next date to be announced', false);
 });

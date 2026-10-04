@@ -119,10 +119,18 @@ return [
     // a smaller number, reads as fake scarcity to an audience we sell "no surprises"
     // to — so if it moves again, move it before the next send, not during one.
     'cohort_cap'        => 30,
-    'earlybird_seats'   => 10,    // early-bird active while seats_sold < this
+    // Early-bird is OFF: 0 means seats_sold is always >= it, so earlybirdActive() is
+    // false whatever the date says. Do NOT turn it off by clearing earlybird_ends_at
+    // instead - an empty end date means "no cutoff" and flips early-bird back ON,
+    // which would quietly sell at the early-bird price. Set this back to 10 (and give
+    // earlybird_ends_at a future date) to run early-bird for the next cohort.
+    'earlybird_seats'   => 0,
     'earlybird_ends_at' => '2026-08-31 23:59:59', // Monday 31st August 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
     'cohort_starts_at'  => '2026-09-12', // Saturday 12th September 2026
-    'cart_closes_at'    => '2026-09-14 23:59:59', // Monday 14th September 2026 (doors stay open 2 days into the cohort)
+    // Extended to Sat 31 Oct 2026: Cohort 3 is mid-run and self-paced, so enrolment
+    // stays open while the cohort is live. The DATE IS NOT SHOWN in any page copy - it
+    // is the real close the system enforces, not a deadline being marketed.
+    'cart_closes_at'    => '2026-10-31 23:59:59',
 
     'payment_provider'  => 'paystack', // or 'flutterwave'
 

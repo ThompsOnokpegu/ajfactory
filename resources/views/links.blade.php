@@ -37,12 +37,12 @@
     $cohortLabel   = Accelerator::cohortLabel();
     $cohortStarts  = Accelerator::cohortStartsAt();
     $cartCloses    = Accelerator::cartClosesAt();
+    // No dates in this line: enrolment stays open while the cohort runs, and the cart
+    // close is enforced from config rather than marketed as a deadline.
     $acceleratorMeta = match (true) {
-        Accelerator::isSoldOut()      => $cohortLabel . ' is full - join the waitlist',
-        ! $cohortStarts               => $cohortLabel . ' - start date to be announced',
-        // Mid-cohort it's self-paced, so the deadline that matters is the cart close.
-        Accelerator::hasStarted()     => $cohortLabel . ' running' . ($cartCloses ? ' · doors close ' . $cartCloses->format('D j M') : ''),
-        default                       => $cohortLabel . ' starts ' . $cohortStarts->format('D j M'),
+        Accelerator::isSoldOut()  => $cohortLabel . ' is full - join the waitlist',
+        Accelerator::hasStarted() => $cohortLabel . ' running · self-paced, join anytime',
+        default                   => $cohortLabel . ' · enrolment open',
     };
     $acceleratorPrice = '₦' . number_format(Accelerator::fullPrice('NGN'));
 @endphp
