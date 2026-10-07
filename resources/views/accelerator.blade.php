@@ -332,7 +332,15 @@
                     @else
                         <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.</p>
                         @if($regOpen)
-                            <p class="mt-2 text-sm font-bold text-amber-400">Enrolment is open@if($hasStarted) - the cohort is live, and you catch up with daily Telegram support and weekly live clinics@endif.</p>
+                            <p class="mt-2 text-sm font-bold text-amber-400">
+                                {{-- Do NOT inline @if straight after a word: Blade needs a non-word
+                                     character before the @ or it emits the directive as text. --}}
+                                @if($hasStarted)
+                                    Enrolment is open - the cohort is live, and you catch up with daily Telegram support and weekly live clinics.
+                                @else
+                                    Enrolment is open.
+                                @endif
+                            </p>
                         @endif
                     @endif
                 </div>

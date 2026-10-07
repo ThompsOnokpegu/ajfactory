@@ -150,6 +150,18 @@ These encode real incidents. Changing them will break something that took a whil
   went live a GH₵820 sale rendered as "$820" - on the admin screens payments are reconciled
   from, and on the student's own balance notice. The manual-enrol form had the same split and
   could not record a sale in any other currency at all. `CurrencyDisplayTest` guards it.
+- **Never inline a Blade directive straight after a word character.** `open@if($x)` does
+  not compile - Blade matches statements with `/\B@\w+/`, and the boundary between a word
+  character and the `@` makes `\B` fail - so the directive is printed to the page as text
+  and the response is still a 200. `.@if` and `}}@if` are fine, which is why the existing
+  inline uses work and the one added next to a word did not. `BladeOutputTest` renders the
+  public pages and asserts no directive survives.
+- **`expect()->not->toContain()` is variadic: never pass it a failure message.** The message
+  becomes a second *needle*, and negating a multi-needle check passes as soon as any one of
+  them is absent - so the assertion silently stops testing anything. That is how the first
+  version of `BladeOutputTest` passed against a visibly broken page. Use
+  `assertStringNotContainsString($needle, $haystack, $message)`, and prove a new guard fails
+  before trusting it.
 - **Don't `git add -A`.** This repo contains large binaries and n8n exports that GitHub's
   push protection rejects. Stage only what you changed.
 
