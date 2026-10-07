@@ -308,6 +308,7 @@
                         'The Agency Toolkit: intake form, outreach script, onboarding roadmap, pricing playbook',
                         'Lifetime LMS access + all future updates & session recordings',
                         'Alumni community + Demo Day',
+                        'Certificate of Completion, earned when every module checkpoint is approved - with a public verification page anyone can check',
                         'Completion guarantee (see below)',
                     ] as $item)
                         <div class="flex items-start gap-4 p-5">
@@ -413,6 +414,7 @@
                         ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
                         ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
                         ['Can I pay in installments?', 'Yes - ₦'.number_format($instEach).' × '.$instCount.'.'],
+                        ['Do I get a certificate?', 'Yes - a Certificate of Completion, issued automatically once every module has had its build proof reviewed and approved. It is not given for watching videos: every module has to be built and signed off. It carries a code anyone can check on a public verification page, so a client or employer can confirm it is real. It is a certificate of completion issued by Deepr Web Services, not an accredited qualification.'],
                         ['What\'s the guarantee?', 'Do the work and if your stack still isn\'t live by the end, we coach you 1-on-1 until it is.'],
                     ] as $i => [$q, $a])
                         <div class="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden">

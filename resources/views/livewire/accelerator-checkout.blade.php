@@ -436,6 +436,7 @@ new class extends Component {
                             'Ship-to-unlock + weekly live clinics',
                             'n8n Snapshot Vault (deployment ready)',
                             'Lifetime LMS access + future updates',
+                            'Verifiable Certificate of Completion',
                             'Completion guarantee',
                         ] as $perk)
                             <div class="flex items-center gap-3 text-xs text-zinc-400">
