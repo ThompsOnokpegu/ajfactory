@@ -62,6 +62,13 @@ new #[Layout('components.layouts.admin', ['title' => 'Progress'])] class extends
         <div>
             <h2 class="text-xl font-black tracking-tighter text-white">Student progress</h2>
             <p class="text-[11px] text-zinc-500 mt-0.5">Ranked by approved checkpoints, then live sessions attended - the same order students see on their leaderboard.</p>
+            <p class="text-[11px] text-zinc-600 mt-1">
+                Preview the
+                <a href="{{ route('admin.certificate.preview') }}" target="_blank" rel="noopener" class="text-cyan-500 hover:underline">certificate</a>
+                and its
+                <a href="{{ route('admin.certificate.preview.verify') }}" target="_blank" rel="noopener" class="text-cyan-500 hover:underline">verification page</a>
+                with sample data.
+            </p>
         </div>
         <div class="flex items-center gap-2">
             <select wire:model.live="cohort"

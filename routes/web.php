@@ -193,6 +193,37 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Volt::route('/leads', 'admin.leads')->name('admin.leads');
     Volt::route('/resources', 'admin.resources')->name('admin.resources');
 
+    /*
+    | Certificate previews, admin only.
+    |
+    | The certificate is only reachable by a student who has earned one, so there was
+    | no way to look at the design without being that student. These render both halves
+    | with sample data so the layout can be checked any time, including on a phone.
+    |
+    | The sample code is deliberately not one mintCode() can produce (it has vowels and
+    | is the wrong length), so it can never collide with a real certificate and will
+    | never resolve on the public /verify page.
+    */
+    Route::get('/certificate/preview', function () {
+        return view('certificate', [
+            'name'     => 'Amara Nwachukwu',
+            'code'     => 'AJ-PREVIEW',
+            'issuedAt' => now('Africa/Lagos')->format('j F Y'),
+            'cohort'   => config('accelerator.cohort_number', 3),
+            'modules'  => \App\Support\Certificate::moduleTitles(),
+        ]);
+    })->name('admin.certificate.preview');
+
+    Route::get('/certificate/preview/verify', function () {
+        return view('certificate-verify', [
+            'code'       => 'AJ-PREVIEW',
+            'enrollment' => new \App\Models\Enrollment(['cohort' => config('accelerator.cohort_number', 3)]),
+            'name'       => 'Amara Nwachukwu',
+            'issuedAt'   => now('Africa/Lagos')->format('j F Y'),
+            'modules'    => \App\Support\Certificate::moduleTitles(),
+        ]);
+    })->name('admin.certificate.preview.verify');
+
     Route::get('/masterclass/export', [\App\Http\Controllers\Admin\ExportController::class, 'masterclass'])->name('admin.masterclass.export');
     Route::get('/leads/export', [\App\Http\Controllers\Admin\ExportController::class, 'leads'])->name('admin.leads.export');
 });

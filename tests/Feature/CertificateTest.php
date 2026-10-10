@@ -400,3 +400,47 @@ it('shows the certificate and the chosen name on the admin progress screen', fun
         ->assertSee($code)
         ->assertSee('Chidi O. Okonkwo');
 });
+
+/* ------------------------------------------------------------- previewing -- */
+
+it('lets an admin preview the certificate without being a student', function () {
+    certCurriculum();
+    $this->actingAs(User::factory()->create(['is_admin' => true]));
+
+    $this->get('/admin/certificate/preview')
+        ->assertOk()
+        ->assertSee('Certificate of Completion')
+        ->assertSee('Amara Nwachukwu')
+        ->assertSee('Issued by: Deepr Web Services')
+        // The module list lives on the verify page, not the certificate.
+        ->assertDontSee('Module 01: Build 1');
+});
+
+it('lets an admin preview the verification page in its verified state', function () {
+    certCurriculum();
+    $this->actingAs(User::factory()->create(['is_admin' => true]));
+
+    $this->get('/admin/certificate/preview/verify')
+        ->assertOk()
+        ->assertSee('Verified credential')
+        ->assertSee('Amara Nwachukwu')
+        ->assertSee('Module 01: Build 1');
+});
+
+it('keeps both previews behind the admin gate', function () {
+    certCurriculum();
+    $e = certStudent();
+    certLogin($e);
+
+    $this->get('/admin/certificate/preview')->assertForbidden();
+    $this->get('/admin/certificate/preview/verify')->assertForbidden();
+});
+
+it('uses a preview code that can never resolve as a real certificate', function () {
+    certCurriculum();
+
+    // Not a code mintCode() can produce, so it cannot collide with an issued one.
+    expect(Certificate::verify('AJ-PREVIEW'))->toBeNull();
+
+    $this->get('/verify/AJ-PREVIEW')->assertOk()->assertSee('No match');
+});

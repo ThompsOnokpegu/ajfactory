@@ -542,6 +542,18 @@ disclaimer is present.
 Verification is public at `/verify` (or `/verify/{code}`). It has to stay reachable for as
 long as certificates exist - a dead verify URL turns every certificate back into a JPEG.
 
+**To look at the design** without being a student who has earned one, use the admin previews,
+linked from the top of `/admin/progress`:
+
+| | |
+|---|---|
+| `/admin/certificate/preview` | the certificate, with sample data |
+| `/admin/certificate/preview/verify` | the verification page in its verified state |
+
+Both are admin-only. The sample code `AJ-PREVIEW` is deliberately not one `mintCode()` can
+produce, so it can never collide with a real certificate and never resolves on public
+`/verify`.
+
 ### Selling a written guide
 
 The guides are gated by default and free to Accelerator students. To sell one to
