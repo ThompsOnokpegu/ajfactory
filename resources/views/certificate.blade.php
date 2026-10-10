@@ -85,7 +85,7 @@
                 <h1 class="mt-4 text-2xl sm:text-4xl font-bold tracking-tight text-zinc-900 leading-tight max-w-2xl">
                     AI Automation Accelerator
                 </h1>
-                <p class="mt-2 text-xs sm:text-sm text-zinc-500">6 weeks &middot; 9 production workflows</p>
+                <p class="mt-2 text-xs sm:text-sm text-zinc-500">8 weeks &middot; 9 production workflows</p>
 
                 <p class="mt-8 sm:mt-10 text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] text-zinc-500">
                     Issued to

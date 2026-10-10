@@ -74,7 +74,7 @@
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A smartphone.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A Google account.</span></li>
                     <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>A bank card - <strong class="text-zinc-300">a Naira card is fine</strong>, no USD card needed - for the one-time $30 Google Cloud prepayment. Rather not prepay? A small paid host (~$10/mo for ~3 months) is the fallback.</span></li>
-                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>~5–8 hours/week for 6 weeks.</span></li>
+                    <li class="flex gap-2"><span class="text-cyan-500 mt-0.5 shrink-0">→</span><span>~5–8 hours/week for 8 weeks.</span></li>
                 </ul>
             </div>
             <div class="p-6 rounded-2xl border border-zinc-800 bg-zinc-950/60">

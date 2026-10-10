@@ -94,7 +94,7 @@
                     <div class="flex flex-col text-left">
                         <span class="font-bold text-white text-lg tracking-wide group-hover:text-cyan-400 transition-colors">AI Automation Accelerator</span>
                         <p class="text-sm text-zinc-400 mt-1 leading-relaxed max-w-[92%]">
-                            Six weeks, nine production workflows, and the playbook to charge real money for building them.
+                            Eight weeks, nine production workflows, and the playbook to charge real money for building them.
                         </p>
                         <span class="mt-2.5 text-[10px] font-mono uppercase tracking-widest text-zinc-500">
                             {{ $acceleratorMeta }} · from {{ $acceleratorPrice }}

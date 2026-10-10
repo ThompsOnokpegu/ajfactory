@@ -3,13 +3,13 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="description" content="Build 9 real AI automations in 6 weeks — Telegram, WhatsApp & Voice AI on your own infrastructure, even if you can't code. Finish, or we coach you 1-on-1 until you do.">
+        <meta name="description" content="Build 9 real AI automations in 8 weeks — Telegram, WhatsApp & Voice AI on your own infrastructure, even if you can't code. Finish, or we coach you 1-on-1 until you do.">
 
         <!-- Open Graph / Facebook -->
         <meta property="og:type" content="website">
         <meta property="og:url" content="{{ config('app.url') }}">
         <meta property="og:title" content="AI Automation Accelerator | {{ \App\Support\Accelerator::cohortLabel() }}">
-        <meta property="og:description" content="Build 9 real AI automations in 6 weeks — and the playbook to charge for them.">
+        <meta property="og:description" content="Build 9 real AI automations in 8 weeks — and the playbook to charge for them.">
         <meta property="og:image" content="{{ asset('img/og-preview.jpg') }}">
 
         <!-- Twitter -->
@@ -120,8 +120,6 @@
                             <span class="text-amber-400 font-bold">Enrolment open</span>
                             <span class="text-zinc-700">·</span>
                         @endif
-                        <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
-                        <span class="text-zinc-700">·</span>
                         <span>Installments available</span>
                     @endif
                 </div>
@@ -232,15 +230,14 @@
                 <div class="text-center mb-16 space-y-3">
                     <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// How It Works</div>
                     <h2 class="text-4xl md:text-5xl font-black text-white uppercase italic tracking-tighter">Why you'll actually finish.</h2>
-                    <p class="text-zinc-500 font-mono text-xs uppercase tracking-widest">6 weeks · ~5–8 hours/week</p>
+                    <p class="text-zinc-500 font-mono text-xs uppercase tracking-widest">8 weeks · ~5–8 hours/week</p>
                 </div>
 
-                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                     @foreach([
                         ['Self-paced video', 'Every module lives on this LMS — learn on your schedule.'],
                         ['Ship-to-unlock', 'The next module opens when you submit proof the last build works, so you never silently fall behind.'],
                         ['Weekly live clinics', 'Build & Debug sessions — get unblocked in real time.'],
-                        ['Accountability pods', '3–4 classmates working alongside you.'],
                     ] as $i => [$title, $desc])
                         <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl hover:border-cyan-500/50 transition-all">
                             <div class="text-[10px] font-mono text-cyan-500 mb-4 uppercase tracking-[0.2em]">0{{ $i + 1 }}</div>
@@ -265,18 +262,33 @@
                 @if($testimonials->isNotEmpty())
                     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         @foreach($testimonials as $t)
-                            <div class="p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl">
-                                <p class="text-sm text-zinc-300 leading-relaxed mb-6">"{{ $t['quote'] ?? '' }}"</p>
-                                <div class="flex items-center gap-3">
+                            @php
+                                $tName = trim($t['name'] ?? '');
+                                // Initials for the avatar, so a card has a face even with no photo.
+                                $tInitials = collect(preg_split('/\s+/', $tName))
+                                    ->filter()->take(2)
+                                    ->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))
+                                    ->implode('');
+                            @endphp
+                            <figure class="flex flex-col p-8 bg-zinc-900/50 border border-zinc-800 rounded-3xl hover:border-cyan-500/40 transition-colors">
+                                <span class="block text-6xl leading-[0.6] font-black text-cyan-500/25 select-none" aria-hidden="true">&ldquo;</span>
+
+                                <blockquote class="mt-5 flex-1 text-sm text-zinc-300 leading-relaxed">{{ $t['quote'] ?? '' }}</blockquote>
+
+                                <figcaption class="mt-6 pt-5 border-t border-zinc-800 flex items-center gap-3">
                                     @if(!empty($t['photo']))
-                                        <img src="{{ $t['photo'] }}" alt="{{ $t['name'] ?? '' }}" class="h-10 w-10 rounded-full object-cover">
+                                        <img src="{{ $t['photo'] }}" alt="{{ $tName }}" class="h-10 w-10 shrink-0 rounded-full object-cover">
+                                    @else
+                                        <span class="h-10 w-10 shrink-0 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-[11px] font-black tracking-wider text-cyan-400">{{ $tInitials }}</span>
                                     @endif
-                                    <div>
-                                        <div class="text-sm font-bold text-white">{{ $t['name'] ?? '' }}</div>
-                                        <div class="text-[10px] text-zinc-500 uppercase tracking-widest">{{ $t['role'] ?? '' }}</div>
+                                    <div class="min-w-0">
+                                        <div class="text-sm font-bold text-white truncate">{{ $tName }}</div>
+                                        @if(!empty($t['role']))
+                                            <div class="text-[10px] text-zinc-500 uppercase tracking-widest">{{ $t['role'] }}</div>
+                                        @endif
                                     </div>
-                                </div>
-                            </div>
+                                </figcaption>
+                            </figure>
                         @endforeach
                     </div>
                 @else
@@ -330,7 +342,6 @@
                     @if($soldOut)
                         <p class="text-amber-400 font-bold">This cohort is full. Join the waitlist for the next one.</p>
                     @else
-                        <p class="text-zinc-500">{{ $seatsLeft }} of {{ $cap }} seats left.</p>
                         @if($regOpen)
                             <p class="mt-2 text-sm font-bold text-amber-400">
                                 {{-- Do NOT inline @if straight after a word: Blade needs a non-word
@@ -419,7 +430,7 @@
                         ['Do I need a registered business (CAC)?', 'No — not for any part of the program. The WhatsApp bot is built in test mode, so no business registration is required to build or complete it.'],
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
                         ['Do I need an international card?', 'Not any more. Google Cloud now asks for a one-time $30 prepayment instead, and a Naira card works for it. If you\'d rather not prepay, the fallback is a small paid host at ~$10/mo for about 3 months.'],
-                        ['How much time per week?', 'About 5–8 hours, over 6 weeks.'],
+                        ['How much time per week?', 'About 5–8 hours, over 8 weeks.'],
                         ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
                         ['Can I pay in installments?', 'Yes - ₦'.number_format($instEach).' × '.$instCount.'.'],
                         ['Do I get a certificate?', 'Yes - a Certificate of Completion, issued automatically once every module has had its build proof reviewed and approved. It is not given for watching videos: every module has to be built and signed off. It carries a code anyone can check on a public verification page, so a client or employer can confirm it is real. It is a certificate of completion issued by Deepr Web Services, not an accredited qualification.'],
@@ -452,7 +463,6 @@
                             <span class="text-amber-400 font-bold">Enrolment open</span>
                             <span class="text-zinc-700">·</span>
                         @endif
-                        <span class="text-cyan-400">{{ $seatsLeft }} of {{ $cap }} seats left</span>
                     @endif
                 </div>
                 <a href="{{ $primaryCta }}" class="inline-block px-12 py-6 bg-cyan-500 text-black font-black uppercase tracking-tighter text-2xl rounded-2xl hover:bg-white transition-all shadow-[0_20px_50px_rgba(6,182,212,0.2)]">

@@ -123,7 +123,7 @@
         @endif
 
         <p class="mt-8 text-[11px] text-zinc-500 leading-relaxed">
-            The AI Automation Accelerator is a 6-week programme run by Deepr Web Services
+            The AI Automation Accelerator is an 8-week programme run by Deepr Web Services
             (<a href="{{ url('/') }}" class="text-cyan-600 hover:underline">ajbuildai.com</a>). A certificate of
             completion records that a student finished every module with reviewed build proof. It is not an
             accredited qualification.

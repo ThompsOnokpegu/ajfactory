@@ -286,7 +286,7 @@ new class extends Component {
                 <div class="mb-8">
                     <h1 class="text-4xl font-black text-white uppercase italic tracking-tighter mb-2">Join {{ $cohortPadded }}.</h1>
                     <p class="text-[11px] font-mono uppercase tracking-widest {{ $earlybird ? 'text-cyan-400' : 'text-zinc-500' }}">
-                        {{ $seatsLeft }} of {{ $cap }} seats left
+                        Enrolment open
                     </p>
                 </div>
 

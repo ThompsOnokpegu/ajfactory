@@ -254,11 +254,15 @@ return [
     | resources/views/accelerator.blade.php must be uncommented, or these render
     | nowhere and the page silently keeps its empty state.
     */
+    /*
+    | 'role' is optional and currently unset on every entry: the cohort number was
+    | dropped from the cards because it dates a quote the moment the next cohort
+    | starts. Set it only for something that stays true (a city, a job title).
+    */
     'testimonials' => [
         [
             // Answers the "I'll just learn it free on YouTube" objection, unprompted.
             'name' => 'Janet',
-            'role' => 'Cohort 2',
             'quote' => 'The process explained is simpler than watching YouTube videos.',
             'photo' => '',
             'is_published' => true,
@@ -268,7 +272,6 @@ return [
             // students. Left in his own plain phrasing on purpose — that's what makes
             // it read as a real person. Only OAuth/API were capitalised.
             'name' => 'James A.',
-            'role' => 'Cohort 2',
             'quote' => 'In Module 1, I could not configure those OAuth and API properly - but now I am good.',
             'photo' => '',
             'is_published' => true,
@@ -280,7 +283,6 @@ return [
             // course teaches Gemini, and requirements-costs.blade.php advertises that
             // key at ₦0. Publishing it would contradict the costs table on the same page.
             'name' => 'Michael Egwuchukwu Ugochukwu',
-            'role' => 'Cohort 2',
             'quote' => 'What surprised me most was how much you can build without being an expert programmer... Seeing my first automation actually work gave me the confidence that I can build solutions for real businesses.',
             'photo' => '',
             'is_published' => true,
@@ -291,7 +293,6 @@ return [
             // moment the doubt broke. From her "what were you unsure about" answer,
             // whole and unedited.
             'name' => 'Tolulope O Ogunsola',
-            'role' => 'Cohort 3',
             'quote' => "I wasn't completely sure I could do it at first, but after going through the first module and seeing how simplified and practical AJ made the course, it sparked a strong desire in me to see it through to the end.",
             'photo' => '',
             'is_published' => true,
@@ -307,7 +308,6 @@ return [
             // answers that before it's asked. Trailing "Thank you." dropped - it's
             // addressed to AJ, not to a reader.
             'name' => 'Accelerator student',
-            'role' => 'Cohort 3',
             'quote' => 'The learning method. Figuring it out ourselves and asking questions when we get stuck. I must say, it is a great way of learning.',
             'photo' => '',
             'is_published' => true,
@@ -321,7 +321,6 @@ return [
             // funnel before joining. True, and fine in a review, but as public proof it
             // reads as "module 1 taught me nothing new".
             'name' => 'Soremekun',
-            'role' => 'Cohort 3',
             'quote' => 'Would it be different from every other tutorial I have watched online and yeah I have gotten my answers... It is different.',
             'photo' => '',
             'is_published' => true,
@@ -341,7 +340,6 @@ return [
             // NOT his Module 1 answer - "Module 1 was a breeze for me" is fine in a
             // review and poor as public proof.
             'name' => 'Damilola A.',
-            'role' => 'Cohort 3',
             'quote' => "I had taken an automation course before. Somehow I wasn't satisfied and I wanted to learn more and learn fast... I knew a couple of things that I could really get better at with a few YouTube videos but I was happy to pay for the knowledge and speed.",
             'photo' => '',
             'is_published' => true,
@@ -361,7 +359,6 @@ return [
             // only parses as a reply to the question, and stitching the question into
             // the quote would be writing a sentence she never said.
             'name' => 'Abigail Ijomah',
-            'role' => 'Cohort 3',
             'quote' => 'Working on n8n and being able to connect to Telegram and finding welcome mail in my inbox. So amazing 🤩',
             'photo' => '',
             'is_published' => true,

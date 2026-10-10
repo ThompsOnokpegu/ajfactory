@@ -41,7 +41,7 @@ links to the architecture, configuration, and operations docs.
 |---|---|
 | Legal entity | **Deepr Web Services** |
 | Public identity | **ajbuildai.com** · hello@ajbuildai.com |
-| Paid product | **AI Automation Accelerator** — 6 weeks, 9 production workflows |
+| Paid product | **AI Automation Accelerator** — 8 weeks, 9 production workflows |
 | Free funnel | **TAAB (The AI Automation Bootcamp)** — a live 2-hour masterclass |
 | Audience | Nigeria-first, beginners, no coding required. Mostly mobile / TikTok traffic. |
 | Tone | Confident, plain-English, no hype, Naira-first, "no surprises" |

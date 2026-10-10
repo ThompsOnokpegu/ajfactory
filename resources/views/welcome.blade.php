@@ -77,7 +77,7 @@
                 </div>
 
                 <p class="mt-10 text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em]">
-                    Free one-day bootcamp · 6-week paid cohort · Build &amp; sell, no surprises
+                    Free one-day bootcamp · 8-week paid cohort · Build &amp; sell, no surprises
                 </p>
             </section>
 
@@ -136,7 +136,7 @@
                                 <div class="text-amber-400 text-sm font-bold mb-2">· or ₦{{ number_format((int) config('accelerator.installment_each')) }} × {{ (int) config('accelerator.installment_count') }}</div>
                             </div>
                             <p class="text-zinc-400 leading-relaxed my-6 flex-1">
-                                Build 9 real automations in 6 weeks — and the playbook to charge for them. Ship-to-unlock structure, weekly live clinics, and a completion guarantee.
+                                Build 9 real automations in 8 weeks — and the playbook to charge for them. Ship-to-unlock structure, weekly live clinics, and a completion guarantee.
                             </p>
                             <a href="{{ route('accelerator') }}" class="block text-center w-full py-4 border border-zinc-700 text-white font-black uppercase tracking-tighter text-lg rounded-2xl hover:border-cyan-500 hover:text-cyan-400 transition-all">
                                 Explore the Accelerator

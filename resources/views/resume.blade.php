@@ -86,7 +86,7 @@
                     <span class="text-gray-600 font-medium whitespace-nowrap">2026 – Present</span>
                 </div>
                 <ul class="list-disc list-outside ml-4 text-gray-700 space-y-1 mt-1.5">
-                    <li>Created and teach a 6-week cohort program on building 9 production AI automations — Telegram lead-capture agents, RAG knowledge bases, WhatsApp bots, AI voice receptionists — each one shipped by me first.</li>
+                    <li>Created and teach an 8-week cohort program on building 9 production AI automations — Telegram lead-capture agents, RAG knowledge bases, WhatsApp bots, AI voice receptionists — each one shipped by me first.</li>
                     <li>Engineered the platform end to end: Laravel/Livewire LMS with Paystack checkout (installment billing, signed payment links, server-side verification), ship-to-unlock module gating, and an n8n-automated marketing funnel with idempotent, throttled webhook sends.</li>
                     <li>Run zero-touch CI/CD with GitHub Actions deploying over SSH, including automatic recovery from drifted server state.</li>
                 </ul>
