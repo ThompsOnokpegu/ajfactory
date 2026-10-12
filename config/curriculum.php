@@ -179,7 +179,7 @@ Plenty of troubleshooting along the way - the failures are part of the lesson.
 
 The original walkthrough is kept as a legacy reference, but Vapi's interface has moved on since it was recorded, so follow the new build.",
             'videos' => [
-                ['id' => 'module-06-v2', 'title' => 'AI Voice Agent on Vapi', 'video_id' => '715fe51b-9c17-4d65-8ce0-3c45b303a349', 'duration' => ''],
+                ['id' => 'module-06-v2', 'title' => 'AI Voice Agent on Vapi', 'video_id' => '715fe51b-9c17-4d65-8ce0-3c45b303a349', 'duration' => '52:41 Mins'],
                 // Kept so students who already completed it keep the tick (completed_lessons keys off the id).
                 ['id' => 'module-06-v1', 'title' => 'LEGACY: AI Voice Support Agent', 'video_id' => 'ad4ae58d-9faf-453d-8fa9-45df3d78d1a0', 'duration' => '40:00'],
             ],
