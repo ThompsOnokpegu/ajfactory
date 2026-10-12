@@ -166,9 +166,22 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
             'title' => 'Module 07: AI Voice Support Agent',
             'release_at' => '2026-08-10 00:00:00',
             'has_blueprint' => true,
-            'description' => "Creating 'Tola', a real-time voice receptionist. This module covers:\n\n• Introduction to Voice AI latency and the Vapi Orchestrator.\n• Configuring the Voice, Transcriber, and System Prompt.\n• Using Function Calling to connect Vapi to n8n for real-time data lookups.",
+            'description' => "Building a real-time voice agent on Vapi, rebuilt for the interface Vapi ships today. We cover:
+
+• How a voice agent actually works - speech to text, the model, then text to speech, and why latency is the thing you design around.
+• Creating a Vapi assistant and configuring it.
+• Building a custom tool as an n8n workflow and assigning it to an assistant.
+• Handling the tool call and the end-of-call report.
+• Getting a phone number and assigning it to an assistant, so the thing actually answers.
+• Handling several webhook notifications arriving on one URL.
+
+Plenty of troubleshooting along the way - the failures are part of the lesson.
+
+The original walkthrough is kept as a legacy reference, but Vapi's interface has moved on since it was recorded, so follow the new build.",
             'videos' => [
-                ['id' => 'module-06-v1', 'title' => 'AI Voice Support Agent', 'video_id' => 'ad4ae58d-9faf-453d-8fa9-45df3d78d1a0', 'duration' => '40:00'],
+                ['id' => 'module-06-v2', 'title' => 'AI Voice Agent on Vapi', 'video_id' => '715fe51b-9c17-4d65-8ce0-3c45b303a349', 'duration' => ''],
+                // Kept so students who already completed it keep the tick (completed_lessons keys off the id).
+                ['id' => 'module-06-v1', 'title' => 'LEGACY: AI Voice Support Agent', 'video_id' => 'ad4ae58d-9faf-453d-8fa9-45df3d78d1a0', 'duration' => '40:00'],
             ],
         ],
         [
