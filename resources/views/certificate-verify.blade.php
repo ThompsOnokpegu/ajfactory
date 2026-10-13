@@ -29,7 +29,7 @@
 
     <header class="border-b border-zinc-200 bg-white">
         <div class="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
-            <a href="{{ url('/') }}" class="font-bold tracking-tight text-zinc-900">AJBUILD<span class="text-cyan-600">AI</span></a>
+            <a href="{{ url('/') }}" class="font-bold tracking-tight text-zinc-900">AJBUILDS<span class="text-cyan-600"> AI</span></a>
             <span class="text-[11px] font-bold uppercase tracking-widest text-zinc-500">Credential verification</span>
         </div>
     </header>

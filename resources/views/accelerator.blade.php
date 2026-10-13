@@ -330,6 +330,27 @@
                     @endforeach
                 </div>
 
+                {{-- Certificate: shown small and under the includes list on purpose. It is a
+                     tool for winning a client, not the headline - leading with it would
+                     attract people collecting certificates rather than people who build. --}}
+                <div class="mt-12 grid lg:grid-cols-5 gap-8 items-center">
+                    <div class="lg:col-span-2 max-w-sm mx-auto w-full">
+                        @include('partials.certificate-mock')
+                    </div>
+                    <div class="lg:col-span-3">
+                        <div class="text-xs font-mono text-cyan-500 uppercase tracking-widest">// Certificate</div>
+                        <h3 class="mt-2 text-2xl md:text-3xl font-black text-white uppercase italic tracking-tighter">Proof you can hand a client.</h3>
+                        <p class="mt-4 text-sm text-zinc-400 leading-relaxed">
+                            Earned, not given. It is issued only when every module's build proof has been reviewed and approved - not for watching videos. Each one carries a code anyone can check, so a client or an employer can confirm it in seconds.
+                        </p>
+                        <a href="{{ route('certificate.verify.form') }}" target="_blank" rel="noopener"
+                           class="inline-flex items-center gap-2 mt-5 text-[11px] font-black uppercase tracking-widest text-cyan-500 hover:text-white transition">
+                            See how verification works
+                            <span aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+
                 <p class="mt-8 text-center text-base text-zinc-400 leading-relaxed max-w-2xl mx-auto">
                     Agencies charge <span class="text-amber-400 font-bold">₦300k–1M to build <em>one</em></span> of these. You'll learn to build all nine — and sell them — for <span class="text-white font-bold">₦{{ number_format(config('accelerator.price_full')) }}</span>.
                 </p>

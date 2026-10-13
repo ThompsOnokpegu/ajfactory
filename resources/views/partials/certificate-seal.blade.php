@@ -17,7 +17,7 @@
     <path d="M4 4h112v78c0 24-26 38-56 56C30 120 4 106 4 82V4z" fill="#ffffff" stroke="#d4d4d8" stroke-width="2"/>
     {{-- dark header band --}}
     <path d="M8 8h104v34H8z" fill="#18181b"/>
-    <text x="60" y="26" text-anchor="middle" font-family="'Space Grotesk',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" letter-spacing="0.5">AJBUILD</text>
+    <text x="60" y="26" text-anchor="middle" font-family="'Space Grotesk',Arial,sans-serif" font-size="12" font-weight="700" fill="#ffffff" letter-spacing="0.5">AJBUILDS</text>
     <text x="60" y="37" text-anchor="middle" font-family="'Space Grotesk',Arial,sans-serif" font-size="9" font-weight="700" fill="#06b6d4" letter-spacing="3">AI</text>
     {{-- cyan panel --}}
     <path d="M8 46h104v36H8z" fill="#06b6d4"/>

@@ -444,3 +444,30 @@ it('uses a preview code that can never resolve as a real certificate', function 
 
     $this->get('/verify/AJ-PREVIEW')->assertOk()->assertSee('No match');
 });
+
+/* -------------------------------------------------------- on the sales page -- */
+
+it('shows the certificate on the sales page without faking a credential', function () {
+    $html = $this->get('/accelerator')->assertOk()->getContent();
+
+    expect($html)->toContain('Proof you can hand a client')
+        ->and($html)->toContain('Your Name Here');   // a placeholder, never a real person
+
+    // The mock must never carry a code the public verifier would accept.
+    $this->assertStringNotContainsString('AJ-SAMPLE', $html, 'sales page shows a resolvable-looking code');
+    expect(Certificate::verify('AJ-XXXXXXXX'))->toBeNull();
+});
+
+it('uses the same wordmark on the certificate as the rest of the site', function () {
+    certCurriculum();
+    $this->actingAs(User::factory()->create(['is_admin' => true]));
+
+    foreach (['/admin/certificate/preview', '/admin/certificate/preview/verify'] as $url) {
+        $html = $this->get($url)->assertOk()->getContent();
+
+        expect($html)->toContain('AJBUILDS');
+        // The old lockup dropped the S, so the certificate read AJBUILDAI while the
+        // homepage read AJBUILDS AI.
+        $this->assertDoesNotMatchRegularExpression('/AJBUILD(?!S)/', $html, "{$url} still uses the old wordmark");
+    }
+});

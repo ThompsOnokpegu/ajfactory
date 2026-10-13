@@ -62,7 +62,7 @@
             {{-- Corner brand blocks, the angular device the reference uses --}}
             <div class="absolute top-0 right-0 w-28 h-28 sm:w-36 sm:h-36 bg-zinc-900 flex items-center justify-center">
                 <div class="text-center leading-none">
-                    <div class="text-white font-bold tracking-tight text-sm sm:text-base">AJBUILD</div>
+                    <div class="text-white font-bold tracking-tight text-sm sm:text-base">AJBUILDS</div>
                     <div class="text-cyan-400 font-bold text-[10px] sm:text-xs tracking-[0.3em] mt-0.5">AI</div>
                 </div>
             </div>
