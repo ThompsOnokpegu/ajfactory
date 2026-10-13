@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Links | AJ Thompson</title>
-    <meta name="description" content="Everything AJ Thompson builds and teaches: the free TAAB masterclass, the AI Automation Accelerator, 1-on-1 coaching, and the readiness scorecard.">
+    <meta name="description" content="Everything AJ Thompson builds and teaches: the free TAAB masterclass, the AI Automation Accelerator, 1-on-1 coaching, and the self-hosting guide.">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
@@ -123,15 +123,30 @@
                 </div>
             </div>
 
-            <!-- 4. Free Readiness Scorecard -->
-            <a href="/taab/scorecard" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl transition-all duration-300 btn-hover-effect hover:-translate-y-1">
-                <span class="absolute top-5 right-5 text-[9px] font-mono uppercase tracking-widest text-zinc-500">Free</span>
+            {{-- 4. Self-hosting guide (paid). Links at the guide path, not a buy URL: the
+                 `guide` middleware shows the sales page with its own Buy button to anyone
+                 who has not bought, and the guide itself to students and buyers. The price
+                 is read from the Resource row so it cannot drift from what checkout charges,
+                 and falls back to "Paid guide" when no row exists yet. --}}
+            @php
+                $hostingGuide = \App\Models\Resource::where('url', '/guides/n8n-on-google-cloud')
+                    ->where('is_published', true)
+                    ->first();
+            @endphp
+            <a href="/guides/n8n-on-google-cloud" class="group relative block w-full bg-zinc-900/80 border border-zinc-800 p-5 rounded-2xl transition-all duration-300 btn-hover-effect hover:-translate-y-1">
+                <span class="absolute top-5 right-5 text-[9px] font-mono uppercase tracking-widest text-cyan-500">
+                    @if($hostingGuide && $hostingGuide->isPaid())
+                        ₦{{ number_format((float) $hostingGuide->price) }}
+                    @else
+                        Paid guide
+                    @endif
+                </span>
                 <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0 mt-0.5"><span class="text-lg">🎯</span></div>
+                    <div class="flex-shrink-0 mt-0.5"><span class="text-lg">🖥️</span></div>
                     <div class="flex flex-col text-left">
-                        <span class="font-bold text-white text-lg tracking-wide group-hover:text-cyan-400 transition-colors">Readiness Scorecard</span>
+                        <span class="font-bold text-white text-lg tracking-wide group-hover:text-cyan-400 transition-colors">Self-Host n8n Guide</span>
                         <p class="text-sm text-zinc-400 mt-1 leading-relaxed max-w-[92%]">
-                            A short honest check on whether you are ready to start automating, before spending anything.
+                            Your own n8n on a server you control. Free if you are an Accelerator student.
                         </p>
                     </div>
                 </div>

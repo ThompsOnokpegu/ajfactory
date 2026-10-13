@@ -99,3 +99,30 @@ it('says so plainly when the masterclass date has not been set', function () {
 
     $this->get('/links')->assertSee('Next date to be announced', false);
 });
+
+it('offers the paid self-hosting guide, not the readiness scorecard', function () {
+    $html = $this->get('/links')->assertOk()->getContent();
+
+    expect($html)->toContain('Self-Host n8n Guide')
+        ->and($html)->toContain('/guides/n8n-on-google-cloud');
+
+    $this->assertStringNotContainsString('Readiness Scorecard', $html, '/links still offers the scorecard');
+    $this->assertStringNotContainsString('/taab/scorecard', $html, '/links still links the scorecard');
+});
+
+it('shows the guide price from its Resource row, never a hardcoded one', function () {
+    \App\Models\Resource::create([
+        'title' => 'Self-hosting guide',
+        'url' => '/guides/n8n-on-google-cloud',
+        'price' => 15000,
+        'is_published' => true,
+    ]);
+
+    expect($this->get('/links')->assertOk()->getContent())->toContain('15,000');
+});
+
+it('says "Paid guide" rather than inventing a price when no Resource row exists', function () {
+    $html = $this->get('/links')->assertOk()->getContent();
+
+    expect($html)->toContain('Paid guide');
+});
