@@ -23,6 +23,18 @@ function guideBodyMarker(): string
     return 'Before you start';
 }
 
+/**
+ * A string only the SALES page carries, never the guide itself.
+ *
+ * This used to be "this guide is for members". That sentence was removed when the page
+ * was reworked to sell rather than announce a lock, which broke the gating test - so the
+ * marker is now the CTA, which the page cannot lose without ceasing to be a sales page.
+ */
+function guideSalesMarker(): string
+{
+    return 'See the Accelerator';
+}
+
 function makeGuideResource(float $price = 15000): Resource
 {
     return Resource::create([
@@ -53,7 +65,7 @@ it('does not serve the guides to the public', function () {
         $this->get($url)
             ->assertOk()                          // a sales page, not a 404
             ->assertDontSee(guideBodyMarker(), false)
-            ->assertSee('this guide is for members', false);
+            ->assertSee(guideSalesMarker(), false);
     }
 });
 
@@ -313,4 +325,41 @@ it('never treats an off-site link as one of our guides', function () {
     $this->get(GUIDE.'?t='.$purchase->access_token);
 
     $this->get(GUIDE)->assertDontSee(guideBodyMarker(), false);
+});
+
+it('sells the guide instead of announcing a lock', function () {
+    // GuideAccess deliberately returns a 200 sales page rather than a 403, so these
+    // assert on content. The page used to lead with "this guide is for members" and a
+    // Sign in button, which reads as a wall rather than an offer.
+    $html = $this->get('/guides/n8n-on-google-cloud')->assertOk()->getContent();
+
+    $this->assertStringNotContainsString('members only', $html, 'locked page still leads with a lock');
+    $this->assertStringNotContainsString('this guide is for members', $html, 'locked page still leads with a lock');
+
+    expect($html)->toContain('Your own n8n')
+        ->and($html)->toContain('See the Accelerator');
+});
+
+it('keeps a recovery path for a buyer or student who lands here logged out', function () {
+    // Removing the lock framing must not strand the two people who legitimately see
+    // this page while entitled to the guide.
+    $html = $this->get('/guides/n8n-on-google-cloud')->assertOk()->getContent();
+
+    expect($html)->toContain('Sign in')
+        ->and($html)->toContain('hello@ajbuildai.com');
+});
+
+it('uses the site wordmark on the guide sales page', function () {
+    $html = $this->get('/guides/n8n-on-google-cloud')->assertOk()->getContent();
+
+    expect($html)->toContain('AJBUILDS');
+    $this->assertDoesNotMatchRegularExpression('/AJBUILD(?!S)/', $html, 'guide sales page still reads AJBUILDAI');
+});
+
+it('does not squeeze the sales page into the sidebar column on desktop', function () {
+    // The shared guide chrome makes .wrap a "15rem sidebar + content" grid at >=1040px.
+    // This page has no sidebar, so without an override <main> renders in the 15rem track.
+    $html = $this->get('/guides/n8n-on-google-cloud')->assertOk()->getContent();
+
+    expect($html)->toContain('grid-template-columns: minmax(0, 1fr)');
 });
