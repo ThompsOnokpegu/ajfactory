@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\VapiWebhookController;
 use App\Http\Controllers\Api\PaystackWebhookController;
 use App\Http\Controllers\Api\FlutterwaveWebhookController;
+use App\Http\Controllers\Api\OfferController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -20,3 +21,6 @@ Route::post('/webhooks/paystack', [PaystackWebhookController::class, 'handleWebh
 //Flutterwave Webhook (Exclude from CSRF)
 Route::post('/webhooks/flutterwave', [FlutterwaveWebhookController::class, 'handleWebhook']);
 
+
+// Live offer snapshot for Veta (bearer token, read-only)
+Route::get('/offer', [OfferController::class, 'show'])->middleware('throttle:60,1');

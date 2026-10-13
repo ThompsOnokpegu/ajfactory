@@ -71,4 +71,10 @@ return [
         'api_version' => env('META_API_VERSION', 'v25.0'),
     ],
 
+    // Veta (the consulting WhatsApp AI) reads GET /api/offer with this bearer token.
+    // Unset = the feed answers 401 to everyone. Same value as LIVE_FACTS_TOKEN on Veta.
+    'veta' => [
+        'feed_token' => env('VETA_FEED_TOKEN'),
+    ],
+
 ];
