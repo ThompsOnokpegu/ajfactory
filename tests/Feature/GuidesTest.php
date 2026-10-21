@@ -60,10 +60,20 @@ it('resolves every guide_url referenced by the curriculum', function () {
 
     expect($guideUrls)->not->toBeEmpty();
 
-    // A typo'd guide_url doesn't error anywhere — it just 404s for the student who
+    // A typo'd guide_url doesn't error anywhere - it just 404s for the student who
     // clicks "Open the guide". This is the only place that catches it.
-    foreach ($guideUrls as $url) {
+    //
+    // Only IN-APP paths can be resolved here. A guide_url may also point at something
+    // hosted elsewhere (the Module 09 client playbooks live in a Google Doc), and a
+    // test must not reach the network to check it - so those are shape-checked instead.
+    [$external, $internal] = $guideUrls->partition(fn ($url) => str_starts_with($url, 'http'));
+
+    foreach ($internal as $url) {
         $this->get($url)->assertOk();
+    }
+
+    foreach ($external as $url) {
+        expect($url)->toStartWith('https://');   // never ship a student an http link
     }
 });
 

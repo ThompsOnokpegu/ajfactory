@@ -199,14 +199,26 @@ The original walkthrough is kept as a legacy reference, but Vapi's interface has
             'title' => 'Module 09: Deploy Your Automation',
             'release_at' => '2026-08-24 00:00:00',
             'has_blueprint' => true,
-            'description' => "Taking your bots from 'Student Project' to 'Business Asset'. Topics:\n\n• Building a Global Error Handling workflow (The Safety Net).\n• The critical difference between Test URLs and Production Webhook URLs.\n• Managing Execution Data logs and exporting workflows for backup.\n\nThen the full hosting walkthrough — get your n8n live on the web for free on Google Cloud's Always Free tier:\n\n• Setting up a Google Cloud account and navigating the console.\n• Configuring a Compute Engine VM with Docker to host n8n.\n• A reverse proxy secured with SSL (Let's Encrypt).\n• Connecting your custom domain and configuring DNS.",
+            'description' => "Taking your bots from 'Student Project' to 'Business Asset', then going out and selling one. We cover:
+
+• Building a Global Error Handling workflow - the safety net.
+• The critical difference between Test URLs and Production Webhook URLs.
+• Managing execution data logs and exporting workflows for backup.
+• Getting your first client - where to look, what to say, what to charge, and what to send.
+
+The playbooks, templates and kits used in the client lesson are in the companion doc below.
+
+Self-hosting is not here: it lives in Module 02, which carries both the full walkthrough and the written step-by-step guide.",
             'videos' => [
                 ['id' => 'module-08-v1', 'title' => 'Deploy Your Automation', 'video_id' => '67369c39-c2d7-481f-abbf-6aa879641949', 'duration' => '35:00'],
-                // Moved here from the retired standalone hosting module. The video id is
-                // KEPT so it still matches Enrollment.completed_lessons for anyone who
-                // already ticked it off. Neither module set a library_id, so playback
-                // is unaffected by the move.
-                ['id' => 'module-09-v1', 'title' => 'FREE Google Cloud Hosting Guide', 'video_id' => '27d0d009-27fc-432e-b246-63bfd77fb2a9', 'duration' => '33:00'],
+                ['id' => 'module-08-v2', 'title' => 'Getting Your First Client', 'video_id' => 'cc421fe4-8943-496c-ab40-e4882827e71a', 'duration' => ''],
+                // The doc is a SEPARATE lesson, not a guide_url on the video above: the
+                // dashboard checks guide_url before video_id, so a lesson carrying both
+                // renders the guide panel and the video never plays.
+                ['id' => 'module-08-guide', 'title' => 'First Client Playbooks and Templates', 'video_id' => '', 'duration' => 'Doc', 'guide_url' => 'https://docs.google.com/document/d/1sSbY6WpXP6pMv_veCuBci01XP0YTdqww4KQlp5Mc1K8/edit?usp=sharing', 'guide_icon' => '📄', 'guide_heading' => 'Playbooks, templates and kits', 'guide_blurb' => 'Every script, template and checklist from the lesson, in one doc you can copy and adapt. Make your own copy before you edit it.', 'guide_cta' => 'Open the doc'],
+                // 'module-09-v1' (FREE Google Cloud Hosting Guide) was removed here: it
+                // duplicated Module 02's self-hosting walkthrough and written guide.
+                // Anyone who ticked it keeps a harmless orphan id in completed_lessons.
             ],
         ],
     ],
