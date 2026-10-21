@@ -196,7 +196,7 @@ The original walkthrough is kept as a legacy reference, but Vapi's interface has
         ],
         [
             'id' => 'module-08',
-            'title' => 'Module 09: Deploy Your Automation',
+            'title' => 'Module 09: Deploy and Get Paid',
             'release_at' => '2026-08-24 00:00:00',
             'has_blueprint' => true,
             'description' => "Taking your bots from 'Student Project' to 'Business Asset', then going out and selling one. We cover:
@@ -211,7 +211,7 @@ The playbooks, templates and kits used in the client lesson are in the companion
 Self-hosting is not here: it lives in Module 02, which carries both the full walkthrough and the written step-by-step guide.",
             'videos' => [
                 ['id' => 'module-08-v1', 'title' => 'Deploy Your Automation', 'video_id' => '67369c39-c2d7-481f-abbf-6aa879641949', 'duration' => '35:00'],
-                ['id' => 'module-08-v2', 'title' => 'Getting Your First Client', 'video_id' => 'cc421fe4-8943-496c-ab40-e4882827e71a', 'duration' => ''],
+                ['id' => 'module-08-v2', 'title' => 'Getting Your First Client', 'video_id' => 'cc421fe4-8943-496c-ab40-e4882827e71a', 'duration' => '17:31 Mins'],
                 // The doc is a SEPARATE lesson, not a guide_url on the video above: the
                 // dashboard checks guide_url before video_id, so a lesson carrying both
                 // renders the guide panel and the video never plays.

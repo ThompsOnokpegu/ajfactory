@@ -164,7 +164,7 @@ return [
         'module-05' => 'https://t.me/c/3619461825/305',  // Module 06 · WhatsApp Automation
         'module-06' => 'https://t.me/c/3619461825/435',  // Module 07 · AI Voice Support Agent
         'module-07' => 'https://t.me/c/3619461825/438',  // Module 08 · AI Chat Support Agent
-        'module-08' => 'https://t.me/c/3619461825/440',  // Module 09 · Deploy Your Automation
+        'module-08' => 'https://t.me/c/3619461825/440',  // Module 09 · Deploy and Get Paid
         // 'module-09' retired — the standalone hosting module was folded into Deploy.
         // Its Telegram topic (…/771) still exists in the group; point students at the
         // Deploy thread above, or re-map this line if you'd rather keep using it.

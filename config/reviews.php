@@ -135,7 +135,7 @@ return [
 
         [
             'key' => 'finish',
-            // The LAST module — displayed as "Module 09: Deploy Your Automation".
+            // The LAST module - displayed as "Module 09: Deploy and Get Paid".
             // Was 'module-09' (the retired standalone hosting module); leaving it
             // there would have silently disabled this stage forever.
             'after_module' => 'module-08',
