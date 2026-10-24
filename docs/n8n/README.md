@@ -20,6 +20,14 @@ opaque n8n credential *reference* (`7RGhNLHFADXdsIsp`), which is useless off the
 **Before committing any export, scan it.** If it contains a token, key, account SID or
 password, leave it untracked and document the workflow in markdown instead.
 
+**Scan `pinData` too, not just the credential blocks.** Pinned test data is a real captured
+execution, so it carries whatever that execution carried. The 24 Oct 2026 export of
+`aj-buildai-waitlist-masterclass.json` had a paying customer's name, email and IP pinned on
+the Webhook node — along with a **working `/resources/access/<token>` unlock link** for a
+guide they had paid for. None of that is a credential, so a secret scanner would pass it.
+It is scrubbed to `test@example.com` / `EXAMPLE-TOKEN-NOT-REAL`; re-scrub after any
+re-export, or unpin the node before exporting.
+
 ## The email bodies are duplicated on purpose
 
 The three installment email templates live in both

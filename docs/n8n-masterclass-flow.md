@@ -20,8 +20,21 @@ Webhook (POST, =N8N_STUDENT_WEBHOOK_URL)
        ├─ masterclass_starting_soon   → Email + WhatsApp   (T-2h nudge)
        ├─ masterclass_followup        → Email + WhatsApp   (post-session → Accelerator)
        ├─ masterclass_waitlist        → Email + WhatsApp   (registration closed)
-       └─ masterclass_reinvite        → Email + WhatsApp   ("registration open" → register)
+       ├─ masterclass_reinvite        → Email + WhatsApp   ("registration open" → register)
+       ├─ masterclass_live            → Email + WhatsApp   ("we're live now", fired by hand)
+       ├─ taab_lead                   → Email              (a free-tool capture)
+       ├─ scorecard_result            → Email              (the scored result + next steps)
+       ├─ student_signup              → Email              (the /earn build-in-public list)
+       ├─ resource_purchased          → Email              (a paid-resource unlock link)
+       └─ (fallback)                  → Stop and Error     (unrouted type → non-2xx → retry)
 ```
+
+> **`registration`, `reinvite`, `followup` and `live` each round-robin three senders**
+> (`hello@` / `aj@` / `taab@` on ajbuildai.com) because each Hostinger mailbox is capped
+> at 100 emails/day. A `Pick Sender` Code node sets `smtpIndex = n % 3` and a `Rotate SMTP`
+> Switch matches **0, 1, 2**. **Keep the modulo and the rule values in step** — the
+> registration rotation matched `3 / 0 / 1` against `% 3`, so one confirmation in three
+> matched no rule and was silently dropped until 24 Oct 2026.
 
 > The same webhook also receives `taab_lead` (lead-magnet tools),
 > `student_signup`, and `resource_purchased` (a paid-resource sale). Add those as
@@ -246,6 +259,28 @@ drop the `.split('/').pop()` from the node's ContentVariables.
 Extra fields: `accelerator_url` (relative — prepend `https://ajbuildai.com`),
 `recording_url` (may be empty → make the recording line conditional).
 
+**Plus the offer figures, added 24 Oct 2026** — this is the only template that quotes a
+price, and n8n templates are edited in a browser and never move when the price does. That
+is how the live follow-up spent months selling a *6-week* programme and never mentioning
+TAAB100. `ProcessMasterclass` now reads them from `config/accelerator.php` and sends them
+pre-formatted, so the template does no currency logic and needs no edit when a price moves:
+
+| Field | Example | Notes |
+|---|---|---|
+| `coupon_code` | `TAAB100` | **null** once the coupon is retired → branch on it |
+| `attendee_rate` | `₦100,000` | null whenever `coupon_code` is null |
+| `full_price` | `₦120,000` | the pay-in-full price |
+| `installment_each` | `₦64,000` | |
+| `installment_count` | `2` | integer |
+
+> **TAAB100 applies to the pay-in-full plan only** (`'plans' => ['full']`). Quote the
+> installment separately — never as "from ₦x" — or the email promises the attendee rate on
+> a plan that cannot take it.
+>
+> Branch on `coupon_code`, don't assume it: `{{ $json.body.coupon_code ? '…use code ' +
+> $json.body.coupon_code + '…' : 'The price is ' + $json.body.full_price }}`. Guarded by
+> `TaabTest`, which changes the config and asserts the payload follows.
+
 **Email**
 - **Subject:** `Your next step after TAAB`
 - **Body:**
@@ -257,27 +292,38 @@ Thanks for joining TAAB — I hope you walked away with real clarity.
 {{#if recording_url}}📺  Session recording: {{ $json.body.recording_url }}{{/if}}
 
 If the bootcamp showed you that AI automation IS for you, the next step is the
-AI Automation Accelerator — the 6-week cohort where you build 9 real automations
-end to end (and the playbook to charge for them), backed by a completion guarantee.
+AI Automation Accelerator - the 8-week cohort where you build 9 real automations
+end to end (and the playbook to charge for them), backed by a completion guarantee
+and a verifiable certificate when you finish.
 
 Everything we previewed, built with you, step by step:
 👉  https://ajbuildai.com/accelerator
 
-Seats are capped each cohort and fill from this list first — if you're in, grab
-your seat before it's full.
+{{ coupon_code ? "Because you were on the call: use code " + coupon_code + " at
+checkout and pay " + attendee_rate + " instead of " + full_price + "."
+              : "The price is " + full_price + "." }}
+Prefer to split it? {{ installment_each }} × {{ installment_count }}.
 
 Questions? Just reply to this email.
 
 — AJ Thompson
-Repetigo · AJBuilds AI
+AJBuilds AI · Deepr Web Services
 ```
+> The old version of this closed on "seats are capped each cohort and fill from this
+> list first". Seat counts were deliberately removed from all customer-facing copy —
+> don't put scarcity back in here.
 > n8n has no `{{#if}}` — implement the recording line with an IF node or a Set
 > node that builds the line only when `recording_url` is non-empty.
 
 **WhatsApp**
 ```
-Thanks for joining TAAB! 🙌 If you're ready to actually build, the AI Automation Accelerator is the next step — 9 real automations in 6 weeks: https://ajbuildai.com/accelerator . Seats fill from this list first. Reply with any questions. — AJ
+Thanks for joining TAAB! 🙌 If you're ready to actually build, the AI Automation Accelerator is the next step — 9 real automations in 8 weeks: https://ajbuildai.com/accelerator . Reply with any questions. — AJ
 ```
+> ⚠️ The live WhatsApp send uses a **Twilio-approved template**
+> (`HX6db2535b64dc5d87c15ab25eae933b79`), whose body is fixed on Twilio's side and still
+> says **6 weeks**. Editing this file does not change it — the template has to be
+> re-submitted for approval in Twilio. Its only variable is `{{1}}` = first name, so the
+> offer figures above cannot be injected into it.
 
 ---
 
@@ -374,9 +420,43 @@ Hi {{ $json.body.first_name }} 👋 New TAAB Bootcamp date: {{SESSION}} (WAT), l
 
 ---
 
+---
+
+## 7. `taab_lead` — a capture from one of the three free tools
+
+Fired by `TaabLeadController` every time someone hands over an email on
+`/taab/scorecard`, `/taab/roi-calculator` or `/taab/tool-stack`.
+
+Fields: `source` (`scorecard` | `roi` | `tool-stack`), `name` (full name — **there is no
+`first_name` on this event**), `email`, `whatsapp` (may be null), `timestamp`.
+
+> **This branch did not exist until 24 Oct 2026.** Laravel had been firing `taab_lead`
+> since the tools shipped, the Switch had no rule for it, and `fallbackOutput` was `none`
+> — so every item was dropped and n8n still answered `2xx`. The lead got no email and
+> nothing was logged at either end. If you add an event type to Laravel, add the branch
+> here in the same change.
+
+**Email** — `TAAB Lead Email`, subject `Your <tool> - plus the other two`. Hands over all
+three tool links (they asked for one; the other two cost nothing to give) and points at the
+free masterclass as the next step. Name the tool they used from `source`:
+
+```
+{{ $json.body.source === 'roi' ? 'ROI Calculator'
+   : ($json.body.source === 'tool-stack' ? 'Tool Stack Guide' : 'Readiness Scorecard') }}
+```
+
+**WhatsApp** — none. There is no approved template for this event.
+
+---
+
 ## WhatsApp node notes
 - Guard the WhatsApp send on `{{ $json.body.whatsapp }}` being non-empty (an `IF` node)
   — some registrants leave it blank.
+- **Send the no-number branch to a NoOp, never to Stop and Error.** With
+  respond-when-done, erroring there returns a non-2xx for the whole touch, so Laravel
+  leaves it unstamped and retries it on every run — forever, because the number will never
+  become valid — even though the email went out fine. The workflow shipped this way; the
+  branch is now the `No WhatsApp Number` NoOp.
 - The send node depends on your provider (Meta WhatsApp Cloud API, 360dialog,
   Whapi, etc.). Templates above are plain text; if you're on Meta Cloud API for the
   reminders, those must be **pre-approved template messages** (session window rules),

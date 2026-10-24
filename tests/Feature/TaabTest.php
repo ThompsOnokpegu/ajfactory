@@ -246,3 +246,94 @@ it('fires the post-session follow-up after the session ends', function () {
     expect($reg->fresh()->reminder_sent_at)->toBeNull(); // session already passed — no reminder
     Http::assertSent(fn ($req) => $req['type'] === 'masterclass_followup');
 });
+
+/*
+ | The hub is the page the masterclass waitlist actually lands on, and it carried
+ | "TAAB by Repetigo", a repetigo.co link and hello@repetigo.co in its footer for months
+ | while every CTA on it pointed at ajbuildai.com/accelerator. A registrant emailing the
+ | footer address was writing to a different brand than the one taking their money.
+ | Public identity is ajbuildai.com / hello@ajbuildai.com (CLAUDE.md §2).
+ */
+it('brands the TAAB hub as the same company that takes the enrolment', function () {
+    openSession();
+
+    $html = $this->get('/taab')->assertOk()->getContent();
+
+    expect($html)->toContain('by AJBuilds AI');
+    expect($html)->toContain('hello@ajbuildai.com');
+
+    foreach (['repetigo.co', 'hello@repetigo.co', 'by Repetigo'] as $wrong) {
+        $this->assertStringNotContainsString(
+            $wrong,
+            $html,
+            "The hub must not send registrants to {$wrong} - it is not this product's brand."
+        );
+    }
+});
+
+/*
+ | The post-session follow-up is the masterclass conversion email, and it is the one
+ | n8n template that quotes the offer. n8n templates are edited in a browser and never
+ | move with a price change, which is how the live follow-up ended up selling a 6-week
+ | programme months after it became 8 and never mentioning TAAB100 at all. Laravel now
+ | sends the figures from config/accelerator.php so the template holds no copy of them
+ | (CLAUDE.md: never hardcode pricing; vault rule: offer facts are owned by config).
+ */
+it('sends the live offer figures with the post-session follow-up', function () {
+    config([
+        'taab.masterclass.date' => '2026-06-27',
+        'taab.masterclass.timezone' => 'UTC',
+        'taab.masterclass.starts_at' => now()->subHours(4)->format('Y-m-d H:i'),
+        'taab.masterclass.ends_at' => now()->subHours(3)->format('Y-m-d H:i'),
+        'taab.masterclass.followup_after_hours' => 2,
+        'services.n8n.student_webhook_url' => 'https://example.test/hook',
+        'accelerator.price_full' => 998877,
+        'accelerator.installment_each' => 554433,
+        'accelerator.installment_count' => 2,
+        'accelerator.coupons.TAAB100.value.NGN' => 123456,
+        'accelerator.earlybird_seats' => 0,
+    ]);
+    Http::fake();
+
+    MasterclassRegistration::create([
+        'first_name' => 'Ada', 'last_name' => 'O', 'email' => 'ada@example.com',
+        'session_date' => '2026-06-27', 'status' => 'registered',
+    ]);
+
+    $this->artisan('masterclass:remind')->assertExitCode(0);
+
+    Http::assertSent(function ($req) {
+        return $req['type'] === 'masterclass_followup'
+            && $req['coupon_code'] === 'TAAB100'
+            && $req['attendee_rate'] === '₦123,456'
+            && $req['full_price'] === '₦998,877'
+            && $req['installment_each'] === '₦554,433'
+            && $req['installment_count'] === 2;
+    });
+});
+
+it('drops the coupon from the follow-up once TAAB100 is retired', function () {
+    config([
+        'taab.masterclass.date' => '2026-06-27',
+        'taab.masterclass.timezone' => 'UTC',
+        'taab.masterclass.starts_at' => now()->subHours(4)->format('Y-m-d H:i'),
+        'taab.masterclass.ends_at' => now()->subHours(3)->format('Y-m-d H:i'),
+        'taab.masterclass.followup_after_hours' => 2,
+        'services.n8n.student_webhook_url' => 'https://example.test/hook',
+        'accelerator.coupons' => [],
+    ]);
+    Http::fake();
+
+    MasterclassRegistration::create([
+        'first_name' => 'Ada', 'last_name' => 'O', 'email' => 'ada@example.com',
+        'session_date' => '2026-06-27', 'status' => 'registered',
+    ]);
+
+    $this->artisan('masterclass:remind')->assertExitCode(0);
+
+    // Null, not a stale price: the n8n template branches on this and says nothing
+    // about a discount rather than advertising one that no longer exists.
+    Http::assertSent(fn ($req) => $req['type'] === 'masterclass_followup'
+        && $req['coupon_code'] === null
+        && $req['attendee_rate'] === null);
+});

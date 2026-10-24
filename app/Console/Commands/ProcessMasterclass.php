@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\MasterclassRegistration;
+use App\Support\Accelerator;
 use App\Support\Masterclass;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -35,6 +36,24 @@ class ProcessMasterclass extends Command
         $dayofAt = $startsAt->copy()->subHours((int) ($session['dayof_lead_hours'] ?? 2));
         $followupAt = ($endsAt ?? $startsAt)->copy()->addHours((int) ($session['followup_after_hours'] ?? 2));
 
+        // The follow-up is the one email that quotes the offer, so it carries the live
+        // figures rather than letting n8n hold its own copy. n8n templates are edited in
+        // a browser and never move with a price change, which is how the follow-up ended
+        // up advertising a six-week programme months after it became eight. These are
+        // pre-formatted so the template does no currency logic, and `coupon_code` is null
+        // once TAAB100 is retired - the template drops that sentence instead of lying.
+        $symbol = Accelerator::currencySymbol('NGN');
+        $taab100 = Accelerator::coupon('TAAB100');
+        $attendeeRate = $taab100['value']['NGN'] ?? null;
+
+        $offer = [
+            'coupon_code' => $attendeeRate ? 'TAAB100' : null,
+            'attendee_rate' => $attendeeRate ? $symbol . number_format($attendeeRate) : null,
+            'full_price' => $symbol . number_format(Accelerator::fullPrice('NGN')),
+            'installment_each' => $symbol . number_format(Accelerator::installmentEach('NGN')),
+            'installment_count' => Accelerator::installmentCount(),
+        ];
+
         $reminders = 0;
         $dayofs = 0;
         $followups = 0;
@@ -63,10 +82,10 @@ class ProcessMasterclass extends Command
 
             // 3. Post-session follow-up: push the Accelerator.
             if (! $reg->followup_sent_at && $now->gte($followupAt)) {
-                if ($this->fire('masterclass_followup', $reg, [
+                if ($this->fire('masterclass_followup', $reg, array_merge([
                     'accelerator_url' => config('taab.accelerator_url'),
                     'recording_url' => $session['recording_url'] ?? null,
-                ])) {
+                ], $offer))) {
                     $reg->update(['followup_sent_at' => $now]);
                     $followups++;
                 }
