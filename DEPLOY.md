@@ -9,10 +9,29 @@ whenever the server tree had drifted), then runs `deploy.sh`
 (copies the build assets into the web root, then clears + rebuilds the
 config/route/view caches). No more manual copying or cache commands.
 
-## How the build assets get published
-The web root is `public_html` but Vite's assets are pulled into
-`laravel/public/build`. `deploy.sh` copies that folder up to `public_html/build`
-on every deploy (the original stays put), so you never copy it by hand again.
+## How static assets get published
+The web root is `public_html`, **not** `laravel/public`. Nothing you add to
+`public/` is served until `deploy.sh` copies it up a level. On every deploy it
+publishes:
+
+| From | To | How |
+|---|---|---|
+| `public/build` | `public_html/build` | replaced (`rm -rf` then copy) |
+| `public/img/` | `public_html/img/` | **merged** - overwrites, never deletes |
+| `favicon.ico`, `favicon.svg`, `apple-touch-icon.png` | `public_html/` | overwritten |
+
+`index.php`, `.htaccess` and `robots.txt` are deliberately **not** copied. Those
+are shaped for the `public_html` layout and overwriting them from `public/` would
+break routing.
+
+> **Until 24 Oct 2026 only `build/` was published**, so any other static file
+> added to `public/` after the initial setup silently 404'd while looking entirely
+> present in the repo. `/img/og-preview.jpg` was referenced as `og:image` and
+> `twitter:image` by four pages and had never been reachable; `/img/taab-community-logo.png`
+> was a 404; and the favicon stayed on the framework default no matter what the
+> repo held. `/img/headshot.jpg` worked only because it had been copied by hand once.
+> If you add a file to `public/` and it 404s in production, this is why - check
+> `deploy.sh` publishes its directory.
 
 ## One-time server setup
 
