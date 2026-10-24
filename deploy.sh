@@ -19,9 +19,9 @@ cp -r public/build ../build
 # The web root is public_html, NOT public/, so EVERY static file Laravel serves
 # has to be published the same way. Only build/ ever was, so anything else added
 # to public/ since setup simply 404'd while looking perfectly present in the repo:
-# /img/og-preview.jpg was referenced as og:image by four pages and had never been
-# reachable, /img/taab-community-logo.png was a 404, and the favicon stayed on the
-# framework default no matter what the repo contained.
+# /img/og-preview.jpg was referenced as og:image by four pages and stayed a 404 even
+# after the file was committed, and the favicon kept serving the framework default
+# no matter what the repo contained.
 #
 # Merge, never mirror: files are overwritten but nothing is deleted, because the
 # web root also holds things an operator put there by hand. index.php, .htaccess

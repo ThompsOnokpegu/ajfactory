@@ -27,11 +27,26 @@ break routing.
 > **Until 24 Oct 2026 only `build/` was published**, so any other static file
 > added to `public/` after the initial setup silently 404'd while looking entirely
 > present in the repo. `/img/og-preview.jpg` was referenced as `og:image` and
-> `twitter:image` by four pages and had never been reachable; `/img/taab-community-logo.png`
-> was a 404; and the favicon stayed on the framework default no matter what the
-> repo held. `/img/headshot.jpg` worked only because it had been copied by hand once.
+> `twitter:image` by four pages and stayed a 404 even after the file was committed;
+> the favicon kept serving the framework default no matter what the repo held.
+> `/img/headshot.jpg` worked only because it had been copied up by hand once.
 > If you add a file to `public/` and it 404s in production, this is why - check
-> `deploy.sh` publishes its directory.
+> `deploy.sh` publishes its directory. And if it still 404s, check it is actually
+> **committed**: `public/img/taab-community-logo.*` is untracked, so no deploy can
+> ever carry it.
+
+### Replacing an asset in place: version the URL
+Hostinger fronts the site with its own CDN (`hcdn`) and serves static assets with
+`Cache-Control: public, max-age=604800`. **A replaced file keeps serving the old
+bytes at its bare URL for up to 7 days**, with `x-hcdn-cache-status` the only clue.
+Deploying the new favicon showed this exactly: `/favicon.ico` returned the old
+4,286-byte Laravel icon while `/favicon.ico?bust=1` returned the new 21,627-byte one
+from the same deploy.
+
+So when you replace an asset rather than add one, **change the URL the page asks
+for**. That is what the `?v=` in [partials/icons.blade.php](resources/views/partials/icons.blade.php)
+is for - bump it and every visitor gets the new file immediately. Vite already does
+this for `build/` via content-hashed filenames.
 
 ## One-time server setup
 
