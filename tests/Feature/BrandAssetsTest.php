@@ -28,7 +28,13 @@ it('ships a brand icon set rather than the framework default', function () {
 });
 
 it('points every share image at a file that exists', function () {
-    foreach (['/', '/accelerator', '/builders', '/earn'] as $url) {
+    // The TAAB pages are in this list because they were NOT, and that is exactly
+    // how /img/taab-og.jpg stayed missing: x-layouts.taab referenced it from the day
+    // it was written, behind a {{TODO}} comment nobody circled back to, so every
+    // share of /taab, the scorecard, the ROI calculator and the tool stack guide
+    // previewed blank. Any new public page belongs here.
+    foreach (['/', '/accelerator', '/builders', '/earn',
+              '/taab', '/taab/scorecard', '/taab/roi-calculator', '/taab/tool-stack'] as $url) {
         $html = $this->get($url)->assertOk()->getContent();
 
         preg_match_all('#<meta\s+property="(?:og|twitter):image"\s+content="([^"]+)"#', $html, $m);
