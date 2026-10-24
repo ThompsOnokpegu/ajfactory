@@ -41,7 +41,7 @@ it('enriches an existing lead without reclassifying their source', function () {
     ]);
 
     $this->postJson(route('taab.scorecard.store'), [
-        'email' => 'grace@example.com', 'score' => 30, 'tier' => 'not_yet',
+        'name' => 'Grace', 'email' => 'grace@example.com', 'score' => 30, 'tier' => 'not_yet',
     ])->assertOk();
 
     $lead = DB::table('students')->where('email', 'grace@example.com')->first();
@@ -57,6 +57,25 @@ it('rejects an invalid submission', function () {
     $this->postJson(route('taab.scorecard.store'), [
         'email' => 'not-an-email', 'score' => 200, 'tier' => 'bogus',
     ])->assertStatus(422);
+
+    expect(DB::table('students')->count())->toBe(0);
+    Http::assertNothingSent();
+});
+
+/*
+ | The name used to be optional. It gates nothing on its own, but the result email opens
+ | on it and a lead row saved as "Scorecard lead" cannot be followed up by hand - which is
+ | the entire point of capturing the result. Required on the page AND here: the page's
+ | check is a convenience, this one is the guarantee.
+ */
+it('rejects a submission with no first name', function () {
+    Http::fake();
+
+    $this->postJson(route('taab.scorecard.store'), [
+        'email' => 'ada@example.com',
+        'score' => 70,
+        'tier' => 'almost',
+    ])->assertStatus(422)->assertJsonValidationErrors('name');
 
     expect(DB::table('students')->count())->toBe(0);
     Http::assertNothingSent();

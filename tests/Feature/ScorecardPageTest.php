@@ -108,3 +108,39 @@ it('quotes the programme length the Accelerator actually runs', function () {
         'The Accelerator is 8 weeks; the time-commitment question drifted behind it before.'
     );
 });
+
+/*
+ | The setup/budget questions quote what the course costs beyond tuition, so a wrong
+ | number here talks someone out of enrolling over money they never had to spend. Two were
+ | wrong at once: voice credits were billed as a cost when Vapi gives every account a free
+ | $10 credit, and the domain floor was quoted as a .com when a .site or .online starts
+ | around $1 for the first year.
+ */
+it('does not bill the student for costs they do not carry', function () {
+    $html = $this->get('/taab/scorecard')->assertOk()->getContent();
+
+    expect($html)->toContain('free $10 credit Vapi gives you');
+    expect($html)->toContain('.site or .online starts from about $1');
+
+    $this->assertStringNotContainsString(
+        'of voice credits',
+        $html,
+        'Vapi includes a free $10 credit - voice credits are not a cost the student carries.'
+    );
+    $this->assertStringNotContainsString(
+        '8k to ',
+        $html,
+        'The domain floor is a ~$1 .site/.online, not a .com at 8k-15k naira.'
+    );
+});
+
+it('requires a first name before it will show the results', function () {
+    $html = $this->get('/taab/scorecard')->assertOk()->getContent();
+
+    $this->assertStringNotContainsString(
+        'First name (optional)',
+        $html,
+        'The result email opens on the name and a nameless lead cannot be followed up by hand.'
+    );
+    expect($html)->toContain('Please add your first name');
+});

@@ -447,7 +447,7 @@
                 <div class="space-y-3" x-data="{ open: null }">
                     @foreach([
                         ['Do I need to know how to code?', "No. It's drag-and-drop automation. If you can follow step-by-step instructions, you can do this."],
-                        ['What will it cost beyond the ₦'.number_format($regular).'?', 'A one-time $30 Google Cloud prepayment (Google now asks for it before it will run your free server - a Naira card is fine) and one cheap domain (from ~$10/yr). Vapi gives a free $10 credit for the optional voice module, and everything else runs on free tiers.'],
+                        ['What will it cost beyond the ₦'.number_format($regular).'?', 'A one-time $30 Google Cloud prepayment (Google now asks for it before it will run your free server - a Naira card is fine) and one cheap domain - a .site or .online is about $1 for the first year, a .com roughly $10 to $15. Vapi gives a free $10 credit for the optional voice module, and everything else runs on free tiers.'],
                         ['Do I need a registered business (CAC)?', 'No — not for any part of the program. The WhatsApp bot is built in test mode, so no business registration is required to build or complete it.'],
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
                         ['Do I need an international card?', 'Not any more. Google Cloud now asks for a one-time $30 prepayment instead, and a Naira card works for it. If you\'d rather not prepay, the fallback is a small paid host at ~$10/mo for about 3 months.'],

@@ -20,6 +20,7 @@ This file is the checklist that stops that. Work through it whenever you roll a 
 | Module / workflow count | `config/curriculum.php` (9 core modules, 9 workflows) | 13 |
 | Scorecard dimensions, thresholds, buckets | `resources/views/taab/scorecard.blade.php` | 9, 10 + notes 9, 10 |
 | Hosting cost and what blocks it | the Setup questions in the scorecard | 6, 10 + notes 7, 9, 10 |
+| Running cost beyond tuition (one domain) | the Setup questions in the scorecard + `components/requirements-costs.blade.php` | notes 7 |
 | Certificate of completion | `App\Support\Certificate` | 12, 13 + notes 13 |
 
 **TAAB100 applies to the pay-in-full plan only** (`'plans' => ['full']`). Slides 13 and 14
@@ -88,3 +89,12 @@ template's own schema quirks are not read as new breakage, and read the content 
   TAAB100 at ₦100,000, early-bird removed, module count corrected to 9, certificate added,
   the international-card claim corrected on three notes slides, and speaker notes written for
   slide 13, which had none at all.
+- **24 Oct 2026, later the same day** - the running-cost claim corrected on notes 7. It said
+  "the only recurring cost is one cheap domain - about ten dollars a year", which is a `.com`
+  price quoted as the floor; a `.site` or `.online` starts around $1 for the first year. The
+  same wrong floor was live on `/accelerator`, the shared requirements table and the tool-stack
+  guide, and the scorecard additionally billed students for voice credits that Vapi gives away
+  as a free $10 credit. Quote the first year, not a flat annual price - these TLDs renew dearer.
+  **Still unchanged:** the paid self-hosting guide says `$6-11` for a domain, because it walks
+  the reader through buying a `.com` on Hostinger step by step. Changing the number there means
+  changing the walkthrough.

@@ -41,7 +41,7 @@
                         ['Pinecone', 'AI knowledge base', '₦0', false],
                         ['Meta WhatsApp API', 'WhatsApp bot (optional)', '₦0', false],
                         ['Google Cloud Hosting', 'self-hosted server (₦0/mo to run)', '$30 one-time prepayment', true],
-                        ['Domain name', 'your server address', 'from ~$10 / yr', true],
+                        ['Domain name', 'your server address', 'from ~$1 first yr', true],
                         ['Vapi', 'AI receptionist (optional)', 'Free $10 credit', false],
                     ];
                 @endphp
@@ -60,7 +60,7 @@
     <div class="mt-6 p-5 rounded-2xl border border-amber-500/20 bg-amber-500/5">
         <p class="text-sm text-zinc-300 leading-relaxed">
             <span class="font-black text-amber-400 uppercase tracking-wide text-xs">Bottom line:</span>
-            the only real costs are <strong class="text-white">a one-time $30 Google Cloud prepayment</strong> (Google now asks for it before it will run your free server - a Naira card is fine) and <strong class="text-white">one cheap domain (from ~$10/year).</strong>
+            the only real costs are <strong class="text-white">a one-time $30 Google Cloud prepayment</strong> (Google now asks for it before it will run your free server - a Naira card is fine) and <strong class="text-white">one cheap domain</strong> - a .site or .online starts from about $1 for the first year (they renew dearer), and a .com is roughly $10 to $15.
             Vapi even gives you a free $10 credit - enough to test through the whole course. Rather not prepay Google? A small paid host runs ~$10/mo for about 3 months instead. Otherwise, no servers to rent and no surprise charges.
         </p>
     </div>

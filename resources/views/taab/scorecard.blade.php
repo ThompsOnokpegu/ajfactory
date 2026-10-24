@@ -136,7 +136,7 @@
       <div class="q-text">Want your scorecard + a tailored next step in your inbox?</div>
       <p class="gate-sub">Drop your email and we'll send your full breakdown and the exact next move for your readiness level.</p>
       <div class="gate-fields">
-        <input type="text" id="gate-name" class="gate-input" placeholder="First name (optional)" autocomplete="given-name">
+        <input type="text" id="gate-name" class="gate-input" placeholder="First name" autocomplete="given-name" required>
         <input type="email" id="gate-email" class="gate-input" placeholder="you@email.com" autocomplete="email" required>
         <div id="gate-error" class="gate-error"></div>
       </div>
@@ -252,11 +252,17 @@ const questions = [
     { label: 'Not yet, but I could set aside ~$30 within a few weeks', score: 3 },
     { label: "I can't cover ~$30 for hosting either way right now", score: 0, blocks: true },
   ]},
-  { dim: 2, dimName: 'Setup', text: 'Beyond tuition you need one domain (about ₦8k to ₦15k a year) and, optionally, about $5 to $10 of voice credits. There are no monthly tool bills. Can you cover these?', options: [
-    { label: 'Yes, comfortably', score: 10 },
-    { label: 'Yes, though it would be a slight stretch', score: 7 },
-    { label: 'Only the domain - the optional voice credits would be hard', score: 5 },
-    { label: 'No - even a ₦10k domain is out of reach right now', score: 0 },
+  // Voice credits used to be half of this question. They are not a cost at all -
+  // Vapi hands every account a free $10 credit, which covers the optional voice
+  // module for the whole course. And the domain benchmark was ₦8k-₦15k, i.e. a
+  // .com, when a .site or .online starts around $1 for the first year. Quoting
+  // the .com as the floor priced people out of a course over a cost they do not
+  // have to carry. Keep the first-year wording: these TLDs renew dearer.
+  { dim: 2, dimName: 'Setup', text: 'Beyond tuition and that one-time hosting prepayment, there is one running cost: a domain. A .site or .online starts from about $1 for the first year, and a .com is roughly $10 to $15. Everything else runs on free tiers, and the optional voice module is covered by the free $10 credit Vapi gives you. Can you cover a domain?', options: [
+    { label: 'Yes, comfortably - a .com too if I want one', score: 10 },
+    { label: 'Yes - a $1 .site or .online works for me', score: 8 },
+    { label: 'Probably, but I would have to plan for it', score: 5 },
+    { label: 'No - I have no way to pay for one right now', score: 0 },
   ]},
   { dim: 3, dimName: 'Mindset', text: 'How do you typically respond when you hit a wall — a tool that does not work, a concept you cannot grasp?', options: [
     { label: 'I get frustrated and often give up or pause for a long time', score: 1 },
@@ -449,6 +455,13 @@ function submitEmail() {
   const email = document.getElementById('gate-email').value.trim();
   const name = document.getElementById('gate-name').value.trim();
   const err = document.getElementById('gate-error');
+  // The name is required: the result email opens on it, and a lead row that
+  // says "Scorecard lead" is useless to follow up by hand.
+  if (!name) {
+    err.textContent = 'Please add your first name so we can address your results to you.';
+    document.getElementById('gate-name').focus();
+    return;
+  }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     err.textContent = 'Please enter a valid email so we can send your results.';
     return;
@@ -466,7 +479,7 @@ function submitEmail() {
       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
     },
     body: JSON.stringify({
-      name: name || null,
+      name,
       email,
       score: result.total,
       tier: result.tier,
