@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        @include('partials.icons')
         <meta name="description" content="Build 9 real AI automations in 8 weeks — Telegram, WhatsApp & Voice AI on your own infrastructure, even if you can't code. Finish, or we coach you 1-on-1 until you do.">
 
         <!-- Open Graph / Facebook -->
@@ -27,6 +28,26 @@
             @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
             .badge-pulse { animation: pulse-border 2s infinite; }
             @keyframes pulse-border { 0% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } 50% { border-color: rgba(6, 182, 212, 0.6); box-shadow: 0 0 20px 0 rgba(6, 182, 212, 0.1); } 100% { border-color: rgba(6, 182, 212, 0.2); box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.2); } }
+
+            /* Hero flow schematic.
+               This is a DIAGRAM of the architecture every workflow in the course shares -
+               it is drawn in CSS, weighs nothing, and needs no network. It must never be
+               restyled to look like captured output: CLAUDE.md forbids fabricated proof,
+               and a screenshot-alike is exactly that. Real canvases replace nothing here;
+               they go in alongside it. The animation is decoration - the strip reads
+               correctly with motion off, which is also what a data-capped phone gets. */
+            .flow-strip { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; }
+            @media (min-width: 768px) { .flow-strip { display: flex; align-items: center; justify-content: center; gap: 0; } }
+            .flow-wire { display: none; }
+            @media (min-width: 768px) { .flow-wire { display: block; position: relative; height: 2px; flex: 1 1 2rem; max-width: 3.5rem; background: #27272a; } }
+            .flow-packet { position: absolute; top: 50%; left: 0; width: 6px; height: 6px; margin-top: -3px; border-radius: 9999px; background: #06b6d4; box-shadow: 0 0 10px #06b6d4; opacity: 0; animation: flow-travel 4.8s linear infinite; animation-delay: var(--d, 0s); }
+            @keyframes flow-travel { 0% { left: 0; opacity: 0; } 6% { opacity: 1; } 20% { left: 100%; opacity: 1; } 26% { opacity: 0; } 100% { left: 100%; opacity: 0; } }
+            .flow-node { animation: node-fire 4.8s ease-in-out infinite; animation-delay: calc(var(--i) * 1.2s); }
+            @keyframes node-fire { 0%, 100% { border-color: #27272a; box-shadow: none; } 8% { border-color: rgba(6, 182, 212, 0.55); box-shadow: 0 0 24px 0 rgba(6, 182, 212, 0.16); } 26% { border-color: #27272a; box-shadow: none; } }
+            @media (prefers-reduced-motion: reduce) {
+                .flow-node, .flow-packet, .badge-pulse, .shimmer { animation: none; }
+                .flow-packet { opacity: 1; left: 50%; }
+            }
         </style>
         {{-- Fully-qualified on purpose: the page's use-statements sit below the head. --}}
         @include('partials.meta-pixel', [
@@ -136,12 +157,50 @@
                     </p>
                 @endif
 
-                <div class="mt-16 flex flex-wrap justify-center items-center gap-5 opacity-40 grayscale hover:grayscale-0 transition-all duration-700">
-                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">N8N</span>
-                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">TELEGRAM</span>
-                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">WHATSAPP</span>
-                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">VAPI</span>
-                    <span class="text-xl font-black font-['Space_Grotesk'] tracking-tighter italic">PINECONE</span>
+                {{-- The page used to go from the headline straight to a price with nothing
+                     shown in between. Most of this traffic has never seen an n8n canvas, so
+                     "build AI automations" is an abstraction. This is the shape of one. --}}
+                <div class="mt-16 max-w-4xl mx-auto">
+                    <div class="flow-strip">
+                        @php
+                            // icon: a path drawn at 24x24, stroked. Kept inline so the hero
+                            // costs no extra request on a phone connection.
+                            $flow = [
+                                ['Trigger', 'A message arrives', 'M21 11.5a8.4 8.4 0 0 1-9 8.4 8.6 8.6 0 0 1-3.9-.9L3 21l1.9-5A8.4 8.4 0 0 1 12 3a8.4 8.4 0 0 1 9 8.5Z'],
+                                ['Workflow', 'n8n routes it', 'M6 5v6a3 3 0 0 0 3 3h6M6 5a2 2 0 1 0-.01-4.01A2 2 0 0 0 6 5Zm0 0v14a2 2 0 1 0 4 0M18 14a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z'],
+                                ['Intelligence', 'The agent decides', 'M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1M12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6Z'],
+                                ['Action', 'Replies, books, logs', 'M20 6 9 17l-5-5'],
+                            ];
+                        @endphp
+                        @foreach($flow as $i => [$kicker, $label, $path])
+                            @if($i > 0)
+                                <div class="flow-wire"><span class="flow-packet" style="--d: {{ 0.3 + ($i - 1) * 1.2 }}s"></span></div>
+                            @endif
+                            <div class="flow-node flex items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-950/60 px-3.5 py-3 text-left" style="--i: {{ $i }}">
+                                <span class="shrink-0 h-8 w-8 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true"><path d="{{ $path }}"/></svg>
+                                </span>
+                                <span class="min-w-0">
+                                    <span class="block text-[9px] font-black uppercase tracking-[0.18em] text-zinc-600">{{ $kicker }}</span>
+                                    <span class="block text-xs font-bold text-zinc-200 truncate">{{ $label }}</span>
+                                </span>
+                            </div>
+                        @endforeach
+                    </div>
+                    <p class="mt-5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">The shape of every workflow you build</p>
+                </div>
+
+                {{-- These are set as wordmarks, not logos. Drop official SVGs into
+                     public/img/logos/ and swap the span for an <img> when they exist. --}}
+                <div class="mt-12 flex flex-wrap justify-center items-center gap-x-4 gap-y-3">
+                    @foreach(['n8n', 'Telegram', 'WhatsApp', 'Vapi', 'Pinecone', 'Gemini'] as $i => $tool)
+                        @if($i > 0)
+                            <span class="hidden sm:block h-px w-5 bg-zinc-800" aria-hidden="true"></span>
+                        @endif
+                        <span class="inline-flex items-center gap-2 text-sm font-black font-['Space_Grotesk'] tracking-tighter italic uppercase text-zinc-600 hover:text-cyan-400 transition-colors">
+                            <span class="h-1.5 w-1.5 rounded-full bg-zinc-700" aria-hidden="true"></span>{{ $tool }}
+                        </span>
+                    @endforeach
                 </div>
             </section>
 
