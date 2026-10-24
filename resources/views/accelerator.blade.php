@@ -313,9 +313,9 @@
 
                 <div class="rounded-3xl border border-zinc-800 bg-zinc-900/40 divide-y divide-zinc-900">
                     @foreach([
-                        '10 modules · 9 production workflows (full curriculum)',
+                        '9 modules · 9 production workflows (full curriculum)',
                         'Ship-to-unlock structure + weekly live Build & Debug clinics',
-                        'Accountability pod (3–4 peers)',
+                        'Daily support in the Telegram community',
                         'Done-for-you friction kit: one-command self-host script, Money & Tools Map, sandbox/credit budgets, Meta verification help',
                         'The Agency Toolkit: intake form, outreach script, onboarding roadmap, pricing playbook',
                         'Lifetime LMS access + all future updates & session recordings',
@@ -452,7 +452,7 @@
                         ['What if I fall behind?', 'Ship-to-unlock keeps you on track, there\'s a catch-up buffer week, weekly live clinics, and the completion guarantee.'],
                         ['Do I need an international card?', 'Not any more. Google Cloud now asks for a one-time $30 prepayment instead, and a Naira card works for it. If you\'d rather not prepay, the fallback is a small paid host at ~$10/mo for about 3 months.'],
                         ['How much time per week?', 'About 5–8 hours, over 8 weeks.'],
-                        ['Is it live or recorded?', 'Both — self-paced videos plus weekly live Build & Debug clinics and an accountability pod.'],
+                        ['Is it live or recorded?', 'Both - self-paced videos plus weekly live Build & Debug clinics, and daily support in the Telegram community.'],
                         ['Can I pay in installments?', 'Yes - ₦'.number_format($instEach).' × '.$instCount.'.'],
                         ['Do I get a certificate?', 'Yes - a Certificate of Completion, issued automatically once every module has had its build proof reviewed and approved. It is not given for watching videos: every module has to be built and signed off. It carries a code anyone can check on a public verification page, so a client or employer can confirm it is real. It is a certificate of completion issued by Deepr Web Services, not an accredited qualification.'],
                         ['What\'s the guarantee?', 'Do the work and if your stack still isn\'t live by the end, we coach you 1-on-1 until it is.'],

@@ -110,6 +110,20 @@ php artisan tinker --execute="echo config('taab.masterclass.meet_url').PHP_EOL;"
 
 If that prints an empty line, the reminder will send a blank link. Fix it before proceeding.
 
+**Then check what the session feeds.** `accelerator.cart_closes_at` has to sit comfortably
+*after* the session, or the follow-up (which fires `followup_after_hours` after it ends)
+lands on a closed cart. The 31 Oct 2026 edition was scheduled onto the same day the cart
+closed, leaving attendees under eleven hours.
+
+### 1b. Refresh the deck
+
+The scorecard, the ROI calculator and the `/taab` hub all read `config`, so they need no
+edit. **The deck does not** - `docs/TAAB-Presentation.pptx` copies the date, the price, the
+coupon and the hosting requirement onto slides and into the speaker notes AJ reads aloud, and
+it has gone into a session quoting facts that had been untrue for months. Work through
+[taab-deck.md](taab-deck.md) before the session: it lists every fact the deck copies, which
+config key owns it, and the slides that carry it.
+
 ### 2. Re-invite the funnel to register
 
 People who signed up while registration was closed sit in `students` with

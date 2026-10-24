@@ -27,22 +27,25 @@ return [
     | has no expiry - so unlike the Sep edition there is no coupon deadline to line this
     | session up against.
     |
-    | WHAT THIS SESSION FEEDS IS NOT SET. accelerator.cohort_starts_at and
-    | cart_closes_at still describe Cohort 3, which began 12 Sep and closed 14 Sep, so
-    | /accelerator currently shows a start date in the past to anyone this session sends
-    | there. Set the Cohort 4 dates before this runs.
+    | WHAT THIS SESSION FEEDS CLOSES THE SAME NIGHT. This edition runs 09:00-11:00 on
+    | Sat 31 Oct and accelerator.cart_closes_at is 2026-10-31 23:59:59 - so the
+    | follow-up (followup_after_hours = 2, i.e. 13:00) reaches attendees with under
+    | eleven hours of enrolment left, and anyone who opens it the next morning finds a
+    | closed cart. Either push cart_closes_at out past this session or set the Cohort 4
+    | dates before it runs. accelerator.cohort_starts_at is still 12 Sep (Cohort 3) but
+    | the start date was deliberately removed from the copy, so it isn't shown.
     */
     'masterclass' => [
-        'date' => '2026-10-10',                 // Saturday 10 October 2026
+        'date' => '2026-10-31',                 // Saturday 31 October 2026
         'time' => '9:00 AM - 11:00 AM WAT',
         'location' => 'Live · Google Meet',
-        'registration_closes' => '2026-10-09',  // the Friday before
+        'registration_closes' => '2026-10-30',  // the Friday before
         'host' => 'AJ Thompson',
 
         // Real datetimes the reminder scheduler uses (display strings above are
         // for the page). Interpreted in `timezone`, since app default is UTC.
-        'starts_at' => '2026-10-10 09:00',
-        'ends_at' => '2026-10-10 11:00',
+        'starts_at' => '2026-10-31 09:00',
+        'ends_at' => '2026-10-31 11:00',
         'timezone' => 'Africa/Lagos',
 
         // Links sent in the reminders. These come from the SERVER .env, which a deploy

@@ -184,7 +184,9 @@ footer a:hover { color: var(--lime); }
 <div class="page-wrap">
 
   <nav>
-    <div class="nav-logo">TAAB <span>by Repetigo</span></div>
+    {{-- Brand is AJBuilds AI: this page sends people to ajbuildai.com/accelerator, so the
+         nav, the footer and the enrolment destination all have to be the same name. --}}
+    <div class="nav-logo">TAAB <span>by AJBuilds AI</span></div>
     <a href="#register" class="nav-cta">Reserve my spot</a>
   </nav>
 
@@ -417,7 +419,7 @@ footer a:hover { color: var(--lime); }
   </div>
 
   <footer>
-    <p>© {{ date('Y') }} Repetigo · <a href="https://repetigo.co">repetigo.co</a> · Questions? Reach out on WhatsApp or email hello@repetigo.co</p>
+    <p>© {{ date('Y') }} AJBuilds AI · <a href="https://ajbuildai.com">ajbuildai.com</a> · Questions? Reach out on WhatsApp or email hello@ajbuildai.com</p>
   </footer>
 
 </div>

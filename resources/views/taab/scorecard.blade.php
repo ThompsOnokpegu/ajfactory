@@ -1,5 +1,5 @@
 <x-layouts.taab
-    title="AI Automation Readiness Scorecard — TAAB"
+    title="AI Automation Readiness Scorecard - TAAB"
     description="10 questions across 5 dimensions. Get an honest picture of whether you're ready to go all in on AI automation.">
 
 @push('styles')
@@ -98,7 +98,7 @@
   <div class="header">
     <div class="badge">TAAB · Readiness Scorecard</div>
     <h1>Are you ready to go <span>all in</span> on AI Automation?</h1>
-    <p class="header-sub">10 questions across 5 dimensions. No fluff — just an honest picture of where you stand.</p>
+    <p class="header-sub">10 questions across 5 dimensions. No fluff, just an honest picture of where you stand.</p>
   </div>
 
   <div id="quiz">
@@ -175,8 +175,19 @@
       <div id="next-steps-list"></div>
     </div>
 
+    {{--
+      While a session is scheduled the free masterclass is the primary CTA, whatever the
+      score: it is the top of this funnel and the only place the attendee rate is given
+      out, so sending a "not yet" straight to a checkout would be both pushy and worse
+      converting. The Accelerator stays available as the secondary.
+    --}}
     <div class="result-cta">
-      <a href="{{ config('taab.accelerator_url') }}" class="btn btn-primary">Explore the AI Automation Accelerator →</a>
+      @if(\App\Support\Masterclass::registrationOpen())
+        <a href="{{ route('taab.index') }}" class="btn btn-primary">Save my seat at the free masterclass →</a>
+        <a href="{{ config('taab.accelerator_url') }}" class="btn">See the Accelerator</a>
+      @else
+        <a href="{{ config('taab.accelerator_url') }}" class="btn btn-primary">Explore the AI Automation Accelerator →</a>
+      @endif
       <button class="btn" onclick="restart()">↩ Retake scorecard</button>
     </div>
   </div>
@@ -184,7 +195,28 @@
 </div>
 
 @push('scripts')
+@php
+    // Session + offer facts injected from config so this page never retypes a price or
+    // a date. Pricing is owned by config/accelerator.php and must never be hardcoded in
+    // Blade (CLAUDE.md); the session is owned by config/taab.php. Both move on their own,
+    // and the verdict copy below follows them instead of going stale.
+    $scTaab      = \App\Support\Accelerator::coupon('TAAB100');
+    $scTaabRate  = $scTaab['value']['NGN'] ?? null;
+    $scSymbol    = \App\Support\Accelerator::currencySymbol('NGN');
+@endphp
 <script>
+const MASTERCLASS = {
+  open: @json(\App\Support\Masterclass::registrationOpen()),
+  label: @json(\App\Support\Masterclass::sessionLabel()),
+  url: @json(route('taab.index')),
+  // null once TAAB100 is retired - the copy then drops the price line instead of lying.
+  rate: @json($scTaabRate ? $scSymbol . number_format($scTaabRate) : null),
+};
+const ACCELERATOR = {
+  url: @json(config('taab.accelerator_url')),
+  price: @json($scSymbol . number_format(\App\Support\Accelerator::fullPrice('NGN'))),
+};
+
 const questions = [
   { dim: 0, dimName: 'Skills', text: "You're handed an unfamiliar software tool and a step-by-step guide. How does that usually go?", options: [
     { label: 'I get overwhelmed and usually need someone to walk me through it', score: 2 },
@@ -198,17 +230,21 @@ const questions = [
     { label: 'I can map out a simple process on my own', score: 7 },
     { label: 'I regularly document and optimise workflows', score: 10 },
   ]},
-  { dim: 1, dimName: 'Time', text: 'How many hours per week can you realistically protect for this — consistently, for 6 weeks?', options: [
+  { dim: 1, dimName: 'Time', text: 'How many hours per week can you realistically protect for this, consistently, for 8 weeks?', options: [
     { label: "Under 4 hours — I'm genuinely stretched right now", score: 3 },
     { label: '4–6 hours — doable if I stay disciplined', score: 7 },
     { label: "6–8 hours — I've deliberately carved out the recommended time", score: 9 },
     { label: '8+ hours — this is a top priority for me', score: 10 },
   ]},
-  { dim: 1, dimName: 'Time', text: "What's your expected timeline to land your first paid automation client?", options: [
-    { label: 'Within 2 weeks — I need income almost immediately', score: 1 },
-    { label: '1–2 months — I need it to move quickly', score: 5 },
-    { label: "3–6 months — I'm thinking medium-term", score: 9 },
-    { label: 'No urgent financial pressure — I can build properly first', score: 10 },
+  // Deliberately about when money is NEEDED, not when it is wanted. The programme
+  // does hand you first-client scripts and you can pitch inside the first few weeks,
+  // so the risk here is not ambition - it is having no runway when the first pitch
+  // does not convert. Urgency stays scored as risk for that reason.
+  { dim: 1, dimName: 'Time', text: 'You can pitch your first client inside the first few weeks, and you are handed the scripts and playbooks to do it. But money arriving is not the same as money needed. When do you need this to start paying?', options: [
+    { label: 'Within 2 weeks - I need income almost immediately', score: 1 },
+    { label: '1 to 2 months - I need it to move quickly', score: 5 },
+    { label: '3 to 6 months - I am thinking medium term', score: 9 },
+    { label: 'No urgent financial pressure - I can build properly first', score: 10 },
   ]},
   { dim: 2, dimName: 'Setup', id: 'hosting', text: "The owned-stack modules host on Google Cloud's always-free tier. Google now asks for a one-time $30 (≈₦45k) prepayment before it will run your server - a Naira card is fine, no USD card needed. The fallback is paid hosting at ~$10/mo for at least 3 months. Where do you stand?", options: [
     { label: 'I can cover the one-time ~$30 (≈₦45k) Google Cloud prepayment now', score: 10 },
@@ -216,11 +252,11 @@ const questions = [
     { label: 'Not yet, but I could set aside ~$30 within a few weeks', score: 3 },
     { label: "I can't cover ~$30 for hosting either way right now", score: 0, blocks: true },
   ]},
-  { dim: 2, dimName: 'Setup', text: 'Beyond tuition, you\'ll need ~one domain (₦8–15k/yr) and, optionally, ~$5–10 of voice credits. Can you cover these?', options: [
+  { dim: 2, dimName: 'Setup', text: 'Beyond tuition you need one domain (about ₦8k to ₦15k a year) and, optionally, about $5 to $10 of voice credits. There are no monthly tool bills. Can you cover these?', options: [
     { label: 'Yes, comfortably', score: 10 },
-    { label: "Yes, though it'd be a slight stretch", score: 7 },
-    { label: 'Only the domain — the optional voice credits would be hard', score: 5 },
-    { label: 'No — even a ₦10k domain is out of reach right now', score: 0 },
+    { label: 'Yes, though it would be a slight stretch', score: 7 },
+    { label: 'Only the domain - the optional voice credits would be hard', score: 5 },
+    { label: 'No - even a ₦10k domain is out of reach right now', score: 0 },
   ]},
   { dim: 3, dimName: 'Mindset', text: 'How do you typically respond when you hit a wall — a tool that does not work, a concept you cannot grasp?', options: [
     { label: 'I get frustrated and often give up or pause for a long time', score: 1 },
@@ -248,36 +284,58 @@ const questions = [
   ]},
 ];
 
+/*
+ * The step that bridges a result to the funnel.
+ *
+ * While a masterclass is scheduled it is the honest first move for EVERY tier, not just
+ * the ready one: TAAB sells clarity before committing, and attendees are the people who
+ * get the TAAB100 rate. Once the session is over, "ready" goes straight to the offer and
+ * the other two tiers get no pitch at all - a "not yet" result that ends in a sales link
+ * is the one thing that would make this tool dishonest.
+ *
+ * Both read MASTERCLASS/ACCELERATOR, injected from config above, so a new date or a new
+ * price needs no edit here.
+ */
+const enrolStep = () => MASTERCLASS.open
+  ? { text: `<strong>Come to the free masterclass</strong> - ${MASTERCLASS.label}. Two hours, live, and it is where the attendee rate is handed out${MASTERCLASS.rate ? `: ${MASTERCLASS.rate} instead of ${ACCELERATOR.price}` : ''}. <a href="${MASTERCLASS.url}">Save your seat</a>.` }
+  : { text: `<strong>Enrol in the Accelerator</strong> - you are exactly who it is built for. Skip the solo fumbling and get to results faster. <a href="${ACCELERATOR.url}">See the programme</a>.` };
+
+const clarityStep = () => MASTERCLASS.open
+  ? { text: `<strong>Come to the free masterclass first</strong> - ${MASTERCLASS.label}. Two hours on whether this is actually for you: the real costs, the real skills, the real timeline. It is not a build session and there is nothing to buy. <a href="${MASTERCLASS.url}">Save your seat</a>.` }
+  : null;
+
 const verdicts = {
   high: {
     label: '🟢 Ready to start',
     title: 'You are built for this.',
-    text: 'Your score puts you firmly in the "ready" tier. You have the right foundation across skills, time, capital, mindset, and market access. The main risk for people like you is overthinking and under-executing. Pick a niche, build one automation, pitch one client. Start this week.',
+    text: 'Your score puts you firmly in the ready tier. You have the right foundation across skills, time, setup, mindset and market access. The main risk for people like you is overthinking and under-executing. Pick a niche, build one automation, pitch one client. Start this week.',
     steps: [
-      { text: '<strong>Enrol in the Accelerator</strong> — you are exactly who it is built for. Skip solo fumbling and get to results faster.' },
-      { text: '<strong>Identify your first client target</strong> — someone in your network with an obvious repetitive workflow problem.' },
-      { text: '<strong>Set a 30-day deadline</strong> to deliver your first working automation, even for free, to a real business.' },
-    ]
+      enrolStep(),
+      { text: '<strong>Identify your first client target</strong> - someone already in your network with an obviously repetitive workflow. Market access is the real bottleneck, not skill.' },
+      { text: '<strong>Set a 30-day deadline</strong> to put your first working automation in front of a real business, paid or not.' },
+    ].filter(Boolean)
   },
   mid: {
     label: '🟡 Almost ready',
-    title: 'Close — but there are gaps to close first.',
-    text: 'You have solid foundations in some areas but real gaps in others. Jumping in now risks frustration and wasted money. The good news: your gaps are solvable in 4–8 weeks with focused effort. Use your scorecard to see exactly which dimensions pulled you down.',
+    title: 'Close, but there are gaps to close first.',
+    text: 'You have solid foundations in some areas and real gaps in others. Jumping in now risks frustration and wasted money. The good news: these gaps are solvable in 4 to 8 weeks of focused effort. The breakdown below shows exactly which dimensions pulled you down.',
     steps: [
-      { text: '<strong>Target your weakest dimension</strong> — that is your bottleneck. Fixing skills? Build a small project. Low capital? Start on free tiers.' },
-      { text: '<strong>Join a structured cohort</strong> rather than going solo — accountability closes the "almost ready" gap faster than self-study.' },
-      { text: '<strong>Do not invest heavily yet</strong> — spend the next 30 days building clarity, not tools.' },
-    ]
+      { text: '<strong>Target your weakest dimension</strong> - your bottleneck is your lowest bar, not your average. Thin on skills? Build one small thing end to end. Thin on setup? Sort the hosting path before anything else.' },
+      clarityStep(),
+      { text: '<strong>Do not go solo</strong> - what closes the almost-ready gap is having somewhere to ask at 11pm. Daily support and weekly live debug clinics are the point of a cohort, not the videos.' },
+      { text: '<strong>Do not buy tools yet</strong> - spend the next 30 days buying clarity instead.' },
+    ].filter(Boolean)
   },
   low: {
     label: '🔴 Not yet',
-    title: 'The foundation is not there — and that is okay.',
-    text: 'Jumping into AI automation right now would likely lead to wasted money and early burnout. Your scorecard shows significant gaps across multiple dimensions that need addressing first. This is not a "never" — it is a "not now." Here is what to do instead.',
+    title: 'The foundation is not there, and that is okay.',
+    text: 'Starting right now would most likely cost you money and end in burnout. The breakdown below shows gaps across several dimensions that need addressing first. This is not a never, it is a not now. Here is what to do instead.',
     steps: [
-      { text: '<strong>Stabilise your finances first</strong> — AI automation is not a fast money solution. You need runway to learn properly.' },
-      { text: '<strong>Start with free tools</strong> — explore n8n cloud (free tier), Make free plan, and watch YouTube walkthroughs before spending anything.' },
-      { text: '<strong>Come back in 3 months</strong> — with stronger fundamentals. Your score will be very different.' },
-    ]
+      { text: '<strong>Stabilise your finances first</strong> - AI automation is not fast money. You need runway to learn properly.' },
+      { text: '<strong>Start with free tools</strong> - n8n gives you a free trial, and its self-hosted Community edition stays free. Work through free walkthroughs and build one small thing before you spend anything.' },
+      clarityStep(),
+      { text: '<strong>Retake this in 3 months</strong> - with stronger fundamentals the number looks very different. Nothing here is permanent.' },
+    ].filter(Boolean)
   }
 };
 
@@ -360,7 +418,7 @@ function computeResult() {
   let verdictText = verdict.text;
   let steps = verdict.steps.slice();
   if (capped) {
-    verdictText += " One thing gates you first: the owned-stack modules need a server, and right now you can cover neither the one-time ~$30 Google Cloud prepayment nor the paid-hosting fallback - that holds you at “almost ready” until it's sorted.";
+    verdictText += " One thing gates you first: the owned-stack modules need a server, and right now you can cover neither the one-time ~$30 Google Cloud prepayment nor the paid-hosting fallback - that holds you at almost ready until it is sorted.";
     steps = [{ text: "<strong>Sort your hosting path first</strong> - set aside ~$30 (≈₦45k) for the one-time Google Cloud prepayment (a Naira card is fine), or the same for 3 months of paid hosting. Without it you can't complete the owned-stack half of the program." }, ...steps];
   }
 
