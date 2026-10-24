@@ -9,34 +9,34 @@
   .header { margin-bottom: 3rem; animation: fadeUp 0.6s ease both; }
   .badge {
     display: inline-flex; align-items: center; gap: 6px;
-    font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600;
+    font-family: var(--font-display); font-size: 11px; font-weight: 600;
     letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent);
-    background: var(--accent-dim); border: 1px solid rgba(200,240,100,0.2);
+    background: var(--accent-dim); border: 1px solid rgba(6,182,212,0.2);
     padding: 5px 12px; border-radius: 100px; margin-bottom: 1.25rem;
   }
   .badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); animation: pulse 2s ease-in-out infinite; }
-  h1 { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
+  h1 { font-family: var(--font-display); font-size: clamp(2rem, 5vw, 3rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 0.75rem; }
   h1 span { color: var(--accent); }
   .header-sub { font-size: 15px; color: var(--muted); font-weight: 300; max-width: 480px; }
 
   .progress-wrap { margin-bottom: 2.5rem; animation: fadeUp 0.6s 0.1s ease both; }
-  .progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.05em; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 8px; font-family: var(--font-display); font-weight: 600; letter-spacing: 0.05em; }
   .progress-track { height: 3px; background: var(--surface2); border-radius: 100px; overflow: hidden; }
   .progress-fill { height: 100%; background: var(--accent); border-radius: 100px; transition: width 0.5s cubic-bezier(0.4,0,0.2,1); width: 0%; }
 
   .dim-tabs { display: flex; gap: 6px; margin-bottom: 2rem; flex-wrap: wrap; animation: fadeUp 0.6s 0.15s ease both; }
-  .dim-tab { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border); color: var(--muted); background: transparent; transition: all 0.2s; cursor: default; }
-  .dim-tab.active { background: var(--accent-dim); border-color: rgba(200,240,100,0.3); color: var(--accent); }
-  .dim-tab.done { background: rgba(200,240,100,0.05); border-color: rgba(200,240,100,0.15); color: rgba(200,240,100,0.5); }
+  .dim-tab { font-family: var(--font-display); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 12px; border-radius: 100px; border: 1px solid var(--border); color: var(--muted); background: transparent; transition: all 0.2s; cursor: default; }
+  .dim-tab.active { background: var(--accent-dim); border-color: rgba(6,182,212,0.3); color: var(--accent); }
+  .dim-tab.done { background: rgba(6,182,212,0.05); border-color: rgba(6,182,212,0.15); color: rgba(6,182,212,0.5); }
 
   .question-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; margin-bottom: 1rem; animation: fadeUp 0.4s ease both; }
-  .q-number { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
+  .q-number { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 0.75rem; }
   .q-text { font-size: 18px; font-weight: 500; line-height: 1.4; margin-bottom: 1.75rem; }
 
   .options { display: flex; flex-direction: column; gap: 10px; }
   .option { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: all 0.2s; background: transparent; text-align: left; width: 100%; font-family: inherit; }
   .option:hover { border-color: var(--border-hover); background: var(--surface2); }
-  .option.selected { border-color: rgba(200,240,100,0.4); background: var(--accent-dim2); }
+  .option.selected { border-color: rgba(6,182,212,0.4); background: var(--accent-dim2); }
   .option-dot { width: 18px; height: 18px; min-width: 18px; border-radius: 50%; border: 1.5px solid var(--border-hover); display: flex; align-items: center; justify-content: center; margin-top: 1px; transition: all 0.2s; }
   .option.selected .option-dot { border-color: var(--accent); background: var(--accent); }
   .option.selected .option-dot::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--bg); }
@@ -44,10 +44,10 @@
   .option.selected .option-label { color: var(--text); font-weight: 400; }
 
   .nav-row { display: flex; gap: 10px; margin-top: 1.5rem; justify-content: flex-end; animation: fadeUp 0.4s 0.1s ease both; }
-  .btn { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; padding: 12px 24px; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; background: transparent; color: var(--muted); }
+  .btn { font-family: var(--font-display); font-size: 13px; font-weight: 700; letter-spacing: 0.04em; padding: 12px 24px; border-radius: var(--radius-sm); border: 1px solid var(--border); cursor: pointer; transition: all 0.2s; background: transparent; color: var(--muted); }
   .btn:hover { border-color: var(--border-hover); color: var(--text); }
   .btn-primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
-  .btn-primary:hover { background: #d4f474; border-color: #d4f474; color: var(--bg); }
+  .btn-primary:hover { background: #22d3ee; border-color: #22d3ee; color: var(--bg); }
   .btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
   .gate-sub { font-size: 14px; color: var(--muted); font-weight: 300; line-height: 1.6; margin: -1rem 0 1.5rem; }
@@ -55,7 +55,7 @@
   .gate-input { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface2); color: var(--text); font-family: inherit; font-size: 15px; transition: border-color 0.2s; }
   .gate-input:focus { outline: none; border-color: var(--accent); }
   .gate-input::placeholder { color: var(--muted); }
-  .gate-error { color: #ff6b6b; font-size: 12px; min-height: 15px; font-family: 'Syne', sans-serif; font-weight: 600; }
+  .gate-error { color: #f87171; font-size: 12px; min-height: 15px; font-family: var(--font-display); font-weight: 600; }
 
   #email-gate { display: none; }
   #results { display: none; }
@@ -64,24 +64,24 @@
   .score-ring svg { transform: rotate(-90deg); }
   .score-ring-track { fill: none; stroke: var(--surface2); stroke-width: 6; }
   .score-ring-fill { fill: none; stroke-width: 6; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
-  .score-number { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; }
-  .verdict-label { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
-  .verdict-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: 0.75rem; line-height: 1.2; }
+  .score-number { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 28px; font-weight: 800; }
+  .verdict-label { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.5rem; }
+  .verdict-title { font-family: var(--font-display); font-size: 1.6rem; font-weight: 800; margin-bottom: 0.75rem; line-height: 1.2; }
   .verdict-text { font-size: 14px; color: var(--muted); font-weight: 300; max-width: 460px; margin: 0 auto; line-height: 1.7; }
 
   .breakdown { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1.5rem; animation: fadeUp 0.6s 0.1s ease both; }
-  .breakdown-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+  .breakdown-title { font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
   .dim-row { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
   .dim-row:last-child { margin-bottom: 0; }
   .dim-name { font-size: 13px; font-weight: 500; min-width: 90px; }
   .dim-bar-wrap { flex: 1; height: 6px; background: var(--surface2); border-radius: 100px; overflow: hidden; }
   .dim-bar { height: 100%; border-radius: 100px; transition: width 1s cubic-bezier(0.4,0,0.2,1); width: 0%; }
-  .dim-pct { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
+  .dim-pct { font-family: var(--font-display); font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
 
   .next-steps { animation: fadeUp 0.6s 0.2s ease both; }
-  .next-steps-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+  .next-steps-title { font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
   .step-item { display: flex; gap: 14px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); margin-bottom: 8px; }
-  .step-num { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 800; color: var(--accent); min-width: 20px; padding-top: 2px; }
+  .step-num { font-family: var(--font-display); font-size: 11px; font-weight: 800; color: var(--accent); min-width: 20px; padding-top: 2px; }
   .step-text { font-size: 14px; font-weight: 300; line-height: 1.5; }
   .step-text strong { font-weight: 500; color: var(--text); }
 
@@ -164,10 +164,10 @@
     <div class="breakdown">
       <div class="breakdown-title">Score by dimension</div>
       <div class="dim-row"><div class="dim-name">Skills</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-0" style="background:var(--accent)"></div></div><div class="dim-pct" id="pct-0" style="color:var(--accent)">0%</div></div>
-      <div class="dim-row"><div class="dim-name">Time</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-1" style="background:#60c8f0"></div></div><div class="dim-pct" id="pct-1" style="color:#60c8f0">0%</div></div>
-      <div class="dim-row"><div class="dim-name">Setup &amp; budget</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-2" style="background:#f5a623"></div></div><div class="dim-pct" id="pct-2" style="color:#f5a623">0%</div></div>
-      <div class="dim-row"><div class="dim-name">Mindset</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-3" style="background:#c87df0"></div></div><div class="dim-pct" id="pct-3" style="color:#c87df0">0%</div></div>
-      <div class="dim-row"><div class="dim-name">Market</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-4" style="background:#f06488"></div></div><div class="dim-pct" id="pct-4" style="color:#f06488">0%</div></div>
+      <div class="dim-row"><div class="dim-name">Time</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-1" style="background:#38bdf8"></div></div><div class="dim-pct" id="pct-1" style="color:#38bdf8">0%</div></div>
+      <div class="dim-row"><div class="dim-name">Setup &amp; budget</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-2" style="background:#fbbf24"></div></div><div class="dim-pct" id="pct-2" style="color:#fbbf24">0%</div></div>
+      <div class="dim-row"><div class="dim-name">Mindset</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-3" style="background:#c084fc"></div></div><div class="dim-pct" id="pct-3" style="color:#c084fc">0%</div></div>
+      <div class="dim-row"><div class="dim-name">Market</div><div class="dim-bar-wrap"><div class="dim-bar" id="bar-4" style="background:#f472b6"></div></div><div class="dim-pct" id="pct-4" style="color:#f472b6">0%</div></div>
     </div>
 
     <div class="next-steps">
@@ -222,7 +222,7 @@ const questions = [
     { label: 'I get overwhelmed and usually need someone to walk me through it', score: 2 },
     { label: 'I can follow along, but slowly and unsure of myself', score: 5 },
     { label: 'I can follow a good guide and figure most of it out on my own', score: 8 },
-    { label: 'I pick up new tools easily — I often go beyond the guide', score: 10 },
+    { label: 'I pick up new tools easily - I often go beyond the guide', score: 10 },
   ]},
   { dim: 0, dimName: 'Skills', text: 'How well can you think through and map out a business process before automating it?', options: [
     { label: 'I tend to jump in without mapping things out', score: 2 },
@@ -231,10 +231,10 @@ const questions = [
     { label: 'I regularly document and optimise workflows', score: 10 },
   ]},
   { dim: 1, dimName: 'Time', text: 'How many hours per week can you realistically protect for this, consistently, for 8 weeks?', options: [
-    { label: "Under 4 hours — I'm genuinely stretched right now", score: 3 },
-    { label: '4–6 hours — doable if I stay disciplined', score: 7 },
-    { label: "6–8 hours — I've deliberately carved out the recommended time", score: 9 },
-    { label: '8+ hours — this is a top priority for me', score: 10 },
+    { label: "Under 4 hours - I'm genuinely stretched right now", score: 3 },
+    { label: '4-6 hours - doable if I stay disciplined', score: 7 },
+    { label: "6-8 hours - I've deliberately carved out the recommended time", score: 9 },
+    { label: '8+ hours - this is a top priority for me', score: 10 },
   ]},
   // Deliberately about when money is NEEDED, not when it is wanted. The programme
   // does hand you first-client scripts and you can pitch inside the first few weeks,
@@ -264,10 +264,10 @@ const questions = [
     { label: 'Probably, but I would have to plan for it', score: 5 },
     { label: 'No - I have no way to pay for one right now', score: 0 },
   ]},
-  { dim: 3, dimName: 'Mindset', text: 'How do you typically respond when you hit a wall — a tool that does not work, a concept you cannot grasp?', options: [
+  { dim: 3, dimName: 'Mindset', text: 'How do you typically respond when you hit a wall - a tool that does not work, a concept you cannot grasp?', options: [
     { label: 'I get frustrated and often give up or pause for a long time', score: 1 },
     { label: 'I push through eventually but it affects my motivation significantly', score: 4 },
-    { label: 'I treat it as a puzzle — I look it up, ask for help, keep going', score: 8 },
+    { label: 'I treat it as a puzzle - I look it up, ask for help, keep going', score: 8 },
     { label: 'I genuinely enjoy debugging and figuring things out', score: 10 },
   ]},
   { dim: 3, dimName: 'Mindset', text: 'How consistent have you been with other self-directed learning efforts (courses, online skills, personal projects)?', options: [
@@ -278,12 +278,12 @@ const questions = [
   ]},
   { dim: 4, dimName: 'Market', text: 'How well do you understand the types of businesses that need AI automation and what problems they want solved?', options: [
     { label: 'I have no idea who would buy this or why', score: 0 },
-    { label: 'I have a vague sense — something like "businesses want to save time"', score: 3 },
-    { label: 'I can name 2–3 specific business types and their pain points', score: 7 },
+    { label: 'I have a vague sense - something like "businesses want to save time"', score: 3 },
+    { label: 'I can name 2-3 specific business types and their pain points', score: 7 },
     { label: 'I have a clear niche, specific problems, and can speak their language', score: 10 },
   ]},
-  { dim: 4, dimName: 'Market', text: 'The program hands you outreach scripts and an onboarding roadmap — but you have to actually pitch. How do you feel about proactively reaching out to businesses?', options: [
-    { label: "I dread it — I'd probably avoid it", score: 1 },
+  { dim: 4, dimName: 'Market', text: 'The program hands you outreach scripts and an onboarding roadmap - but you have to actually pitch. How do you feel about proactively reaching out to businesses?', options: [
+    { label: "I dread it - I'd probably avoid it", score: 1 },
     { label: "It scares me, but I'll push through with a script", score: 6 },
     { label: "I'm fairly comfortable reaching out to people", score: 9 },
     { label: 'I already pitch/sell regularly, or have warm contacts to start with', score: 10 },
@@ -419,7 +419,7 @@ function computeResult() {
   if (capped) verdict = verdicts.mid;
 
   const tier = verdict === verdicts.high ? 'ready' : verdict === verdicts.mid ? 'almost' : 'not_yet';
-  const color = verdict === verdicts.high ? '#c8f064' : verdict === verdicts.mid ? '#f5a623' : '#ff6b6b';
+  const color = verdict === verdicts.high ? '#06b6d4' : verdict === verdicts.mid ? '#fbbf24' : '#f87171';
 
   let verdictText = verdict.text;
   let steps = verdict.steps.slice();

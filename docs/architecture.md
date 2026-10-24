@@ -12,10 +12,10 @@ matters — it has been got wrong before.
 
 | | **TAAB Masterclass** | **AI Automation Accelerator** |
 |---|---|---|
-| Price | Free | ₦120,000 (early-bird ₦110,000, or ₦64,000 × 2) |
-| Format | One live 2-hour session | 6-week cohort, self-paced + live clinics |
+| Price | Free | Owned by `config/accelerator.php` - read it through `App\Support\Accelerator`, never retype it here |
+| Format | One live 2-hour session | 8-week cohort, self-paced + live clinics |
 | Purpose | **Clarity before committing** — gauge readiness, costs, skills, mindset | **Building** — 9 production automations + the playbook to sell them |
-| Brand | Dark + lime `#c8f064`, Syne / DM Sans | Dark + cyan `#06b6d4`, Space Grotesk |
+| Brand | Shared: dark `zinc-950` + cyan `#06b6d4`, Space Grotesk / Inter (TAAB was lime `#c8f064` / Syne until 24 Oct 2026) | Same |
 | Config | `config/taab.php` | `config/accelerator.php` |
 
 **The masterclass is not a build session.** It sells clarity and honest self-assessment; the
@@ -515,9 +515,12 @@ class block on top, Blade below. Admin screens use
 `#[Layout('components.layouts.admin', ['title' => '…'])]` and `abort_unless(auth()->user()?->is_admin, 403)`
 in `mount()` — every admin action re-checks, not just the mount.
 
-**Styling.** Tailwind v4 utility classes inline. The TAAB pages use their own layout and an
-inline `@push('styles')` block (lime/Syne); Accelerator/admin/links use zinc + cyan +
-Space Grotesk. Mobile-first — most traffic is TikTok on mobile.
+**Styling.** Tailwind v4 utility classes inline. Accelerator/admin/links use zinc + cyan +
+Space Grotesk directly. The TAAB pages are the one exception: they load no Tailwind at all
+and style themselves from CSS custom properties declared in `x-layouts.taab`, with an
+inline `@push('styles')` block per page. Those tokens now resolve to the same zinc + cyan +
+Space Grotesk palette, so **a brand change has two homes** - the Tailwind classes and the
+TAAB layout's `:root`. Mobile-first — most traffic is TikTok on mobile.
 
 **n8n integration.** Laravel never sends email or WhatsApp. It POSTs a typed event and
 records the outcome. Two rules, both learned the hard way:

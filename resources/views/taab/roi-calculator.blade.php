@@ -1,5 +1,5 @@
 <x-layouts.taab
-    title="AI Automation ROI Calculator — TAAB"
+    title="AI Automation ROI Calculator - TAAB"
     description="Fill in your real numbers. Get an honest projection of what AI automation costs and when it pays.">
 
 @push('styles')
@@ -7,15 +7,15 @@
   .container { max-width: 780px; margin: 0 auto; padding: 3rem 1.5rem 5rem; position: relative; z-index: 1; }
 
   .header { margin-bottom: 2.5rem; }
-  .badge { display: inline-block; font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; background: var(--accent); color: var(--bg); padding: 4px 12px; border-radius: 100px; margin-bottom: 1rem; }
-  h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+  .badge { display: inline-block; font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; background: var(--accent); color: var(--bg); padding: 4px 12px; border-radius: 100px; margin-bottom: 1rem; }
+  h1 { font-family: var(--font-display); font-size: clamp(1.75rem, 4vw, 2.5rem); font-weight: 800; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
   .header-sub { font-size: 15px; color: var(--muted); font-weight: 300; }
 
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
   @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
 
   .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
-  .panel-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
+  .panel-title { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; }
   .panel-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
   .field { margin-bottom: 1.25rem; }
@@ -31,11 +31,11 @@
 
   .number-input-wrap { display: flex; align-items: center; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; background: var(--bg); }
   .num-prefix { padding: 8px 12px; font-size: 13px; color: var(--muted); background: var(--surface2); border-right: 1px solid var(--border); white-space: nowrap; }
-  .num-input { border: none; outline: none; padding: 8px 12px; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); width: 100%; background: transparent; -moz-appearance: textfield; }
+  .num-input { border: none; outline: none; padding: 8px 12px; font-family: var(--font-display); font-size: 14px; font-weight: 600; color: var(--text); width: 100%; background: transparent; -moz-appearance: textfield; }
   .num-input::-webkit-outer-spin-button, .num-input::-webkit-inner-spin-button { -webkit-appearance: none; }
 
   .toggle-group { display: flex; gap: 6px; flex-wrap: wrap; }
-  .toggle-btn { font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 400; padding: 7px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
+  .toggle-btn { font-family: var(--font-body); font-size: 13px; font-weight: 400; padding: 7px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s; }
   .toggle-btn:hover { border-color: var(--accent); color: var(--text); }
   .toggle-btn.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
@@ -45,22 +45,22 @@
   @media (max-width: 600px) { .results-grid { grid-template-columns: 1fr; } }
 
   .summary-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; }
-  .summary-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
-  .summary-big { font-family: 'Syne', sans-serif; font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; color: var(--accent); }
+  .summary-title { font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 1.25rem; }
+  .summary-big { font-family: var(--font-display); font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; color: var(--accent); }
   .summary-label { font-size: 13px; color: var(--muted); font-weight: 300; margin-bottom: 1.5rem; }
   .summary-divider { height: 1px; background: var(--border); margin: 1rem 0; }
   .summary-row { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; margin-bottom: 8px; }
   .summary-row:last-child { margin-bottom: 0; }
   .summary-row-label { color: var(--muted); font-weight: 300; }
-  .summary-row-val { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 14px; color: var(--text); }
+  .summary-row-val { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--text); }
 
   .timeline-panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; grid-column: 1 / -1; }
   .timeline-months { display: flex; gap: 6px; margin-bottom: 1rem; }
   .month-col { flex: 1; }
   .month-bar-wrap { height: 80px; display: flex; align-items: flex-end; margin-bottom: 6px; }
   .month-bar { width: 100%; border-radius: 4px 4px 0 0; transition: height 0.5s cubic-bezier(0.4,0,0.2,1); min-height: 3px; }
-  .month-label { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 600; color: var(--muted); text-align: center; }
-  .month-amount { font-family: 'Syne', sans-serif; font-size: 10px; font-weight: 700; text-align: center; margin-bottom: 2px; min-height: 14px; }
+  .month-label { font-family: var(--font-display); font-size: 10px; font-weight: 600; color: var(--muted); text-align: center; }
+  .month-amount { font-family: var(--font-display); font-size: 10px; font-weight: 700; text-align: center; margin-bottom: 2px; min-height: 14px; }
   .legend-row { display: flex; gap: 20px; margin-top: .75rem; flex-wrap: wrap; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); }
   .legend-dot { width: 8px; height: 8px; border-radius: 2px; }
@@ -72,7 +72,7 @@
   .insight-card.amber { background: var(--amber-bg); border-color: var(--amber-border); }
   .insight-card.red   { background: var(--red-bg);   border-color: var(--red-border); }
   .insight-icon { font-size: 18px; margin-bottom: 6px; }
-  .insight-title { font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .insight-title { font-family: var(--font-display); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
   .insight-card.green .insight-title { color: var(--green); }
   .insight-card.amber .insight-title { color: var(--amber); }
   .insight-card.red   .insight-title { color: var(--red); }
@@ -82,7 +82,7 @@
   .note strong { font-weight: 500; color: var(--text); }
 
   .roi-cta { margin-top: 2rem; text-align: center; }
-  .roi-cta a { display: inline-block; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 14px; background: var(--accent); color: var(--bg); text-decoration: none; padding: 14px 28px; border-radius: var(--radius-sm); }
+  .roi-cta a { display: inline-block; font-family: var(--font-display); font-weight: 700; font-size: 14px; background: var(--accent); color: var(--bg); text-decoration: none; padding: 14px 28px; border-radius: var(--radius-sm); }
 
   /* ── Mobile ─────────────────────────────────────────────── */
   @media (max-width: 600px) {
@@ -101,7 +101,7 @@
 
   <div class="header">
     <div class="badge">TAAB · ROI Calculator</div>
-    <h1>What does this actually cost — and when does it pay?</h1>
+    <h1>What does this actually cost - and when does it pay?</h1>
     <p class="header-sub">Fill in your real numbers. Get an honest projection. No sugar-coating.</p>
   </div>
 
@@ -175,41 +175,41 @@
         <!-- Summary -->
         <div class="summary-panel">
           <div class="summary-title">Break-even</div>
-          <div class="summary-big" id="be-months">—</div>
+          <div class="summary-big" id="be-months"> - </div>
           <div class="summary-label" id="be-label">months to recover all costs</div>
           <div class="summary-divider"></div>
-          <div class="summary-row"><span class="summary-row-label">Monthly tool costs</span><span class="summary-row-val" id="s-tool-cost">—</span></div>
-          <div class="summary-row"><span class="summary-row-label">Total upfront investment</span><span class="summary-row-val" id="s-upfront">—</span></div>
-          <div class="summary-row"><span class="summary-row-label">First revenue month</span><span class="summary-row-val" id="s-first-rev">—</span></div>
+          <div class="summary-row"><span class="summary-row-label">Monthly tool costs</span><span class="summary-row-val" id="s-tool-cost"> - </span></div>
+          <div class="summary-row"><span class="summary-row-label">Total upfront investment</span><span class="summary-row-val" id="s-upfront"> - </span></div>
+          <div class="summary-row"><span class="summary-row-label">First revenue month</span><span class="summary-row-val" id="s-first-rev"> - </span></div>
         </div>
 
         <!-- 12-month -->
         <div class="panel">
           <div class="panel-title">12-month outlook</div>
-          <div class="summary-row" style="margin-bottom:10px"><span class="summary-row-label">6-month cumulative revenue</span><span class="summary-row-val" id="s-6mo">—</span></div>
-          <div class="summary-row" style="margin-bottom:10px"><span class="summary-row-label">12-month cumulative revenue</span><span class="summary-row-val" id="s-12mo">—</span></div>
-          <div class="summary-row"><span class="summary-row-label">Effective hourly rate (mo. 6)</span><span class="summary-row-val" id="s-hourly">—</span></div>
+          <div class="summary-row" style="margin-bottom:10px"><span class="summary-row-label">6-month cumulative revenue</span><span class="summary-row-val" id="s-6mo"> - </span></div>
+          <div class="summary-row" style="margin-bottom:10px"><span class="summary-row-label">12-month cumulative revenue</span><span class="summary-row-val" id="s-12mo"> - </span></div>
+          <div class="summary-row"><span class="summary-row-label">Effective hourly rate (mo. 6)</span><span class="summary-row-val" id="s-hourly"> - </span></div>
         </div>
 
         <!-- Timeline -->
         <div class="timeline-panel">
-          <div class="panel-title">Monthly revenue vs costs — first 12 months</div>
+          <div class="panel-title">Monthly revenue vs costs - first 12 months</div>
           <div class="timeline-months" id="timeline"></div>
           <div class="legend-row">
-            <div class="legend-item"><div class="legend-dot" style="background:#8fe07a"></div>Revenue</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#3a3a42"></div>Tool costs</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Revenue</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#3f3f46"></div>Tool costs</div>
           </div>
         </div>
 
         <!-- Insights -->
         <div class="insights" id="insights">
-          <div class="insight-card green"><div class="insight-icon">💡</div><div class="insight-title">Efficiency</div><div class="insight-text" id="insight-eff">—</div></div>
-          <div class="insight-card amber"><div class="insight-icon">⚠️</div><div class="insight-title">Watch out</div><div class="insight-text" id="insight-warn">—</div></div>
-          <div class="insight-card red"><div class="insight-icon">🔑</div><div class="insight-title">Key lever</div><div class="insight-text" id="insight-lever">—</div></div>
+          <div class="insight-card green"><div class="insight-icon">💡</div><div class="insight-title">Efficiency</div><div class="insight-text" id="insight-eff"> - </div></div>
+          <div class="insight-card amber"><div class="insight-icon">⚠️</div><div class="insight-title">Watch out</div><div class="insight-text" id="insight-warn"> - </div></div>
+          <div class="insight-card red"><div class="insight-icon">🔑</div><div class="insight-title">Key lever</div><div class="insight-text" id="insight-lever"> - </div></div>
         </div>
 
         <div class="note">
-          <strong>Assumptions:</strong> Revenue grows linearly from first-client month to month 6, then holds steady. Costs are constant. Exchange rate used: $1 = ₦{{ number_format((int) config('taab.fx_rate')) }}. Tool costs converted from USD. These are estimates — real results depend on niche, effort, and market conditions. This calculator does not account for taxes, infrastructure one-offs, or client acquisition costs beyond your time.
+          <strong>Assumptions:</strong> Revenue grows linearly from first-client month to month 6, then holds steady. Costs are constant. Exchange rate used: $1 = ₦{{ number_format((int) config('taab.fx_rate')) }}. Tool costs converted from USD. These are estimates - real results depend on niche, effort, and market conditions. This calculator does not account for taxes, infrastructure one-offs, or client acquisition costs beyond your time.
         </div>
       </div>
     </div>
@@ -287,7 +287,7 @@ function update() {
   }
 
   document.getElementById('be-months').textContent = beMonth ? 'Month ' + beMonth : '12+';
-  document.getElementById('be-label').textContent = beMonth ? 'break-even point — costs fully recovered' : 'break-even beyond month 12 at these inputs';
+  document.getElementById('be-label').textContent = beMonth ? 'break-even point - costs fully recovered' : 'break-even beyond month 12 at these inputs';
   document.getElementById('s-tool-cost').textContent = fmtUSD(monthlyToolUSD) + '/mo (' + fmt(monthlyToolNGN) + ')';
   document.getElementById('s-upfront').textContent = fmt(learningCostNGN);
   document.getElementById('s-first-rev').textContent = 'Month ' + (monthsToClient + 1);
@@ -297,7 +297,7 @@ function update() {
   const mo6Rev = monthlyRevenue[5];
   const hrsMonth = hrsWeek * 4;
   const hourlyNGN = hrsMonth > 0 ? mo6Rev / hrsMonth : 0;
-  document.getElementById('s-hourly').textContent = hourlyNGN > 0 ? fmt(hourlyNGN) + '/hr' : '—';
+  document.getElementById('s-hourly').textContent = hourlyNGN > 0 ? fmt(hourlyNGN) + '/hr' : ' - ';
 
   const maxRev = Math.max(...monthlyRevenue, monthlyToolNGN, 1);
   const chartH = 80;
@@ -312,11 +312,11 @@ function update() {
     col.className = 'month-col';
     const amountStr = rev > 0 ? (rev >= 1000000 ? '₦' + (rev/1000000).toFixed(1) + 'M' : '₦' + Math.round(rev/1000) + 'k') : '';
     col.innerHTML = `
-      <div class="month-amount" style="color:${rev > 0 ? '#8fe07a' : 'transparent'};font-size:9px">${amountStr}</div>
+      <div class="month-amount" style="color:${rev > 0 ? '#4ade80' : 'transparent'};font-size:9px">${amountStr}</div>
       <div class="month-bar-wrap" style="position:relative">
         <div style="position:absolute;bottom:0;left:0;right:0;display:flex;gap:2px;align-items:flex-end">
-          <div class="month-bar" style="flex:1;height:${revH}px;background:${isBeMonth ? '#c8f064' : '#8fe07a'};"></div>
-          <div class="month-bar" style="flex:1;height:${costH}px;background:#3a3a42;"></div>
+          <div class="month-bar" style="flex:1;height:${revH}px;background:${isBeMonth ? '#06b6d4' : '#4ade80'};"></div>
+          <div class="month-bar" style="flex:1;height:${costH}px;background:#3f3f46;"></div>
         </div>
       </div>
       <div class="month-label">${['J','F','M','A','M','J','J','A','S','O','N','D'][m]}</div>
@@ -324,9 +324,9 @@ function update() {
     timeline.appendChild(col);
   }
 
-  const efficiencyScore = hrsWeek >= 10 ? 'Your 10+ hrs/week pace is serious. Most successful freelancers in this space hit their first client in under 6 weeks at this intensity.' : hrsWeek >= 6 ? 'At ' + hrsWeek + ' hrs/week you can move meaningfully — expect 6–10 weeks to first client with focused effort.' : 'At ' + hrsWeek + ' hrs/week, progress will be slow. Even adding 2 more hours per week cuts your time-to-first-client significantly.';
-  const warnMsg = monthsToClient <= 2 ? 'A ' + monthsToClient + '-month timeline to first client is optimistic. Most learners take 2–4 months. Build in buffer so financial pressure doesn\'t kill your momentum.' : monthlyToolNGN > 50000 ? 'Your tool costs are high relative to starting income. Use free tiers while learning — n8n self-hosted is free and production-ready.' : 'Your projection looks realistic. The main risk is scope creep on early projects — fix your fee before starting, not after.';
-  const leverMsg = projectFeeNGN < 150000 ? 'Your project fee is on the low end. Automations that save a business 10+ hours/month should command ₦150k–₦500k minimum. Don\'t undervalue the work.' : clientsPM === 1 ? 'With one client/month, one churn event wipes your income. Focus on retainer agreements, not one-off projects, as soon as possible.' : 'Retainer agreements are your biggest lever — they turn unpredictable project income into stable monthly recurring revenue.';
+  const efficiencyScore = hrsWeek >= 10 ? 'Your 10+ hrs/week pace is serious. Most successful freelancers in this space hit their first client in under 6 weeks at this intensity.' : hrsWeek >= 6 ? 'At ' + hrsWeek + ' hrs/week you can move meaningfully - expect 6-10 weeks to first client with focused effort.' : 'At ' + hrsWeek + ' hrs/week, progress will be slow. Even adding 2 more hours per week cuts your time-to-first-client significantly.';
+  const warnMsg = monthsToClient <= 2 ? 'A ' + monthsToClient + '-month timeline to first client is optimistic. Most learners take 2-4 months. Build in buffer so financial pressure doesn\'t kill your momentum.' : monthlyToolNGN > 50000 ? 'Your tool costs are high relative to starting income. Use free tiers while learning - n8n self-hosted is free and production-ready.' : 'Your projection looks realistic. The main risk is scope creep on early projects - fix your fee before starting, not after.';
+  const leverMsg = projectFeeNGN < 150000 ? 'Your project fee is on the low end. Automations that save a business 10+ hours/month should command ₦150k - ₦500k minimum. Don\'t undervalue the work.' : clientsPM === 1 ? 'With one client/month, one churn event wipes your income. Focus on retainer agreements, not one-off projects, as soon as possible.' : 'Retainer agreements are your biggest lever - they turn unpredictable project income into stable monthly recurring revenue.';
 
   document.getElementById('insight-eff').textContent = efficiencyScore;
   document.getElementById('insight-warn').textContent = warnMsg;

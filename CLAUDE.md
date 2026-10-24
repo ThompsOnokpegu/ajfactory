@@ -58,8 +58,15 @@ in Blade; the landing page and checkout must always agree.
 - **The Accelerator** is where building happens.
 
 ### Brand
-- **Accelerator / admin / links:** dark `zinc-950` + cyan `#06b6d4`, Space Grotesk.
-- **TAAB:** dark + lime `#c8f064`, Syne / DM Sans.
+- **One brand across every public surface:** dark `zinc-950` + cyan `#06b6d4`,
+  Space Grotesk display over Inter body. Accelerator, admin, links, TAAB and all 18
+  email templates in `docs/emails/`.
+- **TAAB ran its own lime `#c8f064` / Syne brand until 24 Oct 2026.** It was unified
+  because the funnel looked like two companies - a registrant left a lime page, got a
+  lime email and landed on a cyan checkout. The TAAB pages still carry their own
+  `x-layouts.taab` and inline `@push('styles')`, but every token in it now resolves to
+  the Accelerator's palette. Don't re-fork the colours to signal the positioning
+  difference below; that difference lives in the **copy**.
 - Mobile-first, generous spacing.
 - **Hyphens only in student-facing copy. No em (—) or en (–) dashes.** Applies to
   curriculum titles and lesson names, page copy, and emails.

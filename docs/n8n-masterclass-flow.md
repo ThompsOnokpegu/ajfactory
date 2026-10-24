@@ -124,6 +124,16 @@ on every event except `masterclass_waitlist` (which isn't tied to a session).
 > then paste into the n8n Send-Email node's HTML field. The plain-text bodies below are
 > the fallback / WhatsApp copy.
 
+> **Re-paste needed after 24 Oct 2026.** TAAB was unified onto the Accelerator brand
+> (zinc-950 + cyan `#06b6d4`, Space Grotesk; it was lime `#c8f064` / Syne). Nine templates
+> changed - `1-registration`, `2-reminder`, `3-starting-soon`, `4-followup`, `5-waitlist`,
+> `6-scorecard`, `8-reinvite`, `9-live`, `15-taab50-last-call` - and **the copies living in
+> n8n are still lime until someone pastes the new HTML in.** This repo holds mirrors, not
+> the live templates: nothing deploys them. Until that is done a registrant gets a lime
+> email between a cyan page and a cyan checkout, which is the exact problem the unification
+> was meant to remove. Merge fields and subject lines are unchanged, so this is a
+> body-HTML swap per node, with no change to any event name or payload.
+
 **Gotchas**
 - The Webhook node wraps the POSTed JSON under `body`, so every field is referenced as
   `{{ $json.body.<field> }}` (as in the templates below). `recording_block` is the one
