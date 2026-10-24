@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.icons')
     <title>Your resource — AJBuildAI</title>
     @vite(['resources/css/app.css'])
     @if($purchase->status !== 'paid')

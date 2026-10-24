@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.icons')
     <title>Links | AJ Thompson</title>
     <meta name="description" content="Everything AJ Thompson builds and teaches: the free TAAB masterclass, the AI Automation Accelerator, 1-on-1 coaching, and the self-hosting guide.">
     @vite(['resources/css/app.css', 'resources/js/app.js'])

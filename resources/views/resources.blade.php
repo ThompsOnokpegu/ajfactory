@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    @include('partials.icons')
     <title>Free Resources | AJ Thompson</title>
     <meta name="description" content="Free AI automation workflows, cheatsheets, and templates — grab the ones you want.">
     <meta property="og:title" content="Free AI Automation Resources">

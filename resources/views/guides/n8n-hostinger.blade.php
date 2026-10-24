@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+@include('partials.icons')
 <meta name="description" content="Deploy your own n8n on a Hostinger VPS in one click — the alternative route when Google Cloud won't verify your account. From the AI Automation Accelerator by AJBuildAI.">
 <title>Set up n8n on Hostinger — the one-click deploy guide</title>
 

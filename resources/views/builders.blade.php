@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        @include('partials.icons')
         <!-- Primary Meta Tags -->
         <title>Join the Waitlist | AI Automation Accelerator</title>
         <meta name="description" content="The current cohort is closed. Join the waitlist to get first access — and early-bird pricing — when the next AI Automation Accelerator cohort opens.">

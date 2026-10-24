@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        @include('partials.icons')
         <title>Watch Me Land AI Automation Clients | AJBuilds AI</title>
         <meta name="description" content="I don't teach what I haven't proven. For ~60 days I'm documenting exactly how I land AI automation clients from scratch — real messages, real numbers, wins and flops. Get on the list.">
 

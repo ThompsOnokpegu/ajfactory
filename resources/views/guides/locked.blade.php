@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+@include('partials.icons')
 <meta name="description" content="Self-host n8n on your own domain with real HTTPS - a copy-paste written guide. Free for AI Automation Accelerator students.">
 <title>Self-hosting guide - AJBuilds AI</title>
 

@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+@include('partials.icons')
 <meta name="description" content="Part 1 Capstone of the AI Automation Accelerator: build a three-workflow quote engine that reads an RFQ, prices it against a rate card, and lets the MD approve and send from her phone.">
 <title>Part 1 Capstone - The Quote Engine</title>
 

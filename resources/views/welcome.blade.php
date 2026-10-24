@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        @include('partials.icons')
         <meta name="description" content="AJBuilds AI teaches you to build and sell real AI automations — Telegram, WhatsApp & voice agents on your own infrastructure. Nigeria-first, no code required.">
 
         <meta property="og:type" content="website">

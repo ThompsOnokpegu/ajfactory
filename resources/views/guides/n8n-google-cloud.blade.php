@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+@include('partials.icons')
 <meta name="description" content="A copy-paste, beginner-proof guide to self-hosting n8n on Google Cloud's free tier — from the AI Automation Accelerator by AJBuildAI.">
 <title>Set up n8n on Google Cloud — the free-hosting guide</title>
 
