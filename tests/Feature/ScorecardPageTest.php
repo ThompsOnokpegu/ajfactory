@@ -144,3 +144,33 @@ it('requires a first name before it will show the results', function () {
     );
     expect($html)->toContain('Please add your first name');
 });
+
+/*
+ | The domain price is quoted on five surfaces, and it drifted on all of them at once
+ | because each carries its own copy of the sentence. The checkout one matters most: it
+ | is inside the no-surprises acknowledgement the buyer ticks, so understating a cost
+ | there is the version that ends in a refund request.
+ */
+it('quotes the same domain floor on every page that names one', function () {
+    $pages = [
+        '/accelerator' => 'the offer page',
+        '/taab/tool-stack' => 'the tool-stack guide',
+        '/taab/scorecard' => 'the readiness scorecard',
+        '/checkout' => 'the checkout acknowledgement',
+    ];
+
+    foreach ($pages as $url => $what) {
+        $html = $this->get($url)->assertOk()->getContent();
+
+        $this->assertStringNotContainsString(
+            '$10/yr',
+            $html,
+            "A .com price is quoted as the domain floor on {$what}; a .site/.online starts near \$1."
+        );
+        $this->assertStringContainsString(
+            'first year',
+            $html,
+            "The domain cost on {$what} must be quoted as a first-year price - these TLDs renew dearer."
+        );
+    }
+});

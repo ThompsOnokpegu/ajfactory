@@ -106,7 +106,7 @@
   <div class="hero">
     <div class="badge">// taab-tool-stack-guide-2026</div>
     <h1>The right tools for<br>where you actually are</h1>
-    <p class="hero-sub">This is the stack we use in the Accelerator. You can start almost entirely free — the only real recurring cost is one cheap domain (~$10/yr). The paid tools are optional, for when you're already earning.</p>
+    <p class="hero-sub">This is the stack we use in the Accelerator. You can start almost entirely free — the only real recurring cost is one cheap domain (a .site or .online starts from about $1 for the first year). The paid tools are optional, for when you're already earning.</p>
   </div>
 
   <!-- BEGINNER -->
