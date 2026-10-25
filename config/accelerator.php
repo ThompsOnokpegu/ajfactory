@@ -132,13 +132,23 @@ return [
 
     // --- Scarcity / cohort ---
     'cohort_number'     => 3,     // stamped on new enrollments; >= 2 enables ship-to-unlock
-    // Raised 25 -> 30 on 25 Aug 2026, then 30 -> 50 on 25 Oct 2026. This number is the
-    // public scarcity counter ("N of 50 seats left") on the landing page and checkout,
-    // and `Accelerator::isSoldOut()` hard-blocks checkout when it's reached. Raising it
-    // mid-launch, after leads have already seen a smaller number, reads as fake scarcity
-    // to an audience we sell "no surprises" to - so if it moves again, move it before
-    // the next send, not during one. The 25 Oct raise was made six days before the
-    // 31 Oct masterclass for exactly that reason.
+    // Raised 25 -> 30 on 25 Aug 2026, then 30 -> 50 on 25 Oct 2026.
+    //
+    // This comment used to say the number is "the public scarcity counter
+    // ('N of 30 seats left') on the landing page and checkout". It is NOT, and has not
+    // been for as long as the current pages have existed - grep the views, no seat
+    // count is rendered anywhere public. /accelerator computes $seatsLeft and $cap and
+    // then never prints either, and the checkout's $seatsLeft property is set in mount()
+    // and never displayed. The only place a seat number is shown is /admin.
+    //
+    // What this number ACTUALLY does is feed `Accelerator::isSoldOut()`, which flips
+    // the landing page and checkout into waitlist mode (CTA to /builders) and hard-blocks
+    // the pay button. So raising it changes nothing a visitor can see; it only moves the
+    // point at which enrolment slams shut.
+    //
+    // That makes the old "reads as fake scarcity if you raise it mid-launch" warning
+    // moot while no counter is rendered - but it becomes true the moment anyone prints
+    // $seatsLeft. If you add that counter, restore the warning with it.
     'cohort_cap'        => 50,
     // Early-bird is OFF: 0 means seats_sold is always >= it, so earlybirdActive() is
     // false whatever the date says. Do NOT turn it off by clearing earlybird_ends_at
