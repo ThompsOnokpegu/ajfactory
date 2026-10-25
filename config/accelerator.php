@@ -46,12 +46,32 @@ return [
     // anyone who got ill once. 4 leaves real margin while still requiring genuine
     // participation.
     //
-    // For Cohort 3 (starts Sat 12 Sep 2026) the attendable set is live-11..live-16,
-    // six weekly sessions from 19 Sep to 24 Oct 2026 (Saturdays, except live-12 which
-    // ran on Sunday 27 Sep). live-01..live-09 all ran before the
-    // start; live-10 is Cohort 2's closing session on the morning of the start day and
-    // carries no attendance_code, so it credits nobody either. If you shift the cohort
-    // start, RE-COUNT the sessions that fall after it before trusting this number.
+    // For Cohort 3 (starts Sat 12 Sep 2026) the run is live-11 onwards, weekly from
+    // 19 Sep 2026 and still going. live-01..live-09 all ran before the start.
+    //
+    // COUNT THE CODES, NOT THE SESSIONS - they are not the same number, and a session
+    // that ran without an `attendance_code` credits nobody, permanently. As of
+    // 25 Oct 2026 the Cohort 3 picture is:
+    //
+    //   live-10  12 Sep 09:00  HAVARD26       creditable, with a caveat - see below
+    //   live-11  19 Sep        COHORT3        creditable
+    //   live-12  27 Sep (Sun)  MARLIN-834     creditable
+    //   live-13   4 Oct (Sun)  TRAWLER-572    creditable
+    //   live-14  10 Oct        (none set)     credits nobody, cannot be fixed
+    //   live-15  17 Oct        (none set)     credits nobody, cannot be fixed
+    //   live-16  25 Oct (Sun)  HARMATTAN-614  creditable
+    //
+    // live-10 is the subtle one. This comment used to assert it "carries no
+    // attendance_code, so it credits nobody" - that is WRONG, it has one. It runs at
+    // 09:00 on the Cohort 3 start DATE, and the start resolves to 00:00, so it sits
+    // after the start and counts mechanically. But it was Cohort 2's closing call, so
+    // a Cohort 3 student only holds that code if they happened to be on it.
+    //
+    // So: five creditable on paper, four for a realistic Cohort 3 student, against a
+    // threshold of 4. Losing live-14 and live-15 is what ate the margin. More sessions
+    // are planned; each one only counts if its code is set BEFORE the call.
+    //
+    // If you shift the cohort start, RE-COUNT the sessions that fall after it.
     'guarantee_min_live_sessions' => 4,
 
     /*
@@ -112,13 +132,14 @@ return [
 
     // --- Scarcity / cohort ---
     'cohort_number'     => 3,     // stamped on new enrollments; >= 2 enables ship-to-unlock
-    // Raised 25 -> 30 on 25 Aug 2026, deliberately BEFORE the Cohort 3 list campaign
-    // sent anything. This number is the public scarcity counter ("N of 30 seats left")
-    // on the landing page and checkout, and `Accelerator::isSoldOut()` hard-blocks
-    // checkout when it's reached. Raising it mid-launch, after leads have already seen
-    // a smaller number, reads as fake scarcity to an audience we sell "no surprises"
-    // to — so if it moves again, move it before the next send, not during one.
-    'cohort_cap'        => 30,
+    // Raised 25 -> 30 on 25 Aug 2026, then 30 -> 50 on 25 Oct 2026. This number is the
+    // public scarcity counter ("N of 50 seats left") on the landing page and checkout,
+    // and `Accelerator::isSoldOut()` hard-blocks checkout when it's reached. Raising it
+    // mid-launch, after leads have already seen a smaller number, reads as fake scarcity
+    // to an audience we sell "no surprises" to - so if it moves again, move it before
+    // the next send, not during one. The 25 Oct raise was made six days before the
+    // 31 Oct masterclass for exactly that reason.
+    'cohort_cap'        => 50,
     // Early-bird is OFF: 0 means seats_sold is always >= it, so earlybirdActive() is
     // false whatever the date says. Do NOT turn it off by clearing earlybird_ends_at
     // instead - an empty end date means "no cutoff" and flips early-bird back ON,
@@ -127,10 +148,12 @@ return [
     'earlybird_seats'   => 0,
     'earlybird_ends_at' => '2026-08-31 23:59:59', // Monday 31st August 2026 (Africa/Lagos), or until earlybird_seats sell — whichever first
     'cohort_starts_at'  => '2026-09-12', // Saturday 12th September 2026
-    // Extended to Sat 31 Oct 2026: Cohort 3 is mid-run and self-paced, so enrolment
-    // stays open while the cohort is live. The DATE IS NOT SHOWN in any page copy - it
-    // is the real close the system enforces, not a deadline being marketed.
-    'cart_closes_at'    => '2026-10-31 23:59:59',
+    // Extended again to Thu 31 Dec 2026 (was Sat 31 Oct). Cohort 3 is mid-run and
+    // self-paced, so enrolment stays open while the cohort is live. The 31 Oct close
+    // was the same night as the TAAB masterclass, which would have shut the cart the
+    // moment the masterclass pushed traffic at it. The DATE IS NOT SHOWN in any page
+    // copy - it is the real close the system enforces, not a deadline being marketed.
+    'cart_closes_at'    => '2026-12-31 23:59:59',
 
     'payment_provider'  => 'paystack', // or 'flutterwave'
 

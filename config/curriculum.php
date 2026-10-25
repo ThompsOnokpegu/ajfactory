@@ -361,18 +361,26 @@ Self-hosting is not here: it lives in Module 02, which carries both the full wal
 
         /*
         |----------------------------------------------------------------------
-        | COHORT 3 RUN — weekly 9AM WAT from 19 Sep 2026 (6 sessions).
+        | COHORT 3 RUN — weekly 9AM WAT from 19 Sep 2026. STILL RUNNING: more
+        | sessions are planned beyond live-16, so this list grows.
         |----------------------------------------------------------------------
-        | Saturdays, except live-12 which ran on Sunday 27 Sep. Read each
-        | session's release_at rather than assuming the day.
+        | Nominally Saturdays, but live-12 (27 Sep), live-13 (4 Oct) and live-16
+        | (25 Oct) each slipped to the Sunday. Read each session's release_at
+        | rather than assuming the day.
         |----------------------------------------------------------------------
-        | These are the ONLY sessions a Cohort 3 student can be credited for:
-        | attendance requires the session to run AFTER their cohort start
-        | (Sat 12 Sep 2026) and to have an `attendance_code` set. live-10 lands on
-        | the start morning but is Cohort 2's closing call with no code set, so it
-        | doesn't count for anyone in Cohort 3 either. Six sessions
-        | against `accelerator.guarantee_min_live_sessions` = 4 leaves margin for
-        | two misses — don't delete one without re-checking that threshold.
+        | Attendance requires the session to run AFTER the student's cohort start
+        | (Sat 12 Sep 2026, which resolves to 00:00) and to have an
+        | `attendance_code` set. live-10 at 09:00 on the start date therefore
+        | counts mechanically, even though it is Cohort 2's closing call - a
+        | Cohort 3 student only holds that code if they were on it.
+        |
+        | COUNT THE CODES, NOT THE SESSIONS. live-14 and live-15 both ran with
+        | `attendance_code` left commented out, so they credit nobody and never
+        | can - there is no retroactive path. That leaves live-10, 11, 12, 13
+        | and 16 creditable (five on paper, four for a student who was not on
+        | Cohort 2's closing call) against
+        | `accelerator.guarantee_min_live_sessions` = 4. Set the code BEFORE the
+        | call, not after it - that is the whole failure mode.
         |
         | Announce the attendance_code at the END of each call. Set a FRESH code
         | per session: uncomment its line and fill it just before you go live
@@ -445,10 +453,11 @@ Self-hosting is not here: it lives in Module 02, which carries both the full wal
         [
             'id' => 'live-16',
             'title' => 'Live Session #16: Build & Q&A',
-            'release_at' => '2026-10-24 09:00:00',
+            // Ran on SUNDAY, not the usual Saturday - third session to slip a day.
+            'release_at' => '2026-10-25 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            // 'attendance_code' => '', // ← set a FRESH code before Sat 24 Oct
+            'attendance_code' => 'HARMATTAN-614', // ← announced at the END of the call (Sun 25 Oct). Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-16-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
