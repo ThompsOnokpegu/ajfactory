@@ -457,7 +457,7 @@ Self-hosting is not here: it lives in Module 02, which carries both the full wal
             'release_at' => '2026-10-25 09:00:00',
             'library_id' => '589383',
             'has_blueprint' => false,
-            'attendance_code' => 'HARMATTAN-614', // ← announced at the END of the call (Sun 25 Oct). Rotate every session.
+            'attendance_code' => 'QWERTY-25', // ← announced at the END of the call (Sun 25 Oct). Rotate every session.
             'description' => "Weekly live build & Q&A. Recording appears here after the session.",
             'videos' => [
                 ['id' => 'live-16-v1', 'title' => 'Build & Q&A Recording', 'video_id' => '', 'duration' => ''],
