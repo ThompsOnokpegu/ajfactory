@@ -138,11 +138,46 @@ it('schedules enough live sessions AFTER the cohort start to win the guarantee',
     // Threshold + 2 is the deliberate margin: a student may miss two sessions (illness,
     // travel, a clash) and still finish. Landing exactly on the threshold means demanding
     // a perfect record again, which is the bug this whole family of tests exists for.
+    //
+    // NOTE this counts sessions that RAN after the start, which is a looser denominator
+    // than the one that actually pays out - see the test below.
     expect($attendable)->toBeGreaterThanOrEqual(
         $threshold + 2,
         "Only {$attendable} live session(s) fall after the cohort start, against a guarantee "
         ."threshold of {$threshold}. Add sessions to curriculum.live dated after "
         .'accelerator.cohort_starts_at, or lower the threshold.'
+    );
+});
+
+it('keeps the guarantee winnable on sessions that can actually be credited', function () {
+    // The test above counts sessions dated after the cohort start. That is NOT the set
+    // that can be credited: a session also needs an `attendance_code`, and a session that
+    // ran without one credits nobody, for ever - there is no retroactive path.
+    //
+    // The two counts drift apart silently. By 25 Oct 2026 six Cohort 3 sessions had
+    // run and the looser test was comfortably green, while live-14 and live-15 had
+    // both gone live with their code still commented out - so the real creditable
+    // count sat exactly ON the threshold rather than two above it, and one more
+    // uncoded session would have pushed it under.
+    //
+    // This asserts the hard floor only (>= threshold, not threshold + 2). How much
+    // margin to carry is a judgement call that depends on how many sessions are still
+    // to come. An unwinnable promise is not a judgement call, it is a bug.
+    $start = \App\Support\Accelerator::cohortStartsAt();
+    $threshold = (int) config('accelerator.guarantee_min_live_sessions');
+
+    $creditable = collect(config('curriculum.live', []))
+        ->filter(fn ($s) => ! empty($s['release_at'])
+            && ! empty($s['attendance_code'])
+            && \Illuminate\Support\Carbon::parse($s['release_at'], 'Africa/Lagos')->gt($start))
+        ->count();
+
+    expect($creditable)->toBeGreaterThanOrEqual(
+        $threshold,
+        "Only {$creditable} live session(s) after the cohort start carry an attendance_code, "
+        ."against a guarantee threshold of {$threshold}. No student can win the guarantee. "
+        .'Set the code on upcoming sessions BEFORE they run (it cannot be added afterwards), '
+        .'or lower accelerator.guarantee_min_live_sessions.'
     );
 });
 
