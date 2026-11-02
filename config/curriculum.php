@@ -138,10 +138,16 @@ Read sections 01 to 04 first, then work the Build Order one stage at a time. Eve
             'title' => 'Module 05: Knowledge Base (RAG)',
             'release_at' => '2026-07-27 00:00:00',
             'has_blueprint' => true,
-            'description' => "Teaching the AI about your specific business data, so it answers from your documents instead of guessing. We cover:\n\n• RAG Concepts - what Retrieval-Augmented Generation is and why a chatbot needs it.\n• Pinecone Index Creation - a vector database with the right dimensions for Gemini embeddings (768).\n• KB Embedding - the ingestion pipeline that reads your documents, chunks them, and stores them as vectors.\n• KB Retrieval - the chatbot that searches the knowledge base and answers from what it finds.\n\nThe original full-length 'Knowledge Base (RAG)' walkthrough is included as a legacy reference.",
+            'description' => "Teaching the AI about your specific business data, so it answers from your documents instead of guessing. We cover:\n\n• RAG Concepts - what Retrieval-Augmented Generation is and why a chatbot needs it.\n• Pinecone Index Creation - the original walkthrough, kept for reference.\n• UPDATE: Qdrant Index Creation - Pinecone stopped offering 3072-dimension indexes, so the vector database is now Qdrant. Follow this one instead of the Pinecone lesson above.\n• KB Embedding - the ingestion pipeline that reads your documents, chunks them, and stores them as vectors.\n• KB Retrieval - the chatbot that searches the knowledge base and answers from what it finds.\n\nThe original full-length 'Knowledge Base (RAG)' walkthrough is included as a legacy reference.",
             'videos' => [
                 ['id' => 'module-04-v2', 'title' => 'RAG Concepts', 'video_id' => 'f25fb2ea-02c5-4928-88c3-0652db9434ff', 'duration' => '01:54 Mins'],
                 ['id' => 'module-04-v3', 'title' => 'Pinecone Index Creation', 'video_id' => 'f8906653-3178-403a-a6e1-3346efb70358', 'duration' => '02:23 Mins'],
+                // Sits directly after the Pinecone lesson it supersedes, so a student hits
+                // the correction at the point the old instructions stop working. v3 is kept,
+                // not replaced: completed_lessons keys off the id, so removing it would drop
+                // the tick for everyone who has already watched it. New id is v6 because v1
+                // is taken by the legacy video below - ids are keys, never positions.
+                ['id' => 'module-04-v6', 'title' => 'UPDATE: Qdrant Index Creation (replaces Pinecone)', 'video_id' => '11e395d3-6a3d-4c40-a4b7-6653d4419b62', 'duration' => '07:36 Mins'],
                 ['id' => 'module-04-v4', 'title' => 'KB Embedding', 'video_id' => 'fd766a91-95d2-4f23-99a0-0e31edc293b0', 'duration' => '11:00 Mins'],
                 ['id' => 'module-04-v5', 'title' => 'KB Retrieval - Chatbot', 'video_id' => 'fddab7d1-6cfa-4cf7-9edb-8d8e55f4220a', 'duration' => '15:11 Mins'],
                 // Kept so students who already completed it keep the tick (completed_lessons keys off the id).
