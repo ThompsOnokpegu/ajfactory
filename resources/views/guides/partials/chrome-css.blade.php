@@ -169,7 +169,7 @@
   .console { margin: 1.1rem 0 1.3rem; border: 1px solid var(--con-border); border-radius: 10px; overflow: hidden; background: var(--con-bg); }
   .console .chead { display: flex; align-items: center; justify-content: space-between; background: var(--con-head); border-bottom: 1px solid var(--con-border); padding: .4rem .75rem; }
   .console .chead .tag { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .12em; text-transform: uppercase; color: var(--con-muted); display: flex; align-items: center; gap: .5rem; }
-  .console .chead .tag i { width: 9px; height: 9px; border-radius: 50%; background: #f26d5b; box-shadow: 16px 0 0 #f5bf4f, 32px 0 0 #64c97b; }
+  .console .chead .tag i { width: 9px; height: 9px; border-radius: 50%; background: #f26d5b; box-shadow: 16px 0 0 #f5bf4f, 32px 0 0 #64c97b; margin-right: 2rem; }
   .copybtn { font-family: var(--font-mono); font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--con-muted); background: transparent; border: 1px solid var(--con-border); border-radius: 6px; padding: .28rem .55rem; cursor: pointer; }
   .copybtn:hover { color: var(--con-prompt); border-color: var(--con-prompt); }
   .copybtn.done { color: #6ee7a8; border-color: #6ee7a8; }

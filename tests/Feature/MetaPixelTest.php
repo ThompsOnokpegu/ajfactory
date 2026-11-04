@@ -36,6 +36,7 @@ it('puts the base pixel on every public page group', function (string $path) {
     '/', '/builders', '/earn', '/free', '/terms', '/links',
     '/taab', '/taab/scorecard', '/taab/roi-calculator', '/taab/tool-stack',
     '/guides/n8n-on-google-cloud',   // the public locked/sales page for a gated guide
+    '/free/n8n-google-cloud',
 ]);
 
 it('never renders the pixel for logged-in students or on personal pages', function () {

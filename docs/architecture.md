@@ -387,6 +387,7 @@ matches poorly. `MetaPixelTest` guards it.
 | `/taab/scorecard`, `/taab/roi-calculator`, `/taab/tool-stack` | lead-magnet tools |
 | `/free`, `/r/{resource}` | free resource hub + click-tracking redirect |
 | `/guides/n8n-on-google-cloud`, `/guides/n8n-on-hostinger` | written self-hosting guides, surfaced as Module 02 lessons. Two routes to the same outcome — free-but-fiddly (GCP) and paid-but-one-click (Hostinger, for students GCP won't verify). A student does **one**, not both; each page links to the other |
+| `/free/n8n-google-cloud` | free commands page, linked from the YouTube tutorial: the Google Cloud guide's steps and commands with no video, and no mention of the Accelerator or the Hostinger hosting route. Public on purpose, so it sits outside `/guides` and the gate. `N8nCommandsPageTest` holds its commands to the paid guide's |
 | `/links`, `/builders` | link-in-bio, TikTok waitlist |
 | `/terms` | legal |
 

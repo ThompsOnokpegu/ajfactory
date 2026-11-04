@@ -64,6 +64,10 @@ Route::get('/checkout', function () {
 Route::get('/free', function () {
     return view('resources', ['resources' => \App\Models\Resource::published()->get()]);
 })->name('free');
+// The Google Cloud guide's steps and commands, free. The YouTube tutorial sends viewers
+// here. It sits under /free, not /guides, on purpose: every /guides route must be gated,
+// and GuideAccessTest fails on any that is not.
+Route::view('/free/n8n-google-cloud', 'guides.n8n-google-cloud-commands')->name('free.n8n-gcp');
 Route::get('/r/{resource}', function (\App\Models\Resource $resource) {
     abort_unless($resource->is_published, 404);
     // A paid resource's url is gated — never redirect to it; send them to checkout.

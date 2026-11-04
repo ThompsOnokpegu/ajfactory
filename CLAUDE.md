@@ -130,6 +130,11 @@ These encode real incidents. Changing them will break something that took a whil
   `purchasable_paths` is what money actually buys, and a buyer gets only those. Adding the
   capstone brief to `gated_paths` alone made a guide sale hand over course content, because
   any gated path used to unlock every gated path. Course material is gated, never sold.
+  **One deliberate exception:** `/free/n8n-google-cloud` gives the Google Cloud guide's steps
+  and commands away for the YouTube tutorial. It stays out of `/guides/`, where every route
+  must be gated, and it never mentions the Accelerator or the Hostinger hosting route. Change
+  a command in the paid guide and you change it there too (view and `docs/guides/` markdown);
+  `N8nCommandsPageTest` fails until you do.
 - **Resolve a signed-in student with `Enrollment::currentFor($email)`, never
   `where('email', ...)->first()`.** Checkout writes a new `pending` enrollment row on every
   attempt and only the row matching the payment reference is flipped to `paid`, so a student
