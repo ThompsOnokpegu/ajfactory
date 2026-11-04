@@ -101,3 +101,5 @@ template's own schema quirks are not read as new breakage, and read the content 
   **Still unchanged:** the paid self-hosting guide says `$6-11` for a domain, because it walks
   the reader through buying a `.com` on Hostinger step by step. Changing the number there means
   changing the walkthrough.
+- **4 Nov 2026** - rolled to the Sat 14 Nov edition: slide 1's date only. Prices, the module
+  count and the scorecard were checked against their owners and had not changed.
