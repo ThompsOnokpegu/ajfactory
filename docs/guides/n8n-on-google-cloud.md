@@ -105,8 +105,8 @@ A domain is your web address. You can use any registrar; **Hostinger** is used h
 A "project" is just a folder for your stuff.
 
 1. Top-left, click the **project dropdown** (it may say "My First Project").
-2. Click **New Project** → name it `n8n` → **Create**.
-3. Make sure the dropdown now shows your **n8n** project selected.
+2. Click **New Project** → name it `n8n-automation` → **Create**.
+3. Make sure the dropdown now shows your **n8n-automation** project selected.
 
 ### 2.3 — Set a budget alert (safety net)
 
@@ -130,7 +130,7 @@ So you're warned the instant anything tries to cost money.
    - **Machine configuration → Series:** `E2` → **Machine type:** `e2-micro`
      (0.25–2 vCPU, **1 GB memory**). This is the free one.
    - **Boot disk:** click **Change** → **Operating system:** Ubuntu →
-     **Version:** `Ubuntu 22.04 LTS` → **Boot disk type:** `Standard persistent
+     **Version:** `Ubuntu 22.04 LTS Minimal` → **Boot disk type:** `Standard persistent
      disk` → **Size:** `30` GB (the free limit) → **Select**.
    - **Firewall:** tick **both** ✅ **Allow HTTP traffic** and ✅ **Allow HTTPS
      traffic**.
@@ -209,7 +209,7 @@ Run each block one at a time. Wait for the prompt to come back before the next.
 sudo apt-get update && sudo apt-get upgrade -y
 ```
 
-If it asks any yes/no question, press Enter to accept the default.
+If it asks any yes/no question, press Enter to accept the default. If it lists services and asks which to restart, type the number for **none of the above**, then press Enter.
 
 ### 5.2 — Add swap memory (important — 1 GB RAM is tight)
 
@@ -384,6 +384,13 @@ Replace with your subdomain:
 
 ```bash
 dig +short n8n.yourdomain.com
+```
+
+If it says `dig: command not found`, install it, then run the check again. If the
+restart list comes up, choose **none of the above**.
+
+```bash
+sudo apt update && sudo apt install -y dnsutils
 ```
 
 It should print **your static IP** (from Part 2.5). If it prints nothing or a

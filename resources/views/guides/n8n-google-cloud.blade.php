@@ -148,8 +148,8 @@ Google Cloud server  (free e2-micro)
         <p>A "project" is just a folder for your stuff.</p>
         <ol class="steps">
           <li>Top-left, click the <strong>project dropdown</strong> (may say "My First Project").</li>
-          <li><strong>New Project</strong> → name it <code class="inl">n8n</code> → <strong>Create</strong>.</li>
-          <li>Make sure the dropdown now shows your <strong>n8n</strong> project selected.</li>
+          <li><strong>New Project</strong> → name it <code class="inl">n8n-automation</code> → <strong>Create</strong>.</li>
+          <li>Make sure the dropdown now shows your <strong>n8n-automation</strong> project selected.</li>
         </ol>
 
         <h3><span class="k">2.3</span> Set a budget alert (safety net)</h3>
@@ -169,7 +169,7 @@ Google Cloud server  (free e2-micro)
           <li><strong>Name:</strong> <code class="inl">n8n-server</code></li>
           <li><strong>Region:</strong> pick <strong>one</strong> of <code class="inl">us-west1</code>, <code class="inl">us-central1</code>, <code class="inl">us-east1</code> — only these qualify for the free e2-micro.</li>
           <li><strong>Series</strong> <code class="inl">E2</code> → <strong>Machine type</strong> <code class="inl">e2-micro</code> (1 GB memory). This is the free one.</li>
-          <li><strong>Boot disk → Change:</strong> Ubuntu → <code class="inl">Ubuntu 22.04 LTS</code> → <strong>Standard persistent disk</strong> → <strong>30 GB</strong> → Select.</li>
+          <li><strong>Boot disk → Change:</strong> Ubuntu → <code class="inl">Ubuntu 22.04 LTS Minimal</code> → <strong>Standard persistent disk</strong> → <strong>30 GB</strong> → Select.</li>
           <li><strong>Firewall:</strong> tick <strong>both</strong> ✅ Allow HTTP and ✅ Allow HTTPS.</li>
         </ul>
         <ol class="steps" start="3" style="counter-reset:s 2">
@@ -234,7 +234,7 @@ Google Cloud server  (free e2-micro)
         <h3><span class="k">5.1</span> Update the server</h3>
         <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
 <pre><code>sudo apt-get update &amp;&amp; sudo apt-get upgrade -y</code></pre></div>
-        <p>If it asks a yes/no question, press <kbd>Enter</kbd> to accept the default.</p>
+        <p>If it asks a yes/no question, press <kbd>Enter</kbd> to accept the default. If it lists services and asks which to restart, type the number for <strong>none of the above</strong>, then press <kbd>Enter</kbd>.</p>
 
         <h3><span class="k">5.2</span> Add swap memory <span style="color:var(--warn);font-size:.8rem;font-family:var(--font-mono)">· important</span></h3>
         <p>The free server has only 1 GB of RAM — n8n can run out of memory and crash. Swap prevents that.</p>
@@ -338,6 +338,9 @@ EOF</code></pre></div>
         <h3><span class="k">7.1</span> Check the domain points here</h3>
         <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
 <pre><code>dig +short n8n.yourdomain.com</code></pre></div>
+        <p>If it says <code class="inl">dig: command not found</code>, install it, then run the check again. If the restart list comes up, choose <strong>none of the above</strong>.</p>
+        <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
+<pre><code>sudo apt update &amp;&amp; sudo apt install -y dnsutils</code></pre></div>
         <div class="call warn"><div class="h">⚠ must match first</div><p>It should print <strong>your static IP</strong>. Nothing, or a different IP, means DNS hasn't finished — wait 10–15 min and try again. <strong>Don't start n8n until this matches</strong>, or Caddy can't get the certificate.</p></div>
 
         <h3><span class="k">7.2</span> Start everything</h3>

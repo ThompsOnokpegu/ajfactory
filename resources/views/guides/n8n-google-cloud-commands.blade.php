@@ -81,8 +81,8 @@
         <h3><span class="k">2.2</span> Create a project</h3>
         <ol class="steps">
           <li>Top-left, click the <strong>project dropdown</strong>.</li>
-          <li><strong>New Project</strong> → name it <code class="inl">n8n</code> → <strong>Create</strong>.</li>
-          <li>Make sure the dropdown shows your <strong>n8n</strong> project.</li>
+          <li><strong>New Project</strong> → name it <code class="inl">n8n-automation</code> → <strong>Create</strong>.</li>
+          <li>Make sure the dropdown shows your <strong>n8n-automation</strong> project.</li>
         </ol>
 
         <h3><span class="k">2.3</span> Set a budget alert</h3>
@@ -100,7 +100,7 @@
           <li><strong>Name:</strong> <code class="inl">n8n-server</code></li>
           <li><strong>Region:</strong> one of <code class="inl">us-west1</code>, <code class="inl">us-central1</code> or <code class="inl">us-east1</code></li>
           <li><strong>Series</strong> <code class="inl">E2</code> → <strong>Machine type</strong> <code class="inl">e2-micro</code></li>
-          <li><strong>Boot disk → Change:</strong> Ubuntu → <code class="inl">Ubuntu 22.04 LTS</code> → <strong>Standard persistent disk</strong> → <strong>30 GB</strong> → Select</li>
+          <li><strong>Boot disk → Change:</strong> Ubuntu → <code class="inl">Ubuntu 22.04 LTS Minimal</code> → <strong>Standard persistent disk</strong> → <strong>30 GB</strong> → Select</li>
           <li><strong>Firewall:</strong> tick both ✅ Allow HTTP and ✅ Allow HTTPS</li>
         </ul>
         <ol class="steps" start="3" style="counter-reset:s 2">
@@ -161,7 +161,7 @@
         <h3><span class="k">5.1</span> Update the server</h3>
         <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
 <pre><code>sudo apt-get update &amp;&amp; sudo apt-get upgrade -y</code></pre></div>
-        <p>If it asks a yes/no question, press <kbd>Enter</kbd>.</p>
+        <p>If it asks a yes/no question, press <kbd>Enter</kbd>. If it lists services and asks which to restart, type the number for <strong>none of the above</strong>, then press <kbd>Enter</kbd>.</p>
 
         <h3><span class="k">5.2</span> Add swap memory</h3>
         <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
@@ -273,6 +273,9 @@ EOF</code></pre></div>
         <p>Use your own subdomain:</p>
         <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
 <pre><code>dig +short n8n.yourdomain.com</code></pre></div>
+        <p>If it says <code class="inl">dig: command not found</code>, install it, then run the check again. If the restart list comes up, choose <strong>none of the above</strong>.</p>
+        <div class="console cmd"><div class="chead"><span class="tag"><i></i> terminal</span><button class="copybtn">Copy</button></div>
+<pre><code>sudo apt update &amp;&amp; sudo apt install -y dnsutils</code></pre></div>
         <div class="call warn"><div class="h">⚠ must match first</div><p>It should print <strong>your static IP</strong>. If it doesn't, wait 10-15 minutes and try again. <strong>Don't start n8n until it matches</strong>, or Caddy can't get the certificate.</p></div>
 
         <h3><span class="k">7.2</span> Start everything</h3>

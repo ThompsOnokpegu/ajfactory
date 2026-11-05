@@ -42,8 +42,8 @@ Google renames menus often. If a button has moved, look for the same word nearby
 ### 2.2: Create a project
 
 1. Top-left, click the **project dropdown**.
-2. **New Project** → name it `n8n` → **Create**.
-3. Make sure the dropdown shows your **n8n** project.
+2. **New Project** → name it `n8n-automation` → **Create**.
+3. Make sure the dropdown shows your **n8n-automation** project.
 
 ### 2.3: Set a budget alert
 
@@ -59,7 +59,7 @@ Google renames menus often. If a button has moved, look for the same word nearby
    - **Name:** `n8n-server`
    - **Region:** one of `us-west1`, `us-central1` or `us-east1`
    - **Series** `E2` → **Machine type** `e2-micro`
-   - **Boot disk → Change:** Ubuntu → `Ubuntu 22.04 LTS` → **Standard persistent
+   - **Boot disk → Change:** Ubuntu → `Ubuntu 22.04 LTS Minimal` → **Standard persistent
      disk** → **30 GB** → Select
    - **Firewall:** tick both ✅ Allow HTTP and ✅ Allow HTTPS
 3. Click **Create** and wait for the **External IP** to appear.
@@ -120,7 +120,7 @@ Run each block on its own. Wait for the prompt to come back before the next.
 sudo apt-get update && sudo apt-get upgrade -y
 ```
 
-If it asks a yes/no question, press Enter.
+If it asks a yes/no question, press Enter. If it lists services and asks which to restart, type the number for **none of the above**, then press Enter.
 
 ### 5.2: Add swap memory
 
@@ -268,6 +268,13 @@ Use your own subdomain:
 
 ```bash
 dig +short n8n.yourdomain.com
+```
+
+If it says `dig: command not found`, install it, then run the check again. If the
+restart list comes up, choose **none of the above**.
+
+```bash
+sudo apt update && sudo apt install -y dnsutils
 ```
 
 > ⚠️ **Must match first.** It should print **your static IP**. If it doesn't, wait 10-15
